@@ -15,8 +15,6 @@
         .hidden { display: none !important; }
         .bg-pet-sidebar { background-color: #1e1b4b; } 
         .bg-pet-active { background-color: #4338ca !important; border-left: 4px solid #818cf8; }
-        
-        /* Cores dinâmicas para clientes */
         .client-card-0 { border-left: 4px solid #ef4444; }
         .client-card-1 { border-left: 4px solid #3b82f6; }
         .client-card-2 { border-left: 4px solid #10b981; }
@@ -53,15 +51,15 @@
 
                 <nav class="space-y-3">
                     <button onclick="switchTab('clientes')" id="btn-clientes" class="flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium">
-                        <i data-lucide="users" class="w-6 h-6"></i> 1. Clientes
+                        <i data-lucide="users" class="w-6 h-6"></i> Cadastro de Cliente
                     </button>
                     
                     <button onclick="switchTab('agenda')" id="btn-agenda" class="flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium">
-                        <i data-lucide="calendar" class="w-6 h-6"></i> 2. Agenda
+                        <i data-lucide="calendar" class="w-6 h-6"></i> Agenda de Serviço
                     </button>
 
                     <button onclick="switchTab('dashboard')" id="btn-dashboard" class="flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium">
-                        <i data-lucide="layout-grid" class="w-6 h-6"></i> 3. Dashboard
+                        <i data-lucide="pie-chart" class="w-6 h-6"></i> Dashboard & Finanças
                     </button>
                 </nav>
             </div>
@@ -71,7 +69,7 @@
             <header class="bg-white border-b border-gray-200 px-8 py-5 flex justify-between items-center sticky top-0 z-10">
                 <div class="flex items-center gap-4">
                     <div class="w-2 h-8 bg-indigo-600 rounded-full"></div> 
-                    <h2 id="page-title" class="text-2xl font-black text-gray-800 uppercase tracking-tight">Cadastro de Clientes</h2>
+                    <h2 id="page-title" class="text-2xl font-black text-gray-800 uppercase tracking-tight">Cadastro de Cliente</h2>
                 </div>
                 <span class="text-sm font-bold bg-indigo-50 text-indigo-700 px-4 py-2 rounded-full" id="current-date"></span>
             </header>
@@ -105,7 +103,7 @@
                         </h3>
                         <form id="appointment-form" onsubmit="saveAppointment(event)" class="space-y-4">
                             <div class="relative">
-                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Cliente (Digite para buscar)</label>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Cliente</label>
                                 <input type="text" id="clientName" oninput="autocompleteClient(this.value)" autocomplete="off" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <div id="autocomplete-list" class="absolute z-20 w-full bg-white border border-gray-200 rounded-xl mt-1 shadow-xl hidden"></div>
                             </div>
@@ -119,7 +117,8 @@
                                     <select id="serviceType" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none">
                                         <option value="Banho">Banho</option>
                                         <option value="Tosa">Tosa</option>
-                                        <option value="Completo">Banho e Tosa</option>
+                                        <option value="Banho e Tosa">Banho e Tosa</option>
+                                        <option value="Consulta">Consulta</option>
                                     </select>
                                 </div>
                                 <div>
@@ -148,17 +147,24 @@
 
                 <div id="tab-dashboard" class="hidden space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <p class="text-xs font-bold text-gray-400 uppercase">Ganhos (Concluídos)</p>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-emerald-500">
+                            <p class="text-xs font-bold text-gray-400 uppercase">Ganhos do Dia</p>
                             <h3 class="text-3xl font-black text-emerald-600" id="kpi-ganhos">R$ 0,00</h3>
                         </div>
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <p class="text-xs font-bold text-gray-400 uppercase">Perdas (Cancelados)</p>
-                            <h3 class="text-3xl font-black text-rose-600" id="kpi-perdas">R$ 0,00</h3>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-blue-500">
+                            <p class="text-xs font-bold text-gray-400 uppercase">Quantidade de Pet Concluído</p>
+                            <h3 class="text-3xl font-black text-blue-600" id="kpi-concluidos">0</h3>
                         </div>
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <p class="text-xs font-bold text-gray-400 uppercase">Saldo Geral</p>
-                            <h3 class="text-3xl font-black text-indigo-600" id="kpi-saldo">R$ 0,00</h3>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-rose-500">
+                            <p class="text-xs font-bold text-gray-400 uppercase">Quantidade de Pet Cancelado</p>
+                            <h3 class="text-3xl font-black text-rose-600" id="kpi-cancelados">0</h3>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="text-xl font-bold mb-6 text-gray-800">Desempenho Financeiro por Serviço</h3>
+                        <div class="h-[400px]">
+                            <canvas id="financeChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -171,6 +177,7 @@
         const MASTER_LICENSE_KEY = "1234";
         let appointments = JSON.parse(localStorage.getItem('pet_appointments')) || [];
         let clients = JSON.parse(localStorage.getItem('pet_clients')) || [];
+        let financeChart = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
@@ -195,7 +202,7 @@
         function liberarApp() {
             document.getElementById('activation-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
-            switchTab('clientes'); // Começa na aba de clientes conforme pedido
+            switchTab('clientes');
             renderAppointments();
             renderClients();
         }
@@ -209,12 +216,13 @@
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             document.getElementById(`btn-${tab}`).classList.add('bg-pet-active');
             
-            const titles = { 'agenda': 'Agenda de Serviços', 'clientes': 'Cadastro de Clientes', 'dashboard': 'Dashboard & Finanças' };
+            const titles = { 'agenda': 'Agenda de Serviço', 'clientes': 'Cadastro de Cliente', 'dashboard': 'Dashboard & Finanças' };
             document.getElementById('page-title').innerText = titles[tab];
+            
             if(tab === 'dashboard') renderDashboard();
         }
 
-        // --- CLIENTES ---
+        // CLIENTES
         function saveClient(e) {
             e.preventDefault();
             const client = {
@@ -253,11 +261,10 @@
             renderClients();
         }
 
-        // --- AUTOCOMPLETE ---
+        // AUTOCOMPLETE
         function autocompleteClient(val) {
             const list = document.getElementById('autocomplete-list');
             if (!val) { list.classList.add('hidden'); return; }
-            
             const matches = clients.filter(c => c.name.toLowerCase().includes(val.toLowerCase()));
             if (matches.length > 0) {
                 list.innerHTML = matches.map(c => `
@@ -267,9 +274,7 @@
                     </div>
                 `).join('');
                 list.classList.remove('hidden');
-            } else {
-                list.classList.add('hidden');
-            }
+            } else { list.classList.add('hidden'); }
         }
 
         function selectClient(name, pet) {
@@ -278,18 +283,13 @@
             document.getElementById('autocomplete-list').classList.add('hidden');
         }
 
-        // --- AGENDAMENTOS ---
+        // AGENDAMENTOS
         function saveAppointment(e) {
             e.preventDefault();
             const date = document.getElementById('serviceDate').value;
             const time = document.getElementById('serviceTime').value;
-
-            // Bloqueio de horário duplicado
             const conflict = appointments.find(a => a.serviceDate === date && a.serviceTime === time && a.status !== 'cancelado');
-            if (conflict) {
-                alert("⚠️ Erro: Já existe um agendamento para este mesmo dia e horário!");
-                return;
-            }
+            if (conflict) { alert("⚠️ Horário já ocupado!"); return; }
 
             const newApp = {
                 id: Date.now(),
@@ -301,7 +301,6 @@
                 serviceTime: time,
                 status: 'pendente'
             };
-            
             appointments.push(newApp);
             localStorage.setItem('pet_appointments', JSON.stringify(appointments));
             renderAppointments();
@@ -311,14 +310,10 @@
         function renderAppointments() {
             const container = document.getElementById('appointments-container');
             container.innerHTML = '';
-            
-            // Ordenar por horário
             const sorted = [...appointments].sort((a, b) => (a.serviceDate + a.serviceTime).localeCompare(b.serviceDate + b.serviceTime));
-
             sorted.forEach(app => {
                 const isConcluido = app.status === 'concluido';
                 const isCancelado = app.status === 'cancelado';
-
                 container.innerHTML += `
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center transition-all ${isConcluido || isCancelado ? 'opacity-60' : 'hover:shadow-md border-l-4 border-l-indigo-500'}">
                         <div class="flex items-center gap-4">
@@ -335,16 +330,8 @@
                             </div>
                         </div>
                         <div class="flex gap-3">
-                            <button onclick="updateStatus(${app.id}, 'concluido')" 
-                                class="w-10 h-10 rounded-full flex items-center justify-center transition-all ${isConcluido ? 'bg-emerald-600 text-white shadow-lg' : 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200'}">
-                                <i data-lucide="check" class="w-5 h-5"></i>
-                            </button>
-                            
-                            <button onclick="updateStatus(${app.id}, 'cancelado')" 
-                                class="w-10 h-10 rounded-full flex items-center justify-center transition-all ${isCancelado ? 'bg-rose-600 text-white shadow-lg' : 'bg-rose-100 text-rose-600 hover:bg-rose-200'}">
-                                <i data-lucide="x" class="w-5 h-5"></i>
-                            </button>
-
+                            <button onclick="updateStatus(${app.id}, 'concluido')" class="w-10 h-10 rounded-full flex items-center justify-center ${isConcluido ? 'bg-emerald-600 text-white' : 'bg-emerald-100 text-emerald-600'}"><i data-lucide="check" class="w-5 h-5"></i></button>
+                            <button onclick="updateStatus(${app.id}, 'cancelado')" class="w-10 h-10 rounded-full flex items-center justify-center ${isCancelado ? 'bg-rose-600 text-white' : 'bg-rose-100 text-rose-600'}"><i data-lucide="x" class="w-5 h-5"></i></button>
                             <button onclick="deleteApp(${app.id})" class="p-2 text-gray-300 hover:text-gray-600"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
                         </div>
                     </div>
@@ -361,22 +348,66 @@
         }
 
         function deleteApp(id) {
-            if(confirm("Excluir este agendamento permanentemente?")) {
+            if(confirm("Excluir?")) {
                 appointments = appointments.filter(a => a.id !== id);
                 localStorage.setItem('pet_appointments', JSON.stringify(appointments));
                 renderAppointments();
             }
         }
 
+        // DASHBOARD & FINANCEIRO
         function renderDashboard() {
-            let ganhos = 0, perdas = 0;
+            const hoje = new Date().toISOString().split('T')[0];
+            let ganhosDia = 0, concluidoQtde = 0, canceladoQtde = 0;
+
+            const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+            const dadosGrafico = {
+                "Banho": new Array(12).fill(0),
+                "Tosa": new Array(12).fill(0),
+                "Banho e Tosa": new Array(12).fill(0),
+                "Consulta": new Array(12).fill(0)
+            };
+
             appointments.forEach(app => {
-                if(app.status === 'concluido') ganhos += app.serviceValue;
-                else if(app.status === 'cancelado') perdas += app.serviceValue;
+                const mesApp = new Date(app.serviceDate).getMonth();
+                if(app.status === 'concluido') {
+                    if(app.serviceDate === hoje) {
+                        ganhosDia += app.serviceValue;
+                        concluidoQtde++;
+                    }
+                    if(dadosGrafico[app.serviceType]) {
+                        dadosGrafico[app.serviceType][mesApp] += app.serviceValue;
+                    }
+                } else if (app.status === 'cancelado' && app.serviceDate === hoje) {
+                    canceladoQtde++;
+                }
             });
-            document.getElementById('kpi-ganhos').innerText = `R$ ${ganhos.toFixed(2)}`;
-            document.getElementById('kpi-perdas').innerText = `R$ ${perdas.toFixed(2)}`;
-            document.getElementById('kpi-saldo').innerText = `R$ ${(ganhos - perdas).toFixed(2)}`;
+
+            document.getElementById('kpi-ganhos').innerText = `R$ ${ganhosDia.toFixed(2)}`;
+            document.getElementById('kpi-concluidos').innerText = concluidoQtde;
+            document.getElementById('kpi-cancelados').innerText = canceladoQtde;
+
+            const ctx = document.getElementById('financeChart').getContext('2d');
+            if(financeChart) financeChart.destroy();
+
+            financeChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: meses,
+                    datasets: [
+                        { label: 'Banho', data: dadosGrafico["Banho"], backgroundColor: '#3b82f6' },
+                        { label: 'Tosa', data: dadosGrafico["Tosa"], backgroundColor: '#8b5cf6' },
+                        { label: 'Banho e Tosa', data: dadosGrafico["Banho e Tosa"], backgroundColor: '#10b981' },
+                        { label: 'Consulta', data: dadosGrafico["Consulta"], backgroundColor: '#f59e0b' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } },
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => 'R$ ' + v } } }
+                }
+            });
         }
     </script>
 </body>
