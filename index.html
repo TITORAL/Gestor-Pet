@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PetManager Pro - Agenda & Gestão</title>
+    <title>Agenda Pet - Gestão Profissional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -13,7 +13,6 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
         .hidden { display: none !important; }
-        /* Cor exata da imagem: indigo-950 aproximado */
         .bg-pet-sidebar { background-color: #312e81; } 
         .bg-pet-active { background-color: #4338ca; }
     </style>
@@ -25,11 +24,11 @@
             <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto">
                 <i data-lucide="shield-check" class="w-8 h-8"></i>
             </div>
-            <h2 class="text-2xl font-bold text-gray-900">Ativação PetManager</h2>
+            <h2 class="text-2xl font-bold text-gray-900">Ativação Agenda Pet</h2>
             <input type="text" id="license-key-input" placeholder="DIGITE 1234" class="w-full px-4 py-3 border rounded-xl text-center font-mono text-lg uppercase">
             <p id="activation-error" class="text-sm text-rose-600 font-medium hidden">Chave inválida!</p>
             <button onclick="validateLicenseKey()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-lg">
-                Ativar Agenda Virtual
+                Ativar Sistema
             </button>
         </div>
     </div>
@@ -42,7 +41,7 @@
                     <div class="bg-indigo-400/20 p-2 rounded-xl">
                         <i data-lucide="dog" class="w-8 h-8 text-white"></i>
                     </div>
-                    <h1 class="text-2xl font-bold tracking-tight">PetManager</h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Agenda Pet</h1>
                 </div>
 
                 <nav class="space-y-3">
@@ -50,7 +49,7 @@
                         <i data-lucide="calendar" class="w-6 h-6"></i> Agenda de Serviços
                     </button>
                     
-                    <button class="flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium">
+                    <button onclick="switchTab('clientes')" id="btn-clientes" class="flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium">
                         <i data-lucide="users" class="w-6 h-6"></i> Cadastro de Cliente
                     </button>
 
@@ -65,7 +64,8 @@
             
             <header class="bg-white border-b border-gray-200 px-8 py-5 flex justify-between items-center sticky top-0 z-10">
                 <div class="flex items-center gap-4">
-                    <div class="w-2 h-8 bg-blue-600 rounded-full"></div> <h2 id="page-title" class="text-2xl font-black text-gray-800 uppercase tracking-tight">Agenda Pet</h2>
+                    <div class="w-2 h-8 bg-blue-600 rounded-full"></div> 
+                    <h2 id="page-title" class="text-2xl font-black text-gray-800 uppercase tracking-tight">Agenda de Serviços</h2>
                 </div>
                 <span class="text-sm font-bold bg-indigo-50 text-indigo-700 px-4 py-2 rounded-full" id="current-date"></span>
             </header>
@@ -120,6 +120,29 @@
                     </div>
                 </div>
 
+                <div id="tab-clientes" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
+                        <h3 class="text-lg font-bold mb-5 flex items-center gap-2 text-indigo-950">
+                            <i data-lucide="user-plus" class="w-5 h-5 text-blue-600"></i> Novo Cliente
+                        </h3>
+                        <form id="client-form" onsubmit="saveClient(event)" class="space-y-4">
+                            <input type="text" id="regClientName" placeholder="Nome do Cliente" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                            <input type="tel" id="regClientPhone" placeholder="Telefone" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                            <input type="text" id="regClientAddress" placeholder="Endereço" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                            <input type="text" id="regPetName" placeholder="Nome do Pet" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-md">
+                                Salvar Cliente
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="lg:col-span-2 space-y-4">
+                        <h3 class="text-xl font-bold text-gray-800">Clientes Cadastrados</h3>
+                        <div id="clients-list-container" class="space-y-2">
+                            </div>
+                    </div>
+                </div>
+
                 <div id="tab-dashboard" class="hidden space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
@@ -140,6 +163,7 @@
                         <div class="h-80"><canvas id="financeChart"></canvas></div>
                     </div>
                 </div>
+
             </main>
         </div>
     </div>
@@ -147,7 +171,7 @@
     <script>
         const MASTER_LICENSE_KEY = "1234";
         let appointments = JSON.parse(localStorage.getItem('pet_appointments')) || [];
-        let financeChart = null;
+        let clients = JSON.parse(localStorage.getItem('pet_clients')) || [];
 
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
@@ -174,25 +198,82 @@
             document.getElementById('activation-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             renderAppointments();
+            renderClients();
         }
 
         function switchTab(tab) {
-            const isAgenda = tab === 'agenda';
-            document.getElementById('tab-agenda').classList.toggle('hidden', !isAgenda);
-            document.getElementById('tab-dashboard').classList.toggle('hidden', isAgenda);
+            const tabs = ['agenda', 'clientes', 'dashboard'];
+            tabs.forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                const btn = document.getElementById(`btn-${t}`);
+                btn.className = "flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium";
+            });
+
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`btn-${tab}`).className = "flex items-center gap-4 w-full px-5 py-4 rounded-xl bg-pet-active text-white font-medium shadow-lg";
             
-            document.getElementById('btn-agenda').className = isAgenda ? 
-                "flex items-center gap-4 w-full px-5 py-4 rounded-xl bg-pet-active text-white font-medium shadow-lg" : 
-                "flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium";
+            const titles = {
+                'agenda': 'Agenda de Serviços',
+                'clientes': 'Cadastro de Clientes',
+                'dashboard': 'Dashboard Financeiro'
+            };
+            document.getElementById('page-title').innerText = titles[tab];
             
-            document.getElementById('btn-dashboard').className = !isAgenda ? 
-                "flex items-center gap-4 w-full px-5 py-4 rounded-xl bg-pet-active text-white font-medium shadow-lg" : 
-                "flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium";
-            
-            document.getElementById('page-title').innerText = isAgenda ? "Agenda Pet" : "Dashboard Financeiro";
-            if(!isAgenda) renderDashboard();
+            if(tab === 'dashboard') renderDashboard();
         }
 
+        // --- LÓGICA DE CLIENTES ---
+        function saveClient(e) {
+            e.preventDefault();
+            const client = {
+                id: Date.now(),
+                name: document.getElementById('regClientName').value,
+                phone: document.getElementById('regClientPhone').value,
+                address: document.getElementById('regClientAddress').value,
+                pet: document.getElementById('regPetName').value
+            };
+            clients.push(client);
+            localStorage.setItem('pet_clients', JSON.stringify(clients));
+            renderClients();
+            e.target.reset();
+        }
+
+        function renderClients() {
+            const container = document.getElementById('clients-list-container');
+            container.innerHTML = '';
+            clients.forEach(c => {
+                container.innerHTML += `
+                    <div class="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <button onclick="toggleClientDetails(${c.id})" class="w-full px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition">
+                            <span class="font-bold text-gray-700">${c.name}</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+                        </button>
+                        <div id="details-${c.id}" class="hidden px-6 pb-4 pt-2 bg-indigo-50/30 border-t border-indigo-50 space-y-1">
+                            <p class="text-sm"><strong>Telefone:</strong> ${c.phone}</p>
+                            <p class="text-sm"><strong>Endereço:</strong> ${c.address}</p>
+                            <p class="text-sm"><strong>Pet:</strong> ${c.pet}</p>
+                            <div class="pt-2">
+                                <button onclick="deleteClient(${c.id})" class="text-xs text-rose-600 font-bold uppercase">Excluir Cadastro</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        function toggleClientDetails(id) {
+            const el = document.getElementById(`details-${id}`);
+            el.classList.toggle('hidden');
+        }
+
+        function deleteClient(id) {
+            clients = clients.filter(c => c.id !== id);
+            localStorage.setItem('pet_clients', JSON.stringify(clients));
+            renderClients();
+        }
+
+        // --- LÓGICA DE AGENDAMENTOS ---
         function saveAppointment(e) {
             e.preventDefault();
             const newApp = {
