@@ -3,139 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda Pet - Mobile</title>
+    <title>Agenda Pet - Gestão</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
         .hidden { display: none !important; }
-        
         .bg-pet-sidebar { background-color: #312e81; } 
         .bg-pet-active { background-color: #4338ca; }
-        
         .status-concluido { background-color: #10b981 !important; color: white !important; border-color: #10b981 !important; }
         .status-cancelado { background-color: #ef4444 !important; color: white !important; border-color: #ef4444 !important; }
-
-        /* Ajustes Mobile */
+        
         @media (max-width: 768px) {
-            .sidebar-desktop { display: none; }
-            .mobile-nav { display: flex; }
-            .main-content { padding-bottom: 100px; } /* Espaço para a barra inferior */
-            .header-desktop { padding: 1rem; }
-            .grid-mobile { grid-template-cols: 1fr; }
-            .card-servico { flex-direction: column; align-items: flex-start; gap: 12px; }
-            .actions-container { width: 100%; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 10px; }
+            .sidebar { width: 70px; padding: 10px; }
+            .sidebar span, .sidebar h1 { display: none; }
+            .main-content { padding: 15px; }
+            .card-servico { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .actions-container { width: 100%; justify-content: flex-end; border-top: 1px solid #f1f5f9; padding-top: 12px; }
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans">
+<body class="bg-gray-50 text-gray-800 font-sans">
 
-    <div id="main-app" class="flex flex-col md:flex-row h-screen overflow-hidden">
-        
-        <aside class="sidebar-desktop w-72 bg-pet-sidebar text-white flex flex-col p-6">
-            <div class="flex items-center gap-3 mb-10">
-                <i data-lucide="dog" class="w-8 h-8 text-indigo-300"></i>
-                <h1 class="text-xl font-black tracking-tight">Agenda Pet</h1>
-            </div>
-            <nav class="space-y-2">
-                <button onclick="switchTab('agenda')" id="btn-agenda-dt" class="nav-item flex items-center gap-4 w-full px-5 py-4 rounded-xl bg-pet-active transition">
-                    <i data-lucide="calendar" class="w-5 h-5"></i> <span class="font-bold">Agendamento</span>
-                </button>
-                <button onclick="switchTab('clientes')" id="btn-clientes-dt" class="nav-item flex items-center gap-4 w-full px-5 py-4 rounded-xl hover:bg-indigo-800 transition">
-                    <i data-lucide="users" class="w-5 h-5"></i> <span class="font-bold">Clientes</span>
-                </button>
-                <button onclick="switchTab('dashboard')" id="btn-dashboard-dt" class="nav-item flex items-center gap-4 w-full px-5 py-4 rounded-xl hover:bg-indigo-800 transition">
-                    <i data-lucide="pie-chart" class="w-5 h-5"></i> <span class="font-bold">Financeiro</span>
-                </button>
-            </nav>
-        </aside>
-
-        <nav class="mobile-nav hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 flex justify-around p-3 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
-            <button onclick="switchTab('agenda')" id="btn-agenda-mb" class="flex flex-col items-center gap-1 text-indigo-900">
-                <i data-lucide="calendar" class="w-6 h-6"></i><span class="text-[10px] font-bold uppercase">Agenda</span>
-            </button>
-            <button onclick="switchTab('clientes')" id="btn-clientes-mb" class="flex flex-col items-center gap-1 text-slate-400">
-                <i data-lucide="users" class="w-6 h-6"></i><span class="text-[10px] font-bold uppercase">Clientes</span>
-            </button>
-            <button onclick="switchTab('dashboard')" id="btn-dashboard-mb" class="flex flex-col items-center gap-1 text-slate-400">
-                <i data-lucide="pie-chart" class="w-6 h-6"></i><span class="text-[10px] font-bold uppercase">Finanças</span>
-            </button>
-        </nav>
-
-        <div class="flex-1 flex flex-col overflow-y-auto main-content">
-            <header class="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-40">
-                <div>
-                    <h2 id="page-title" class="text-lg font-black text-slate-800 uppercase tracking-tighter">Agendamento</h2>
-                    <p id="current-date" class="text-[10px] font-bold text-indigo-500 uppercase"></p>
+    <div id="main-app" class="flex h-screen overflow-hidden">
+        <div class="w-20 md:w-72 bg-pet-sidebar text-white flex flex-col sidebar transition-all">
+            <div class="p-4 md:p-6">
+                <div class="flex items-center gap-3 mb-10">
+                    <i data-lucide="dog" class="w-8 h-8"></i>
+                    <h1 class="text-xl font-bold tracking-tight">Agenda Pet</h1>
                 </div>
-                <div class="md:hidden"><i data-lucide="dog" class="w-6 h-6 text-indigo-600"></i></div>
+                <nav class="space-y-3">
+                    <button onclick="switchTab('agenda')" id="btn-agenda" class="flex items-center gap-4 w-full px-5 py-4 rounded-xl bg-pet-active text-white font-medium">
+                        <i data-lucide="calendar" class="w-6 h-6"></i> <span>Agendamento</span>
+                    </button>
+                    <button onclick="switchTab('clientes')" id="btn-clientes" class="flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium">
+                        <i data-lucide="users" class="w-6 h-6"></i> <span>Cadastro de Cliente</span>
+                    </button>
+                    <button onclick="switchTab('dashboard')" id="btn-dashboard" class="flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium">
+                        <i data-lucide="bar-chart-3" class="w-6 h-6"></i> <span>Dashboard & Finanças</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <div class="flex-1 flex flex-col overflow-y-auto">
+            <header class="bg-white border-b px-4 md:px-8 py-5 flex justify-between items-center sticky top-0 z-10">
+                <h2 id="page-title" class="text-xl font-black text-gray-800 uppercase tracking-tighter">Agendamento</h2>
+                <span id="current-date" class="text-xs font-bold bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full"></span>
             </header>
 
-            <main class="p-4 md:p-8 max-w-6xl w-full mx-auto space-y-6">
+            <main class="p-4 md:p-8 max-w-7xl w-full mx-auto space-y-6">
 
-                <div id="tab-agenda" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 h-fit">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 id="form-title" class="font-black text-slate-800 uppercase text-sm">Novo Agendamento</h3>
-                            <button id="cancel-edit" onclick="resetForm()" class="hidden text-[10px] font-bold text-rose-500 uppercase">Sair da Edição</button>
+                <div id="tab-agenda" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 h-fit">
+                        <div class="flex justify-between items-center mb-5">
+                            <h3 id="form-title" class="text-lg font-black text-indigo-950 uppercase tracking-tight">Novo Agendamento</h3>
+                            <button id="cancel-edit" onclick="resetForm()" class="hidden text-xs font-bold text-rose-500 underline">Cancelar Edição</button>
                         </div>
-                        <form id="appointment-form" onsubmit="handleFormSubmit(event)" class="space-y-3">
+                        
+                        <form id="appointment-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
                             <input type="hidden" id="edit-id">
-                            <input type="text" id="clientNameSearch" placeholder="Nome do Cliente" oninput="autoFillPet(this.value)" required class="w-full px-4 py-3 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-indigo-400">
-                            <input type="text" id="petName" placeholder="Nome do Pet" required class="w-full px-4 py-3 border rounded-2xl outline-none focus:ring-2 focus:ring-indigo-400">
                             
-                            <div class="p-4 bg-indigo-50 rounded-2xl">
-                                <label class="block text-[10px] font-black text-indigo-900 uppercase mb-2">Serviço</label>
-                                <select id="serviceType" class="w-full px-3 py-2 border rounded-xl mb-2 outline-none">
-                                    <option value="Banho">Banho</option>
-                                    <option value="Tosa">Tosa</option>
-                                    <option value="Banho e Tosa">Banho e Tosa</option>
-                                </select>
-                                <input type="number" id="serviceValue" placeholder="Valor R$" step="0.01" required class="w-full px-3 py-2 border rounded-xl outline-none">
+                            <div>
+                                <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Cliente</label>
+                                <input type="text" id="clientNameSearch" placeholder="Nome do Tutor" oninput="autoFillPet(this.value)" required class="w-full px-4 py-3 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50">
                             </div>
 
-                            <div class="grid grid-cols-2 gap-3">
-                                <input type="date" id="serviceDate" required class="w-full px-3 py-3 border rounded-2xl text-sm outline-none">
-                                <input type="time" id="serviceTime" required class="w-full px-3 py-3 border rounded-2xl text-sm outline-none">
+                            <div>
+                                <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Nome do Pet</label>
+                                <input type="text" id="petName" placeholder="Nome do Animal" required class="w-full px-4 py-3 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
-                            <button type="submit" id="submit-btn" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition-transform">CONFIRMAR</button>
+
+                            <div class="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+                                <label class="block text-xs font-black uppercase text-indigo-900 mb-3 text-center">Serviço</label>
+                                <div class="grid grid-cols-1 gap-3">
+                                    <select id="serviceType" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="Banho">Banho</option>
+                                        <option value="Tosa">Tosa</option>
+                                        <option value="Banho e Tosa">Banho e Tosa</option>
+                                        <option value="Consulta">Consulta</option>
+                                    </select>
+                                    <input type="number" id="serviceValue" placeholder="Valor R$" step="0.01" required class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Data</label>
+                                    <input type="date" id="serviceDate" required class="w-full px-4 py-3 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Hora</label>
+                                    <input type="time" id="serviceTime" required class="w-full px-4 py-3 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
+
+                            <button type="submit" id="submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-lg transition-all">
+                                CONFIRMAR AGENDAMENTO
+                            </button>
                         </form>
                     </div>
 
-                    <div class="lg:col-span-2">
+                    <div class="lg:col-span-2 space-y-4">
+                        <h3 class="text-xl font-black text-gray-800 uppercase tracking-tighter">Serviços do Dia</h3>
                         <div id="appointments-container" class="space-y-3"></div>
                     </div>
                 </div>
 
                 <div id="tab-clientes" class="hidden">
-                    <div class="bg-white p-6 rounded-3xl border border-slate-200 max-w-lg mx-auto">
-                        <h3 class="font-black text-slate-800 uppercase mb-4 text-center">Cadastrar Cliente</h3>
+                    <div class="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 max-w-lg mx-auto md:mx-0">
+                        <h3 class="text-lg font-black text-indigo-950 mb-6 uppercase">Cadastro de Cliente</h3>
                         <form onsubmit="saveClient(event)" class="space-y-4">
-                            <input type="text" id="regClientName" placeholder="Nome do Tutor" required class="w-full px-4 py-3 border rounded-2xl outline-none">
-                            <input type="text" id="regAddress" placeholder="Endereço" class="w-full px-4 py-3 border rounded-2xl outline-none">
-                            <input type="tel" id="regPhone" placeholder="WhatsApp" required class="w-full px-4 py-3 border rounded-2xl outline-none">
-                            <input type="text" id="regPet" placeholder="Nome do Pet" required class="w-full px-4 py-3 border rounded-2xl outline-none">
-                            <button class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl">SALVAR NOVO CLIENTE</button>
+                            <input type="text" id="regClientName" placeholder="Nome do Cliente" required class="w-full px-4 py-3 border border-gray-200 rounded-2xl outline-none">
+                            <input type="text" id="regAddress" placeholder="Endereço" required class="w-full px-4 py-3 border border-gray-200 rounded-2xl outline-none">
+                            <input type="tel" id="regPhone" placeholder="Telefone / WhatsApp" required class="w-full px-4 py-3 border border-gray-200 rounded-2xl outline-none">
+                            <input type="text" id="regPet" placeholder="Nome do Pet" required class="w-full px-4 py-3 border border-gray-200 rounded-2xl outline-none">
+                            <button class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-md">SALVAR CLIENTE</button>
                         </form>
                     </div>
                 </div>
 
-                <div id="tab-dashboard" class="hidden space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-white p-5 rounded-3xl shadow-sm border-l-4 border-emerald-500">
-                            <p class="text-[10px] font-black text-slate-400 uppercase">Ganhos</p>
-                            <h3 class="text-2xl font-black text-emerald-600" id="kpi-ganhos">R$ 0,00</h3>
+                <div id="tab-dashboard" class="hidden space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border-b-4 border-emerald-500">
+                            <p class="text-[10px] font-black text-gray-400 uppercase">Ganhos (Concluídos)</p>
+                            <h3 class="text-3xl font-black text-emerald-600" id="kpi-ganhos">R$ 0,00</h3>
                         </div>
-                        <div class="bg-white p-5 rounded-3xl shadow-sm border-l-4 border-rose-500">
-                            <p class="text-[10px] font-black text-slate-400 uppercase">Perdas</p>
-                            <h3 class="text-2xl font-black text-rose-600" id="kpi-perdas">R$ 0,00</h3>
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border-b-4 border-rose-500">
+                            <p class="text-[10px] font-black text-gray-400 uppercase">Perdas (Cancelados)</p>
+                            <h3 class="text-3xl font-black text-rose-600" id="kpi-perdas">R$ 0,00</h3>
                         </div>
-                        <div class="bg-white p-5 rounded-3xl shadow-sm border-l-4 border-indigo-500">
-                            <p class="text-[10px] font-black text-slate-400 uppercase">Saldo</p>
-                            <h3 class="text-2xl font-black text-indigo-600" id="kpi-saldo">R$ 0,00</h3>
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border-b-4 border-indigo-500">
+                            <p class="text-[10px] font-black text-gray-400 uppercase">Saldo Total</p>
+                            <h3 class="text-3xl font-black text-indigo-600" id="kpi-saldo">R$ 0,00</h3>
                         </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl border border-gray-100 text-center text-gray-400">
+                        <i data-lucide="info" class="mx-auto mb-2 opacity-20"></i>
+                        Os valores são calculados com base nos serviços marcados como concluídos ou cancelados.
                     </div>
                 </div>
 
@@ -148,47 +155,43 @@
         let clients = JSON.parse(localStorage.getItem('pet_clients')) || [];
 
         function switchTab(tab) {
-            const tabs = ['agenda', 'clientes', 'dashboard'];
-            tabs.forEach(t => {
+            ['agenda', 'clientes', 'dashboard'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
-                // Desktop
-                document.getElementById(`btn-${t}-dt`).classList.remove('bg-pet-active');
-                // Mobile
-                const mbBtn = document.getElementById(`btn-${t}-mb`);
-                mbBtn.classList.replace('text-indigo-900', 'text-slate-400');
+                document.getElementById(`btn-${t}`).classList.remove('bg-pet-active');
             });
-
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            document.getElementById(`btn-${tab}-dt`).classList.add('bg-pet-active');
-            document.getElementById(`btn-${tab}-mb`).classList.replace('text-slate-400', 'text-indigo-900');
+            document.getElementById(`btn-${tab}`).classList.add('bg-pet-active');
             
-            const titles = { 'agenda': 'Agendamento', 'clientes': 'Clientes', 'dashboard': 'Financeiro' };
+            const titles = { 'agenda': 'Agendamento', 'clientes': 'Cadastro de Cliente', 'dashboard': 'Dashboard & Finanças' };
             document.getElementById('page-title').innerText = titles[tab];
             
             if(tab === 'dashboard') updateDashboard();
-            lucide.createIcons();
         }
 
         function saveClient(e) {
             e.preventDefault();
-            clients.push({
+            const client = {
                 name: document.getElementById('regClientName').value,
                 pet: document.getElementById('regPet').value
-            });
+            };
+            clients.push(client);
             localStorage.setItem('pet_clients', JSON.stringify(clients));
-            alert('Cliente Salvo!');
+            alert('Cliente cadastrado!');
             e.target.reset();
         }
 
         function autoFillPet(name) {
-            const found = clients.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
-            if (found && name.length > 2) document.getElementById('petName').value = found.pet;
+            const client = clients.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
+            if (client && name.length > 2) {
+                document.getElementById('petName').value = client.pet;
+            }
         }
 
         function handleFormSubmit(e) {
             e.preventDefault();
             const editId = document.getElementById('edit-id').value;
-            const data = {
+            
+            const appData = {
                 id: editId ? parseInt(editId) : Date.now(),
                 clientName: document.getElementById('clientNameSearch').value,
                 petName: document.getElementById('petName').value,
@@ -199,8 +202,11 @@
                 status: editId ? (appointments.find(a => a.id == editId).status) : 'pendente'
             };
 
-            if (editId) appointments = appointments.map(a => a.id == editId ? data : a);
-            else appointments.push(data);
+            if (editId) {
+                appointments = appointments.map(a => a.id == editId ? appData : a);
+            } else {
+                appointments.push(appData);
+            }
 
             localStorage.setItem('pet_appointments', JSON.stringify(appointments));
             resetForm();
@@ -209,6 +215,7 @@
 
         function editApp(id) {
             const app = appointments.find(a => a.id === id);
+            if (!app) return;
             document.getElementById('edit-id').value = app.id;
             document.getElementById('clientNameSearch').value = app.clientName;
             document.getElementById('petName').value = app.petName;
@@ -216,7 +223,8 @@
             document.getElementById('serviceValue').value = app.serviceValue;
             document.getElementById('serviceDate').value = app.serviceDate;
             document.getElementById('serviceTime').value = app.serviceTime;
-            document.getElementById('form-title').innerText = "Editar";
+            document.getElementById('form-title').innerText = "Alterar Serviço";
+            document.getElementById('submit-btn').innerText = "SALVAR ALTERAÇÕES";
             document.getElementById('cancel-edit').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -225,38 +233,44 @@
             document.getElementById('appointment-form').reset();
             document.getElementById('edit-id').value = '';
             document.getElementById('form-title').innerText = "Novo Agendamento";
+            document.getElementById('submit-btn').innerText = "CONFIRMAR AGENDAMENTO";
             document.getElementById('cancel-edit').classList.add('hidden');
         }
 
         function renderAppointments() {
             const container = document.getElementById('appointments-container');
             container.innerHTML = '';
-            [...appointments].sort((a,b) => a.serviceTime.localeCompare(b.serviceTime)).forEach(app => {
+            const sorted = [...appointments].sort((a,b) => a.serviceTime.localeCompare(b.serviceTime));
+            sorted.forEach(app => {
                 const isConcluido = app.status === 'concluido';
                 const isCancelado = app.status === 'cancelado';
                 container.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl border border-slate-100 flex card-servico justify-between items-center shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-indigo-50 text-indigo-700 font-black p-2 rounded-xl text-center min-w-[60px]">
-                                <span class="text-[9px] block uppercase opacity-50">${app.serviceTime}</span>
-                                <span class="text-base">${app.serviceDate.split('-')[2]}</span>
+                    <div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 flex card-servico justify-between items-center shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-indigo-50 text-indigo-700 font-black p-3 rounded-2xl text-center min-w-[70px]">
+                                <span class="text-[10px] block uppercase opacity-60">${app.serviceTime}</span>
+                                <span class="text-lg">${app.serviceDate.split('-')[2]}</span>
                             </div>
                             <div>
-                                <h4 class="font-black text-slate-800 text-sm">${app.petName} <span class="text-slate-400 font-medium text-[10px]">(${app.clientName})</span></h4>
-                                <p class="text-[10px] font-black text-indigo-500 uppercase">${app.serviceType} • R$ ${app.serviceValue.toFixed(2)}</p>
+                                <h4 class="font-black text-gray-900 text-lg">${app.petName} <span class="font-medium text-gray-400 text-xs italic">(${app.clientName})</span></h4>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="bg-indigo-100 text-indigo-700 text-[10px] font-black uppercase px-2 py-0.5 rounded-lg">${app.serviceType}</span>
+                                    <span class="text-sm font-black text-gray-600">R$ ${app.serviceValue.toFixed(2)}</span>
+                                </div>
                             </div>
                         </div>
                         <div class="flex gap-2 actions-container">
-                            <div class="flex gap-1">
-                                <button onclick="updateStatus(${app.id}, 'concluido')" class="p-2.5 rounded-lg border border-emerald-100 text-emerald-600 ${isConcluido ? 'status-concluido' : ''}"><i data-lucide="check" class="w-5 h-5"></i></button>
-                                <button onclick="updateStatus(${app.id}, 'cancelado')" class="p-2.5 rounded-lg border border-rose-100 text-rose-600 ${isCancelado ? 'status-cancelado' : ''}"><i data-lucide="x" class="w-5 h-5"></i></button>
-                            </div>
-                            <div class="flex gap-1">
-                                <button onclick="editApp(${app.id})" class="p-2.5 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="pencil" class="w-5 h-5"></i></button>
-                                <button onclick="deleteApp(${app.id})" class="p-2.5 text-slate-300"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
-                            </div>
+                            <button onclick="updateStatus(${app.id}, 'concluido')" class="p-3 rounded-xl border border-emerald-100 text-emerald-600 ${isConcluido ? 'status-concluido' : 'hover:bg-emerald-50'}">
+                                <i data-lucide="check-circle" class="w-6 h-6"></i>
+                            </button>
+                            <button onclick="updateStatus(${app.id}, 'cancelado')" class="p-3 rounded-xl border border-rose-100 text-rose-600 ${isCancelado ? 'status-cancelado' : 'hover:bg-rose-50'}">
+                                <i data-lucide="x-circle" class="w-6 h-6"></i>
+                            </button>
+                            <button onclick="editApp(${app.id})" class="p-3 text-blue-600 bg-blue-50 rounded-xl"><i data-lucide="pencil" class="w-6 h-6"></i></button>
+                            <button onclick="deleteApp(${app.id})" class="p-3 text-gray-300 hover:text-rose-600"><i data-lucide="trash-2" class="w-6 h-6"></i></button>
                         </div>
-                    </div>`;
+                    </div>
+                `;
             });
             lucide.createIcons();
         }
@@ -268,21 +282,26 @@
         }
 
         function updateDashboard() {
-            let g = 0, p = 0;
-            appointments.forEach(a => {
-                if(a.status === 'concluido') g += a.serviceValue;
-                if(a.status === 'cancelado') p += a.serviceValue;
+            let ganhos = 0, perdas = 0;
+            appointments.forEach(app => {
+                if(app.status === 'concluido') ganhos += app.serviceValue;
+                if(app.status === 'cancelado') perdas += app.serviceValue;
             });
-            document.getElementById('kpi-ganhos').innerText = `R$ ${g.toFixed(2)}`;
-            document.getElementById('kpi-perdas').innerText = `R$ ${p.toFixed(2)}`;
-            document.getElementById('kpi-saldo').innerText = `R$ ${(g-p).toFixed(2)}`;
+            document.getElementById('kpi-ganhos').innerText = `R$ ${ganhos.toFixed(2)}`;
+            document.getElementById('kpi-perdas').innerText = `R$ ${perdas.toFixed(2)}`;
+            document.getElementById('kpi-saldo').innerText = `R$ ${(ganhos - perdas).toFixed(2)}`;
         }
 
-        function deleteApp(id) { if(confirm("Excluir?")) { appointments = appointments.filter(a => a.id !== id); localStorage.setItem('pet_appointments', JSON.stringify(appointments)); renderAppointments(); } }
+        function deleteApp(id) {
+            if(confirm("Excluir agendamento?")) {
+                appointments = appointments.filter(a => a.id !== id);
+                localStorage.setItem('pet_appointments', JSON.stringify(appointments));
+                renderAppointments();
+            }
+        }
 
         window.onload = () => {
-            const d = new Date();
-            document.getElementById('current-date').innerText = d.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'short'});
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString('pt-BR', {day:'numeric', month:'long'});
             renderAppointments();
             lucide.createIcons();
         };
