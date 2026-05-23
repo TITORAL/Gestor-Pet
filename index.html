@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda Pet - Gestão Minimalista</title>
+    <title>PetManager - Gestão de Cliente</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background-color: #e2e8f0; border-radius: 20px; }
+        ::-webkit-scrollbar-thumb { background-color: #3f3f9f; border-radius: 20px; }
         
         .hidden { display: none !important; }
         
-        /* Estilo Clean */
-        .bg-pet-sidebar { background-color: #ffffff; border-right: 1px solid #f1f5f9; }
-        .bg-pet-active { background-color: #f5f3ff !important; color: #6366f1 !important; border-right: 3px solid #6366f1; }
-        .text-clean { color: #475569; }
+        /* Estilo Baseado na Imagem */
+        .bg-pet-sidebar { background-color: #2d2d8a; }
+        .bg-pet-active { background-color: #3f3f9f !important; border-radius: 12px; }
+        .text-sidebar { color: #ffffff; }
+        .text-sidebar-dim { color: #b0b0e0; }
 
         @media (max-width: 768px) {
             .sidebar-desktop { display: none; }
@@ -26,140 +27,122 @@
         }
     </style>
 </head>
-<body class="bg-[#fafafa] text-slate-700 font-sans transition-colors duration-300" id="body-context">
+<body class="bg-[#1a1a4d] text-white font-sans transition-colors duration-300" id="body-context">
 
-    <div id="activation-screen" class="fixed inset-0 bg-white flex items-center justify-center z-[60] p-4">
-        <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 max-w-md w-full text-center space-y-6">
-            <div class="w-16 h-16 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center mx-auto">
-                <i data-lucide="paw-print" class="w-8 h-8"></i>
+    <div id="activation-screen" class="fixed inset-0 bg-[#2d2d8a] flex items-center justify-center z-[60] p-4">
+        <div class="bg-[#3f3f9f] p-8 rounded-3xl shadow-2xl border border-[#4f4fbf] max-w-md w-full text-center space-y-6">
+            <div class="w-16 h-16 bg-[#2d2d8a] text-white rounded-full flex items-center justify-center mx-auto">
+                <i data-lucide="dog" class="w-8 h-8"></i>
             </div>
-            <h2 class="text-2xl font-bold text-slate-800">Agenda Pet</h2>
-            <input type="password" id="license-key-input" placeholder="Senha de Acesso" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-center font-mono text-lg outline-none focus:ring-2 focus:ring-indigo-400">
-            <button onclick="validateLicenseKey()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-indigo-100">Entrar</button>
+            <h2 class="text-2xl font-bold">PetManager</h2>
+            <input type="password" id="license-key-input" placeholder="Senha de Acesso" class="w-full px-4 py-3 bg-[#2d2d8a] border border-[#4f4fbf] rounded-xl text-center font-mono text-lg outline-none focus:ring-2 focus:ring-blue-400 text-white placeholder-blue-300">
+            <button onclick="validateLicenseKey()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-xl transition shadow-lg">Entrar</button>
         </div>
     </div>
 
     <div id="main-app" class="flex h-screen overflow-hidden hidden">
         
-        <aside class="sidebar-desktop w-64 bg-pet-sidebar flex flex-col">
-            <div class="p-6">
-                <div class="flex items-center gap-3 mb-10">
-                    <i data-lucide="dog" class="w-8 h-8 text-indigo-500"></i>
-                    <h1 class="text-xl font-bold tracking-tight text-slate-800">Agenda Pet</h1>
-                </div>
-                <nav class="space-y-2">
-                    <button onclick="switchTab('clientes')" id="btn-clientes" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-slate-500 hover:bg-slate-50 transition-all">
-                        <i data-lucide="user-plus" class="w-5 h-5"></i> <span class="font-medium text-sm">Cadastro Cliente</span>
-                    </button>
-                    <button onclick="switchTab('agenda')" id="btn-agenda" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-slate-500 hover:bg-slate-50 transition-all">
-                        <i data-lucide="calendar-days" class="w-5 h-5"></i> <span class="font-medium text-sm">Agenda de Serviço</span>
-                    </button>
-                    <button onclick="switchTab('dashboard')" id="btn-dashboard" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-slate-500 hover:bg-slate-50 transition-all">
-                        <i data-lucide="pie-chart" class="w-5 h-5"></i> <span class="font-medium text-sm">Dashboard & Finanças</span>
-                    </button>
-                </nav>
+        <aside class="sidebar-desktop w-72 bg-pet-sidebar flex flex-col p-6">
+            <div class="flex items-center gap-3 mb-12">
+                <i data-lucide="dog" class="w-10 h-10 text-white"></i>
+                <h1 class="text-2xl font-bold tracking-tight">PetManager</h1>
             </div>
+            
+            <nav class="space-y-4">
+                <button onclick="switchTab('clientes')" id="btn-clientes" class="flex items-center gap-4 w-full px-5 py-4 text-left hover:bg-[#3f3f9f] transition-all rounded-xl">
+                    <i data-lucide="user-plus" class="w-6 h-6"></i> 
+                    <span class="font-medium text-base">Gestão de Cliente</span>
+                </button>
+                <button onclick="switchTab('agenda')" id="btn-agenda" class="flex items-center gap-4 w-full px-5 py-4 text-left hover:bg-[#3f3f9f] transition-all rounded-xl">
+                    <i data-lucide="calendar" class="w-6 h-6"></i> 
+                    <span class="font-medium text-base">Agenda de Serviço</span>
+                </button>
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="flex items-center gap-4 w-full px-5 py-4 text-left hover:bg-[#3f3f9f] transition-all rounded-xl">
+                    <i data-lucide="layout-dashboard" class="w-6 h-6"></i> 
+                    <span class="font-medium text-base">Dashboard Finanças</span>
+                </button>
+            </nav>
         </aside>
 
-        <div class="flex-1 flex flex-col overflow-y-auto main-content">
-            <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4 flex justify-between items-center sticky top-0 z-40">
-                <h2 id="page-title" class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Painel de Controle</h2>
-                <div id="header-date" class="text-xs font-medium text-slate-400"></div>
+        <div class="flex-1 flex flex-col overflow-y-auto main-content bg-[#1a1a4d]">
+            <header class="px-8 py-6 flex justify-between items-center">
+                <h2 id="page-title" class="text-2xl font-bold tracking-wide">Gestão de Cliente</h2>
+                <div id="header-date" class="text-sm font-medium text-blue-300"></div>
             </header>
 
-            <main class="p-4 md:p-8 max-w-5xl w-full mx-auto space-y-6">
+            <main class="p-4 md:p-8 max-w-6xl w-full space-y-8">
 
-                <div id="tab-clientes" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm h-fit">
-                        <h3 class="font-bold mb-4 text-slate-800 text-sm">Cadastrar Novo</h3>
-                        <form onsubmit="saveClient(event)" class="space-y-3">
-                            <input type="text" id="regClientName" placeholder="Nome do Dono" required class="w-full px-4 py-3 bg-slate-50 rounded-xl outline-none text-sm focus:ring-1 focus:ring-indigo-300">
-                            <input type="tel" id="regClientPhone" placeholder="WhatsApp" required class="w-full px-4 py-3 bg-slate-50 rounded-xl outline-none text-sm focus:ring-1 focus:ring-indigo-300">
-                            <input type="text" id="regPetName" placeholder="Nome do Pet" required class="w-full px-4 py-3 bg-slate-50 rounded-xl outline-none text-sm focus:ring-1 focus:ring-indigo-300">
-                            <button class="w-full bg-indigo-500 text-white font-bold py-3 rounded-xl shadow-md shadow-indigo-50">Salvar Cliente</button>
+                <div id="tab-clientes" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="bg-[#2d2d8a] p-6 rounded-2xl border border-[#3f3f9f] shadow-lg h-fit">
+                        <h3 class="font-bold mb-6 text-blue-200 text-lg">Cadastro</h3>
+                        <form onsubmit="saveClient(event)" class="space-y-4">
+                            <input type="text" id="regClientName" placeholder="Nome do Dono" required class="w-full px-4 py-3 bg-[#1a1a4d] border border-[#3f3f9f] rounded-xl outline-none text-white focus:border-blue-400">
+                            <input type="tel" id="regClientPhone" placeholder="WhatsApp" required class="w-full px-4 py-3 bg-[#1a1a4d] border border-[#3f3f9f] rounded-xl outline-none text-white focus:border-blue-400">
+                            <input type="text" id="regPetName" placeholder="Nome do Pet" required class="w-full px-4 py-3 bg-[#1a1a4d] border border-[#3f3f9f] rounded-xl outline-none text-white focus:border-blue-400">
+                            <button class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition">Salvar Cliente</button>
                         </form>
                     </div>
-                    <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-3" id="clients-list-container"></div>
+                    <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4" id="clients-list-container"></div>
                 </div>
 
-                <div id="tab-agenda" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm h-fit">
-                        <form onsubmit="saveAppointment(event)" class="space-y-3">
+                <div id="tab-agenda" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="bg-[#2d2d8a] p-6 rounded-2xl border border-[#3f3f9f] shadow-lg h-fit">
+                        <h3 class="font-bold mb-6 text-blue-200 text-lg text-left">Novo Agendamento</h3>
+                        <form onsubmit="saveAppointment(event)" class="space-y-4">
                             <div class="relative">
-                                <input type="text" id="clientName" placeholder="Buscar Cliente..." oninput="autocompleteClient(this.value)" class="w-full px-4 py-3 bg-slate-50 rounded-xl outline-none text-sm">
-                                <div id="autocomplete-list" class="absolute left-0 right-0 bg-white shadow-xl border rounded-xl mt-1 z-50 hidden"></div>
+                                <input type="text" id="clientName" placeholder="Buscar Cliente..." oninput="autocompleteClient(this.value)" class="w-full px-4 py-3 bg-[#1a1a4d] border border-[#3f3f9f] rounded-xl outline-none">
+                                <div id="autocomplete-list" class="absolute left-0 right-0 bg-[#2d2d8a] shadow-2xl border border-[#3f3f9f] rounded-xl mt-1 z-50 hidden"></div>
                             </div>
-                            <input type="text" id="petName" placeholder="Pet" class="w-full px-4 py-3 bg-slate-100 rounded-xl outline-none text-sm border-none" readonly>
-                            <div class="grid grid-cols-2 gap-2">
-                                <select id="serviceType" class="px-4 py-3 bg-slate-50 rounded-xl text-sm outline-none">
+                            <input type="text" id="petName" placeholder="Pet" class="w-full px-4 py-3 bg-[#3f3f9f] rounded-xl outline-none text-blue-200" readonly>
+                            <div class="grid grid-cols-2 gap-3">
+                                <select id="serviceType" class="px-4 py-3 bg-[#1a1a4d] border border-[#3f3f9f] rounded-xl outline-none">
                                     <option>Banho</option><option>Tosa</option><option>Combo</option>
                                 </select>
-                                <input type="number" id="serviceValue" placeholder="R$ Valor" class="px-4 py-3 bg-slate-50 rounded-xl text-sm outline-none">
+                                <input type="number" id="serviceValue" placeholder="Valor R$" class="px-4 py-3 bg-[#1a1a4d] border border-[#3f3f9f] rounded-xl outline-none">
                             </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="date" id="serviceDate" class="px-4 py-3 bg-slate-50 rounded-xl text-sm outline-none text-slate-500">
-                                <input type="time" id="serviceTime" class="px-4 py-3 bg-slate-50 rounded-xl text-sm outline-none text-slate-500">
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="date" id="serviceDate" class="px-4 py-3 bg-[#1a1a4d] border border-[#3f3f9f] rounded-xl outline-none">
+                                <input type="time" id="serviceTime" class="px-4 py-3 bg-[#1a1a4d] border border-[#3f3f9f] rounded-xl outline-none">
                             </div>
-                            <button class="w-full bg-indigo-500 text-white font-bold py-3 rounded-xl shadow-md">Agendar Horário</button>
+                            <button class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl shadow-lg">Confirmar Agenda</button>
                         </form>
                     </div>
-                    <div class="lg:col-span-2 space-y-3" id="appointments-container"></div>
+                    <div class="lg:col-span-2 space-y-4" id="appointments-container"></div>
                 </div>
 
-                <div id="tab-dashboard" class="hidden space-y-6">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                            <p class="text-[10px] uppercase font-bold text-slate-400 mb-1">Receita Hoje</p>
-                            <h3 class="text-xl font-bold text-indigo-500" id="kpi-ganhos">R$ 0,00</h3>
+                <div id="tab-dashboard" class="hidden space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="bg-[#2d2d8a] p-6 rounded-2xl border-l-4 border-blue-500">
+                            <p class="text-xs font-bold text-blue-300 uppercase mb-2">Receita Hoje</p>
+                            <h3 class="text-3xl font-black text-white" id="kpi-ganhos">R$ 0,00</h3>
                         </div>
-                        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                            <p class="text-[10px] uppercase font-bold text-slate-400 mb-1">Serviços</p>
-                            <h3 class="text-xl font-bold text-slate-700" id="kpi-concluidos">0</h3>
+                        <div class="bg-[#2d2d8a] p-6 rounded-2xl border-l-4 border-emerald-500">
+                            <p class="text-xs font-bold text-blue-300 uppercase mb-2">Concluídos</p>
+                            <h3 class="text-3xl font-black text-white" id="kpi-concluidos">0</h3>
                         </div>
-                        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                            <p class="text-[10px] uppercase font-bold text-slate-400 mb-1">Cancelados</p>
-                            <h3 class="text-xl font-bold text-rose-400" id="kpi-cancelados">0</h3>
+                        <div class="bg-[#2d2d8a] p-6 rounded-2xl border-l-4 border-rose-500">
+                            <p class="text-xs font-bold text-blue-300 uppercase mb-2">Cancelados</p>
+                            <h3 class="text-3xl font-black text-white" id="kpi-cancelados">0</h3>
                         </div>
-                        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                            <p class="text-[10px] uppercase font-bold text-slate-400 mb-1">Ticket Médio</p>
-                            <h3 class="text-xl font-bold text-slate-700" id="kpi-ticket-medio">R$ 0,00</h3>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                            <h3 class="text-xs font-bold mb-6 text-slate-400 uppercase tracking-widest">Faturamento Mensal</h3>
-                            <div class="h-64"><canvas id="financeChart"></canvas></div>
-                        </div>
-                        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                            <h3 class="text-xs font-bold mb-6 text-slate-400 uppercase tracking-widest">Mix de Serviços</h3>
-                            <div class="h-64"><canvas id="serviceMixChart"></canvas></div>
+                        <div class="bg-[#2d2d8a] p-6 rounded-2xl border-l-4 border-purple-500">
+                            <p class="text-xs font-bold text-blue-300 uppercase mb-2">Ticket Médio</p>
+                            <h3 class="text-3xl font-black text-white" id="kpi-ticket-medio">R$ 0,00</h3>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                        <div class="p-4 border-b border-slate-50 text-[10px] font-bold text-slate-400 uppercase">Últimos Concluídos</div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <tbody id="recent-transactions" class="divide-y divide-slate-50"></tbody>
-                            </table>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 bg-[#2d2d8a] p-8 rounded-2xl border border-[#3f3f9f]">
+                            <h3 class="text-sm font-bold mb-8 text-blue-200 uppercase tracking-widest">Faturamento Mensal</h3>
+                            <div class="h-80"><canvas id="financeChart"></canvas></div>
+                        </div>
+                        <div class="bg-[#2d2d8a] p-8 rounded-2xl border border-[#3f3f9f]">
+                            <h3 class="text-sm font-bold mb-8 text-blue-200 uppercase tracking-widest">Mix de Serviços</h3>
+                            <div class="h-80"><canvas id="serviceMixChart"></canvas></div>
                         </div>
                     </div>
                 </div>
             </main>
         </div>
-
-        <nav class="mobile-nav fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-100 h-20 hidden items-center justify-around z-50 px-4">
-            <button onclick="switchTab('clientes')" id="m-btn-clientes" class="flex flex-col items-center text-slate-400 gap-1">
-                <i data-lucide="user-plus" class="w-5 h-5"></i><span class="text-[9px] font-bold">Clientes</span>
-            </button>
-            <button onclick="switchTab('agenda')" id="m-btn-agenda" class="flex flex-col items-center text-slate-400 gap-1">
-                <i data-lucide="calendar-days" class="w-5 h-5"></i><span class="text-[9px] font-bold">Agenda</span>
-            </button>
-            <button onclick="switchTab('dashboard')" id="m-btn-dashboard" class="flex flex-col items-center text-slate-400 gap-1">
-                <i data-lucide="pie-chart" class="w-5 h-5"></i><span class="text-[9px] font-bold">Finanças</span>
-            </button>
-        </nav>
     </div>
 
     <script>
@@ -170,7 +153,7 @@
 
         window.onload = () => {
             lucide.createIcons();
-            document.getElementById('header-date').innerText = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
+            document.getElementById('header-date').innerText = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
             if (localStorage.getItem('pm_act') === 'true') showApp();
         };
 
@@ -191,20 +174,22 @@
 
         function switchTab(tab) {
             const tabs = ['agenda', 'clientes', 'dashboard'];
+            const titles = { 'clientes': 'Gestão de Cliente', 'agenda': 'Agenda de Serviço', 'dashboard': 'Dashboard Finanças' };
+            
             tabs.forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
                 document.getElementById(`btn-${t}`).classList.remove('bg-pet-active');
-                document.getElementById(`m-btn-${t}`).classList.replace('text-indigo-500', 'text-slate-400');
             });
 
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             document.getElementById(`btn-${tab}`).classList.add('bg-pet-active');
-            document.getElementById(`m-btn-${tab}`).classList.replace('text-slate-400', 'text-indigo-500');
+            document.getElementById('page-title').innerText = titles[tab];
             
             if (tab === 'dashboard') renderDashboard();
             lucide.createIcons();
         }
 
+        // Funções de salvamento e renderização mantidas com ajustes visuais
         function saveClient(e) {
             e.preventDefault();
             clients.push({ id: Date.now(), name: document.getElementById('regClientName').value, phone: document.getElementById('regClientPhone').value, pet: document.getElementById('regPetName').value });
@@ -214,25 +199,30 @@
 
         function renderClients() {
             document.getElementById('clients-list-container').innerHTML = clients.map(c => `
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm">
-                    <div><h4 class="font-bold text-sm text-slate-800">${c.name}</h4><p class="text-[10px] text-indigo-400 font-bold uppercase">${c.pet}</p></div>
-                    <button onclick="deleteClient(${c.id})" class="text-slate-300 hover:text-rose-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                <div class="bg-[#2d2d8a] p-5 rounded-2xl border border-[#3f3f9f] flex justify-between items-center hover:border-blue-400 transition">
+                    <div>
+                        <h4 class="font-bold text-lg">${c.name}</h4>
+                        <p class="text-xs text-blue-300 font-bold uppercase tracking-tighter">🐶 ${c.pet}</p>
+                    </div>
+                    <button onclick="deleteClient(${c.id})" class="text-rose-400 hover:text-rose-600 transition"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
                 </div>
             `).join('');
             lucide.createIcons();
         }
 
         function deleteClient(id) {
-            clients = clients.filter(c => c.id !== id);
-            localStorage.setItem('pm_cls', JSON.stringify(clients));
-            renderClients();
+            if(confirm("Deseja excluir este cliente?")) {
+                clients = clients.filter(c => c.id !== id);
+                localStorage.setItem('pm_cls', JSON.stringify(clients));
+                renderClients();
+            }
         }
 
         function autocompleteClient(val) {
             const list = document.getElementById('autocomplete-list');
             if (!val) { list.classList.add('hidden'); return; }
             const matches = clients.filter(c => c.name.toLowerCase().includes(val.toLowerCase()));
-            list.innerHTML = matches.map(c => `<div onclick="selectClient('${c.name}', '${c.pet}')" class="px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 text-xs"><b>${c.name}</b> (${c.pet})</div>`).join('');
+            list.innerHTML = matches.map(c => `<div onclick="selectClient('${c.name}', '${c.pet}')" class="px-5 py-4 hover:bg-[#3f3f9f] cursor-pointer border-b border-[#3f3f9f] text-sm"><b>${c.name}</b> (${c.pet})</div>`).join('');
             list.classList.toggle('hidden', matches.length === 0);
         }
 
@@ -245,7 +235,6 @@
         function saveAppointment(e) {
             e.preventDefault();
             const val = parseFloat(document.getElementById('serviceValue').value);
-            if(!val) return alert("Insira um valor");
             const data = {
                 id: Date.now(),
                 clientName: document.getElementById('clientName').value,
@@ -264,17 +253,20 @@
         function renderAppointments() {
             const container = document.getElementById('appointments-container');
             container.innerHTML = appointments.filter(a => a.status === 'pendente').map(app => `
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm">
-                    <div class="flex items-center gap-4">
-                        <div class="text-center bg-indigo-50 px-3 py-1 rounded-xl">
-                            <span class="text-[9px] block text-indigo-400 font-bold">${app.serviceTime}</span>
-                            <span class="text-xs font-black text-indigo-600">${app.serviceDate.split('-').reverse().slice(0,2).join('/')}</span>
+                <div class="bg-[#2d2d8a] p-5 rounded-2xl border border-[#3f3f9f] flex justify-between items-center shadow-lg">
+                    <div class="flex items-center gap-6">
+                        <div class="text-center bg-[#1a1a4d] px-4 py-2 rounded-xl border border-blue-500">
+                            <span class="text-xs block text-blue-300 font-bold">${app.serviceTime}</span>
+                            <span class="text-lg font-black text-white">${app.serviceDate.split('-').reverse().slice(0,2).join('/')}</span>
                         </div>
-                        <div><h4 class="font-bold text-sm text-slate-800">${app.petName}</h4><p class="text-[10px] text-slate-400 font-bold uppercase">${app.serviceType} • R$ ${app.serviceValue.toFixed(2)}</p></div>
+                        <div>
+                            <h4 class="font-bold text-xl">${app.petName}</h4>
+                            <p class="text-xs text-blue-300 font-bold uppercase">${app.serviceType} • R$ ${app.serviceValue.toFixed(2)}</p>
+                        </div>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="updateStatus(${app.id}, 'concluido')" class="p-2 bg-emerald-50 text-emerald-500 rounded-xl"><i data-lucide="check" class="w-4 h-4"></i></button>
-                        <button onclick="updateStatus(${app.id}, 'cancelado')" class="p-2 bg-rose-50 text-rose-500 rounded-xl"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    <div class="flex gap-3">
+                        <button onclick="updateStatus(${app.id}, 'concluido')" class="p-3 bg-emerald-500/20 text-emerald-400 rounded-xl hover:bg-emerald-500 hover:text-white transition"><i data-lucide="check" class="w-5 h-5"></i></button>
+                        <button onclick="updateStatus(${app.id}, 'cancelado')" class="p-3 bg-rose-500/20 text-rose-400 rounded-xl hover:bg-rose-500 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
                     </div>
                 </div>
             `).join('');
@@ -297,7 +289,7 @@
             appointments.forEach(app => {
                 const mes = new Date(app.serviceDate).getMonth();
                 if (app.status === 'concluido') {
-                    if (mix[app.serviceType] !== undefined) mix[app.serviceType]++;
+                    mix[app.serviceType]++;
                     faturamentoMensal[mes] += app.serviceValue;
                     if (app.serviceDate === hoje) { ganhosDia += app.serviceValue; concluidoQtde++; }
                 } else if (app.status === 'cancelado' && app.serviceDate === hoje) {
@@ -310,32 +302,22 @@
             document.getElementById('kpi-cancelados').innerText = canceladoQtde;
             document.getElementById('kpi-ticket-medio').innerText = `R$ ${concluidoQtde > 0 ? (ganhosDia / concluidoQtde).toFixed(2) : '0,00'}`;
 
-            document.getElementById('recent-transactions').innerHTML = appointments.filter(a => a.status === 'concluido').slice(-4).reverse().map(app => `
-                <tr class="hover:bg-slate-50 transition">
-                    <td class="px-4 py-3 text-slate-400 font-mono text-[10px]">${app.serviceDate.split('-').reverse().join('/')}</td>
-                    <td class="px-4 py-3 font-bold text-slate-700">${app.petName} <span class="text-[9px] text-indigo-400 block">${app.serviceType}</span></td>
-                    <td class="px-4 py-3 text-right font-black text-indigo-500 text-xs">R$ ${app.serviceValue.toFixed(2)}</td>
-                </tr>
-            `).join('');
-
             if(financeChart) financeChart.destroy();
             financeChart = new Chart(document.getElementById('financeChart'), {
                 type: 'bar',
                 data: { 
                     labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'], 
                     datasets: [{ 
-                        label: 'Receita', data: faturamentoMensal, 
-                        backgroundColor: '#6366f1',
-                        borderRadius: 10,
-                        barThickness: 6, // COLUNAS BEM FINAS
+                        label: 'Faturamento', data: faturamentoMensal, 
+                        backgroundColor: '#3b82f6', borderRadius: 5, barThickness: 12
                     }] 
                 },
                 options: { 
                     responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: { 
-                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 9 } } },
-                        y: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 9 } } }
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
+                        y: { grid: { color: '#3f3f9f' }, ticks: { color: '#94a3b8' } }
                     }
                 }
             });
@@ -345,11 +327,11 @@
                 type: 'doughnut',
                 data: { 
                     labels: Object.keys(mix), 
-                    datasets: [{ data: Object.values(mix), backgroundColor: ['#818cf8','#c084fc','#34d399'], borderWidth: 0 }] 
+                    datasets: [{ data: Object.values(mix), backgroundColor: ['#3b82f6','#a855f7','#10b981'], borderWidth: 0 }] 
                 },
                 options: { 
-                    responsive: true, maintainAspectRatio: false, cutout: '80%',
-                    plugins: { legend: { position: 'bottom', labels: { color: '#64748b', boxWidth: 8, font: { size: 10 } } } }
+                    responsive: true, maintainAspectRatio: false, cutout: '75%',
+                    plugins: { legend: { position: 'bottom', labels: { color: '#b0b0e0', padding: 20 } } }
                 }
             });
         }
