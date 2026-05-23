@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PetManager - Dashboard Elite</title>
+    <title>Agenda Pet - Gestão Profissional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -11,31 +11,49 @@
     <style>
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background-color: #374151; border-radius: 20px; }
-        
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
         .hidden { display: none !important; }
-        .bg-dark-main { background-color: #111827; }
-        .bg-dark-card { background-color: #1f2937; }
         .bg-pet-sidebar { background-color: #1e1b4b; } 
-        .bg-pet-active { background-color: #312e81 !important; border-left: 4px solid #818cf8; }
-        
-        /* Efeito de brilho nos KPIs similar à foto */
-        .glow-blue { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); color: #60a5fa; }
-        .glow-green { text-shadow: 0 0 10px rgba(16, 185, 129, 0.5); color: #34d399; }
-        .glow-pink { text-shadow: 0 0 10px rgba(244, 63, 94, 0.5); color: #fb7185; }
+        .bg-pet-active { background-color: #4338ca !important; border-left: 4px solid #818cf8; }
+        .client-card-0 { border-left: 4px solid #ef4444; }
+        .client-card-1 { border-left: 4px solid #3b82f6; }
+        .client-card-2 { border-left: 4px solid #10b981; }
+        .client-card-3 { border-left: 4px solid #f59e0b; }
+        .client-card-4 { border-left: 4px solid #8b5cf6; }
+
+        /* Estilos específicos para o Dashboard Dark */
+        .dashboard-dark { background-color: #0f172a; color: #f8fafc; margin: -2rem; padding: 2rem; min-height: 100vh; }
+        .card-dark { background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 1rem; }
+        .text-neon-green { color: #10b981; }
+        .text-neon-pink { color: #f43f5e; }
+        .text-neon-blue { color: #3b82f6; }
     </style>
 </head>
-<body class="bg-dark-main text-gray-100 font-sans">
+<body class="bg-gray-50 text-gray-800 font-sans">
 
-    <div id="main-app" class="flex h-screen overflow-hidden">
+    <div id="activation-screen" class="fixed inset-0 bg-indigo-950 flex items-center justify-center z-50 p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center space-y-6">
+            <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto">
+                <i data-lucide="shield-check" class="w-8 h-8"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900">Ativação Sistema Pet</h2>
+            <input type="text" id="license-key-input" placeholder="DIGITE 1234" class="w-full px-4 py-3 border rounded-xl text-center font-mono text-lg uppercase">
+            <p id="activation-error" class="text-sm text-rose-600 font-medium hidden">Chave inválida!</p>
+            <button onclick="validateLicenseKey()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-lg">
+                Ativar Sistema
+            </button>
+        </div>
+    </div>
+
+    <div id="main-app" class="flex h-screen overflow-hidden hidden">
         
-        <div class="w-72 bg-pet-sidebar text-white flex flex-col shadow-2xl">
+        <div class="w-72 bg-pet-sidebar text-white flex flex-col">
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-10">
                     <div class="bg-indigo-400/20 p-2 rounded-xl">
                         <i data-lucide="dog" class="w-8 h-8 text-white"></i>
                     </div>
-                    <h1 class="text-2xl font-bold tracking-tight">PetManager</h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Agenda Pet</h1>
                 </div>
 
                 <nav class="space-y-3">
@@ -53,169 +71,78 @@
         </div>
 
         <div class="flex-1 flex flex-col overflow-y-auto">
-            <header class="bg-dark-main border-b border-gray-800 px-8 py-5 flex justify-between items-center sticky top-0 z-10">
+            <header id="main-header" class="bg-white border-b border-gray-200 px-8 py-5 flex justify-between items-center sticky top-0 z-10">
                 <div class="flex items-center gap-4">
-                    <div class="w-2 h-8 bg-indigo-500 rounded-full"></div> 
-                    <h2 id="page-title" class="text-xl font-bold uppercase tracking-widest text-gray-300">Dashboard & Finanças</h2>
+                    <div class="w-2 h-8 bg-indigo-600 rounded-full"></div> 
+                    <h2 id="page-title" class="text-2xl font-black text-gray-800 uppercase tracking-tight font-sans">Cadastro de Cliente</h2>
                 </div>
-                <span class="text-xs font-bold text-gray-500" id="current-date"></span>
+                <span class="text-sm font-bold bg-indigo-50 text-indigo-700 px-4 py-2 rounded-full" id="current-date"></span>
             </header>
 
             <main class="p-8 max-w-7xl w-full mx-auto space-y-6">
 
-                <div id="tab-dashboard" class="space-y-8">
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="bg-dark-card p-6 rounded-2xl border border-gray-800 shadow-lg">
-                            <p class="text-xs font-bold text-gray-500 uppercase">Receita Hoje</p>
-                            <h3 class="text-2xl font-black mt-2 glow-blue" id="kpi-ganhos">R$ 0,00</h3>
-                        </div>
-                        <div class="bg-dark-card p-6 rounded-2xl border border-gray-800 shadow-lg">
-                            <p class="text-xs font-bold text-gray-500 uppercase">Margem (Meta)</p>
-                            <h3 class="text-2xl font-black mt-2 glow-green" id="kpi-concluidos">0</h3>
-                        </div>
-                        <div class="bg-dark-card p-6 rounded-2xl border border-gray-800 shadow-lg">
-                            <p class="text-xs font-bold text-gray-500 uppercase">Perda / Cancelados</p>
-                            <h3 class="text-2xl font-black mt-2 glow-pink" id="kpi-cancelados">0</h3>
-                        </div>
-                        <div class="bg-dark-card p-6 rounded-2xl border border-gray-800 shadow-lg">
-                            <p class="text-xs font-bold text-gray-500 uppercase">Ticket Médio</p>
-                            <h3 class="text-2xl font-black mt-2 text-white" id="kpi-ticket-medio">R$ 0,00</h3>
-                        </div>
+                <div id="tab-clientes" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
+                        <h3 class="text-lg font-bold mb-5 flex items-center gap-2 text-indigo-950">
+                            <i data-lucide="user-plus" class="w-5 h-5 text-indigo-600"></i> Novo Registro
+                        </h3>
+                        <form id="client-form" onsubmit="saveClient(event)" class="space-y-4">
+                            <input type="text" id="regClientName" placeholder="Nome do Dono" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <input type="tel" id="regClientPhone" placeholder="WhatsApp (DDD)" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <input type="text" id="regPetName" placeholder="Nome do Pet" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-md">
+                                Salvar Cadastro
+                            </button>
+                        </form>
                     </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-2 bg-dark-card p-6 rounded-2xl border border-gray-800">
-                            <h3 class="text-sm font-bold text-gray-400 mb-6 uppercase tracking-wider">Faturamento Mensal vs Custos</h3>
-                            <div class="h-[350px]"><canvas id="financeChart"></canvas></div>
-                        </div>
-                        <div class="bg-dark-card p-6 rounded-2xl border border-gray-800">
-                            <h3 class="text-sm font-bold text-gray-400 mb-6 uppercase tracking-wider">Distribuição de Serviços</h3>
-                            <div class="h-[350px]"><canvas id="serviceMixChart"></canvas></div>
-                        </div>
-                    </div>
-
-                    <div class="bg-dark-card rounded-2xl border border-gray-800 overflow-hidden shadow-xl">
-                        <div class="p-6 border-b border-gray-800"><h3 class="font-bold text-gray-300">Análise de Vendas Recentes</h3></div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left">
-                                <thead class="bg-gray-900/50 text-gray-500 text-xs font-bold uppercase">
-                                    <tr>
-                                        <th class="px-6 py-4">Data</th>
-                                        <th class="px-6 py-4">Cliente / Pet</th>
-                                        <th class="px-6 py-4">Serviço</th>
-                                        <th class="px-6 py-4 text-right">Receita</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="recent-transactions" class="divide-y divide-gray-800 text-gray-300"></tbody>
-                            </table>
-                        </div>
+                    <div class="lg:col-span-2">
+                        <div id="clients-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
                     </div>
                 </div>
 
-                <div id="tab-clientes" class="hidden text-center py-20 text-gray-500 italic">Interface de Clientes Ativa</div>
-                <div id="tab-agenda" class="hidden text-center py-20 text-gray-500 italic">Interface de Agenda Ativa</div>
+                <div id="tab-agenda" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
+                        <h3 class="text-lg font-bold mb-5 flex items-center gap-2 text-indigo-950">
+                            <i data-lucide="clock" class="w-5 h-5 text-indigo-600"></i> <span id="form-agenda-title">Agendar Horário</span>
+                        </h3>
+                        <form id="appointment-form" onsubmit="saveAppointment(event)" class="space-y-4">
+                            <div class="relative">
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Dono do Pet</label>
+                                <input type="text" id="clientName" oninput="autocompleteClient(this.value)" autocomplete="off" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                                <div id="autocomplete-list" class="absolute z-20 w-full bg-white border border-gray-100 rounded-xl mt-1 shadow-xl hidden"></div>
+                            </div>
+                            <input type="text" id="petName" placeholder="Nome do Pet" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none">
+                            <div class="grid grid-cols-2 gap-4">
+                                <select id="serviceType" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none">
+                                    <option value="Banho">Banho</option>
+                                    <option value="Tosa">Tosa</option>
+                                    <option value="Banho e Tosa">Banho e Tosa</option>
+                                    <option value="Consulta">Consulta</option>
+                                </select>
+                                <input type="number" id="serviceValue" placeholder="Preço R$" step="0.01" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="date" id="serviceDate" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none">
+                                <input type="time" id="serviceTime" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none">
+                            </div>
+                            <button type="submit" id="submit-appointment-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-md">
+                                Confirmar Agendamento
+                            </button>
+                        </form>
+                    </div>
+                    <div class="lg:col-span-2 space-y-4">
+                        <div id="appointments-container" class="space-y-4"></div>
+                    </div>
+                </div>
 
-            </main>
-        </div>
-    </div>
-
-    <script>
-        let appointments = JSON.parse(localStorage.getItem('pet_appointments')) || [];
-        let financeChart = null, serviceMixChart = null;
-
-        window.onload = () => {
-            lucide.createIcons();
-            document.getElementById('current-date').innerText = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-            renderDashboard();
-        };
-
-        function switchTab(tab) {
-            ['agenda', 'clientes', 'dashboard'].forEach(t => {
-                document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`btn-${t}`).classList.remove('bg-pet-active');
-            });
-            document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            document.getElementById(`btn-${tab}`).classList.add('bg-pet-active');
-            if (tab === 'dashboard') renderDashboard();
-        }
-
-        function renderDashboard() {
-            const hoje = new Date().toISOString().split('T')[0];
-            let ganhosDia = 0, concluidoQtde = 0, canceladoQtde = 0;
-            const mix = { "Banho": 5, "Tosa": 3, "Banho e Tosa": 8, "Consulta": 2 }; // Dados exemplo
-            const faturamentoMensal = [450, 600, 550, 700, 850, 650, 900, 1100, 1200, 1300, 950, 400];
-
-            appointments.forEach(app => {
-                if (app.status === 'concluido' && app.serviceDate === hoje) { ganhosDia += app.serviceValue; concluidoQtde++; }
-                if (app.status === 'cancelado' && app.serviceDate === hoje) canceladoQtde++;
-            });
-
-            document.getElementById('kpi-ganhos').innerText = `R$ ${ganhosDia.toFixed(2)}`;
-            document.getElementById('kpi-concluidos').innerText = concluidoQtde || "42%"; 
-            document.getElementById('kpi-cancelados').innerText = canceladoQtde;
-
-            // --- GRÁFICO DE BARRAS (FINO E ELEGANTE) ---
-            if(financeChart) financeChart.destroy();
-            financeChart = new Chart(document.getElementById('financeChart'), {
-                type: 'bar',
-                data: { 
-                    labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'], 
-                    datasets: [{ 
-                        label: 'Receita', 
-                        data: faturamentoMensal, 
-                        backgroundColor: '#3b82f6', 
-                        borderRadius: 4,
-                        barPercentage: 0.4 // Torna as colunas mais finas
-                    }] 
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        y: { grid: { color: '#374151' }, ticks: { color: '#9ca3af' } },
-                        x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
-                    } 
-                }
-            });
-
-            // --- GRÁFICO DE ROSCA (DOUGHNUT) ---
-            if(serviceMixChart) serviceMixChart.destroy();
-            serviceMixChart = new Chart(document.getElementById('serviceMixChart'), {
-                type: 'doughnut',
-                data: { 
-                    labels: Object.keys(mix), 
-                    datasets: [{ 
-                        data: Object.values(mix), 
-                        backgroundColor: ['#3b82f6','#10b981','#f43f5e','#f59e0b'],
-                        borderWidth: 0
-                    }] 
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    cutout: '80%',
-                    plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', usePointStyle: true } } }
-                }
-            });
-
-            // Preenchimento da tabela (Exemplo)
-            document.getElementById('recent-transactions').innerHTML = `
-                <tr>
-                    <td class="px-6 py-4 text-gray-500">23/05/2026</td>
-                    <td class="px-6 py-4 font-bold">Carla Ferreira <span class="block text-xs font-normal text-gray-500">Pet: Thor</span></td>
-                    <td class="px-6 py-4">Banho e Tosa</td>
-                    <td class="px-6 py-4 text-right font-bold text-blue-400">R$ 120,00</td>
-                </tr>
-                <tr>
-                    <td class="px-6 py-4 text-gray-500">23/05/2026</td>
-                    <td class="px-6 py-4 font-bold">Leonardo Cardoso <span class="block text-xs font-normal text-gray-500">Pet: Mel</span></td>
-                    <td class="px-6 py-4">Consulta</td>
-                    <td class="px-6 py-4 text-right font-bold text-blue-400">R$ 250,00</td>
-                </tr>
-            `;
-        }
-    </script>
-</body>
-</html>
+                <div id="tab-dashboard" class="hidden dashboard-dark">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="card-dark p-6">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Receita Hoje</p>
+                            <h3 class="text-3xl font-black text-neon-blue mt-2" id="kpi-ganhos">R$ 0,00</h3>
+                        </div>
+                        <div class="card-dark p-6">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Margem (Concluídos)</p>
+                            <h3 class="text-3xl font-black text-neon-green mt-2" id="kpi-concluidos">0</h3>
+                        </div>
+                        <div class="card-dark p-6">
