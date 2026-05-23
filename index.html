@@ -216,7 +216,7 @@
     <!-- REGRAS DE NEGÓCIO E CONTROLE REMOTO -->
     <script>
         // URL DO CONTROLE REMOTO (Cole o link 'Raw' do seu JSON do Gist aqui)
-        const REMOTE_CONTROL_URL = "SUA_URL_RAW_DO_GIST_AQUI";
+        const REMOTE_CONTROL_URL = "<script src="https://gist.github.com/TITORAL/e3aebdd5149e4bab3af321d5583d5691.js"></script>";
 
         let appointments = JSON.parse(localStorage.getItem('pet_appointments')) || [];
         seja financeChart = nulo;
@@ -251,7 +251,7 @@
 
         // Validador Remoto Anti-Burlar Cache (?t=...)
         função assíncrona verificarAutorizaçãoRemota(chave) {
-            if (!REMOTE_CONTROL_URL || REMOTE_CONTROL_URL.includes("SUA_URL_RAW")) {
+            if (!REMOTE_CONTROL_URL || REMOTE_CONTROL_URL.includes("<script src="https://gist.github.com/TITORAL/e3aebdd5149e4bab3af321d5583d5691.js"></script>            ")) {
                 console.warn("Controle remoto offline: Operando localmente.");
                 retornar verdadeiro;
             }
@@ -260,7 +260,7 @@
                 Se (!response.ok) retorne falso;
                 
                 const database = await response.json();
-                se (database[key] && database[key].status === "ativo") {
+                se (database[key] && database[key].status === "pet1234") {
                     retornar verdadeiro;
                 }
                 retornar falso;
