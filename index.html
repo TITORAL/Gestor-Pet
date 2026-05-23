@@ -14,29 +14,29 @@
     <style>
         /* Personalizações para barras de rolagem elegantes e transições suaves */
         ::-webkit-scrollbar {
-            largura: 6px;
+            width: 6px;
         }
         ::-webkit-scrollbar-track {
-            fundo: transparente;
+            background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-            cor de fundo: #cbd5e1;
-            raio da borda: 20px;
+            background-color: #cbd5e1;
+            border-radius: 20px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            cor de fundo: #94a3b8;
+            background-color: #94a3b8;
         }
-        principal > div {
-            transição: opacidade 0,2s entrada e saída suaves;
+        main > div {
+            transition: opacity 0.2s ease-in-out;
         }
-        .escondido {
-            exibir: nenhum !importante;
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
 
-    <!-- TELA DE BLOQUEIO / VALIDAÇÃO DE LICENÇA REMOTA -->
+    <!-- TELA DE BLOQUEIO / VALIDAÇÃO DE LICENÇA -->
     <div id="activation-screen" class="fixed inset-0 bg-indigo-950 flex items-center justify-center z-50 p-4">
         <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center space-y-6">
             <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
@@ -51,7 +51,7 @@
                 <p id="activation-error" class="text-sm text-rose-600 font-medium hidden">Chave inválida! Verifique e tente novamente.</p>
             </div>
             <button onclick="validateLicenseKey()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl transition shadow-lg shadow-indigo-200">
-                Agenda Virtual Ativar
+                Ativar Agenda Virtual
             </button>
         </div>
     </div>
@@ -64,7 +64,7 @@
             <div class="p-5">
                 <div class="flex items-center gap-3 mb-8">
                     <i data-lucide="dog" class="w-8 h-8 text-indigo-400"></i>
-                    <h1 class="text-xl font-bold tracking-wider">Gerente de Animais de Estimação</h1>
+                    <h1 class="text-xl font-bold tracking-wider">Gerente de Pets</h1>
                 </div>
                 <nav class="space-y-2">
                     <button onclick="switchTab('agenda')" id="btn-agenda" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-indigo-800 text-white font-medium transition">
@@ -90,7 +90,7 @@
             <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center sticky top-0 z-10">
                 <div class="flex items-center gap-2 md:hidden">
                     <i data-lucide="dog" class="w-6 h-6 text-indigo-600"></i>
-                    <span class="font-bold text-lg">Gerente de Animais de Estimação</span>
+                    <span class="font-bold text-lg">Gerente de Pets</span>
                 </div>
                 <h2 id="page-title" class="text-xl font-bold text-gray-800 hidden md:block">Agenda de Serviços</h2>
                 
@@ -107,14 +107,13 @@
 
                 <!-- ABA DE AGENDAMENTOS -->
                 <div id="tab-agenda" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!--->
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-fit">
                         <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-900">
                             <i data-lucide="plus-circle" class="w-5 h-5"></i> Novo Agendamento
                         </h3>
                         <form id="appointment-form" onsubmit="saveAppointment(event)" class="space-y-4">
                             <div>
-                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Cliente / Doação</label>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Cliente / Tutor</label>
                                 <input type="text" id="clientName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
                             <div>
@@ -139,7 +138,7 @@
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Dados</label>
+                                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Data</label>
                                     <input type="date" id="serviceDate" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <div>
@@ -150,7 +149,7 @@
                             <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition mt-2">
                                 Agendar Entrada
                             </button>
-                        </formulário>
+                        </form>
                     </div>
 
                     <!-- Lista de Cards -->
@@ -203,7 +202,7 @@
                             </div>
                         </div>
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                            <h4 class="text-md font-bold mb-4 text-gray-700">Histórico recente da Caixa</h4>
+                            <h4 class="text-md font-bold mb-4 text-gray-700">Histórico recente de Caixa</h4>
                             <div id="finance-history" class="space-y-3 max-h-64 overflow-y-auto text-sm"></div>
                         </div>
                     </div>
@@ -213,109 +212,93 @@
         </div>
     </div>
 
-    <!-- REGRAS DE NEGÓCIO E CONTROLE REMOTO -->
+    <!-- REGRAS DE NEGÓCIO E CONTROLE DE ACESSO -->
     <script>
-        // URL DO CONTROLE REMOTO (Cole o link 'Raw' do seu JSON do Gist aqui)
-        const REMOTE_CONTROL_URL = "<script src="https://gist.github.com/TITORAL/e3aebdd5149e4bab3af321d5583d5691.js"></script>";
+        // Chave de segurança definida localmente no sistema
+        const MASTER_LICENSE_KEY = "1234";
 
         let appointments = JSON.parse(localStorage.getItem('pet_appointments')) || [];
-        seja financeChart = nulo;
+        let financeChart = null;
 
         // Monitoramento de inicialização do sistema
         window.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
             definirDataHoje();
             
-            se (localStorage.getItem('pet_app_activated') === 'true') {
+            if (localStorage.getItem('pet_app_activated') === 'true') {
                 const savedKey = localStorage.getItem('pet_app_license_key');
-                const isAuthorized = await checkRemoteAuthorization(savedKey);
+                const isAuthorized = checkRemoteAuthorization(savedKey);
                 
-                se (isAuthorized) {
+                if (isAuthorized) {
                     liberarApp();
-                } outro {
+                } else {
                     localStorage.removeItem('pet_app_activated');
                     localStorage.removeItem('pet_app_license_key');
-                    showBlockError("Esta licença foi revogada ou encontra-se com pendências financeiras.");
+                    mostrarErroDeBloco("Esta licença foi revogada ou encontra-se expirada.");
                 }
             }
         });
 
-        função definirDataHoje() {
+        function definirDataHoje() {
             const dateEl = document.getElementById('current-date');
-            se(dateEl) {
+            if(dateEl) {
                 dateEl.innerText = new Date().toLocaleDateString('pt-BR', {
-                    dia da semana: 'comprimento', ano: 'numérico', mês: 'comprimento', dia: 'numérico'
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
                 });
             }
         }
 
-        // Validador Remoto Anti-Burlar Cache (?t=...)
-        função assíncrona verificarAutorizaçãoRemota(chave) {
-            if (!REMOTE_CONTROL_URL || REMOTE_CONTROL_URL.includes("<script src="https://gist.github.com/TITORAL/e3aebdd5149e4bab3af321d5583d5691.js"></script>            ")) {
-                console.warn("Controle remoto offline: Operando localmente.");
-                retornar verdadeiro;
-            }
-            tentar {
-                const response = await fetch(`${REMOTE_CONTROL_URL}?t=${Date.now()}`);
-                Se (!response.ok) retorne falso;
-                
-                const database = await response.json();
-                se (database[key] && database[key].status === "ativo") {
-                    retornar verdadeiro;
-                }
-                retornar falso;
-            } catch (erro) {
-                console.error("Erro de comunicação com o servidor:", erro);
-                return localStorage.getItem('pet_app_activated') === 'true';
-            }
+        // Validador local adaptado para aceitar a chave 1234
+        function checkRemoteAuthorization(key) {
+            return key === MASTER_LICENSE_KEY;
         }
 
-        função assíncrona validateLicenseKey() {
+        function validateLicenseKey() {
             const inputKey = document.getElementById('license-key-input').value.trim().toUpperCase();
             const errorElement = document.getElementById('activation-error');
             
-            se (!inputKey) retornar;
+            if (!inputKey) return;
             errorElement.classList.add('hidden');
             
-            const isAuthorized = await checkRemoteAuthorization(inputKey);
+            const isAuthorized = checkRemoteAuthorization(inputKey);
 
-            se (isAuthorized) {
+            if (isAuthorized) {
                 localStorage.setItem('pet_app_activated', 'true');
                 localStorage.setItem('pet_app_license_key', inputKey);
                 liberarApp();
-            } outro {
-                showBlockError("Chave inválida, expirada ou suspensa temporariamente.");
+            } else {
+                mostrarErroDeBloco("Chave inválida! Digite a chave correta para liberar.");
             }
         }
 
-        função mostrarErroDeBloco(mensagem) {
+        function mostrarErroDeBloco(mensagem) {
             const errorElement = document.getElementById('activation-error');
-            se(elemento de erro) {
-                errorElement.innerText = mensagem;
+            if(errorElement) {
+                errorElement.innerText = mensaje || mensagem;
                 errorElement.classList.remove('hidden');
             }
         }
 
-        função liberarApp() {
+        function liberarApp() {
             document.getElementById('activation-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             renderAppointments();
         }
 
-        função switchTab(tab) {
+        function switchTab(tab) {
             const btnAgenda = document.getElementById('btn-agenda');
             const btnDashboard = document.getElementById('btn-dashboard');
             const tabAgenda = document.getElementById('tab-agenda');
             const tabDashboard = document.getElementById('tab-dashboard');
             const pageTitle = document.getElementById('page-title');
 
-            se (tab === 'agenda') {
+            if (tab === 'agenda') {
                 tabAgenda.classList.remove('hidden');
                 tabDashboard.classList.add('hidden');
                 btnAgenda.className = "flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-indigo-800 text-white font-medium transition";
                 btnDashboard.className = "flex items-center gap-3 w-full px-4 py-3 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-white font-medium transition";
                 pageTitle.innerText = "Agenda de Serviços";
-            } outro {
+            } else {
                 tabAgenda.classList.add('hidden');
                 tabDashboard.classList.remove('hidden');
                 btnDashboard.className = "flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-indigo-800 text-white font-medium transition";
@@ -325,9 +308,9 @@
             }
         }
 
-        função salvarCompromisso(e) {
+        function saveAppointment(e) {
             e.preventDefault();
-            const novoAplicativo = {
+            const newApp = {
                 id: Date.now(),
                 clientName: document.getElementById('clientName').value,
                 petName: document.getElementById('petName').value,
@@ -338,40 +321,40 @@
                 status: 'pendente'
             };
 
-            compromissos.push(novoApp);
+            appointments.push(newApp);
             atualizarArmazenamento();
             renderAppointments();
             document.getElementById('appointment-form').reset();
         }
 
-        função alterarStatus(id, novoStatus) {
-            compromissos = compromissos.map(app => app.id === id ? { ...app, status: novoStatus } : app);
+        function changeStatus(id, novoStatus) {
+            appointments = appointments.map(app => app.id === id ? { ...app, status: novoStatus } : app);
             atualizarArmazenamento();
             renderAppointments();
         }
 
-        função excluirCompromisso(id) {
-            compromissos = compromissos.filter(app => app.id !== id);
+        function deleteAppointment(id) {
+            appointments = appointments.filter(app => app.id !== id);
             atualizarArmazenamento();
             renderAppointments();
         }
 
-        função atualizarArmazenamento() {
+        function atualizarArmazenamento() {
             localStorage.setItem('pet_appointments', JSON.stringify(appointments));
         }
 
-        função renderizarCompromissos() {
+        function renderAppointments() {
             const container = document.getElementById('appointments-container');
-            se(!container) retornar;
+            if(!container) return;
             container.innerHTML = '';
             
             const sorted = [...appointments].sort((a, b) => new Date(`${a.serviceDate}T${a.serviceTime}`) - new Date(`${b.serviceDate}T${b.serviceTime}`));
             const activeCount = sorted.filter(a => a.status === 'pendente').length;
             document.getElementById('appointment-count').innerText = `${activeCount} ativo${activeCount !== 1 ? 's' : ''}`;
 
-            se(sorted.length === 0) {
-                container.innerHTML = `<div class="text-center py-12 text-gray-400 bg-white round-xl border border-dashed border-gray-200">Nenhum serviço agendado até o momento.</div>`;
-                retornar;
+            if(sorted.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-400 bg-white rounded-xl border border-dashed border-gray-200">Nenhum serviço agendado até o momento.</div>`;
+                return;
             }
 
             sorted.forEach(app => {
@@ -379,15 +362,15 @@
                 let statusBadge = '', actionButtons = '';
 
                 if (app.status === 'pendente') {
-                    statusBadge = `<span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Agenda</span>`;
+                    statusBadge = `<span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Agendado</span>`;
                     actionButtons = `
                         <button onclick="changeStatus(${app.id}, 'concluido')" class="text-emerald-600 hover:bg-emerald-50 p-1.5 rounded-lg transition"><i data-lucide="check-square" class="w-5 h-5"></i></button>
                         <button onclick="changeStatus(${app.id}, 'cancelado')" class="text-rose-600 hover:bg-rose-50 p-1.5 rounded-lg transition"><i data-lucide="x-circle" class="w-5 h-5"></i></button>
                     `;
-                } else if (app.status === 'concluído') {
+                } else if (app.status === 'concluido') {
                     statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Concluído</span>`;
                     actionButtons = `<button onclick="deleteAppointment(${app.id})" class="text-gray-400 hover:text-gray-600 p-1.5"><i data-lucide="trash-2" class="w-5 h-5"></i></button>`;
-                } outro {
+                } else {
                     statusBadge = `<span class="bg-gray-100 text-gray-500 text-xs font-semibold px-2.5 py-0.5 rounded-full">Cancelado</span>`;
                     actionButtons = `<button onclick="deleteAppointment(${app.id})" class="text-gray-400 hover:text-gray-600 p-1.5"><i data-lucide="trash-2" class="w-5 h-5"></i></button>`;
                 }
@@ -400,7 +383,7 @@
                                 <span class="text-[10px] font-normal text-indigo-400">${dateBr}</span>
                             </div>
                             <div>
-                                <h4 class="font-bold text-gray-800 flex items-center gap-1.5">${app.petName} <span class="font-normal text-sm text-gray-500">(Doação: ${app.clientName})</span></h4>
+                                <h4 class="font-bold text-gray-800 flex items-center gap-1.5">${app.petName} <span class="font-normal text-sm text-gray-500">(Tutor: ${app.clientName})</span></h4>
                                 <p class="text-sm text-gray-600 flex items-center gap-1">
                                     <span class="bg-indigo-100 text-indigo-800 text-[11px] font-medium px-2 py-0.5 rounded">${app.serviceType}</span>
                                     <span class="font-semibold text-gray-700 ml-1">R$ ${app.serviceValue.toFixed(2)}</span>
@@ -417,18 +400,18 @@
             lucide.createIcons();
         }
 
-        função renderizarPainel() {
-            seja ganhos = 0, perdas = 0;
+        function renderDashboard() {
+            let ganhos = 0, perdas = 0;
             const serviceTotals = { 'Banho': 0, 'Tosa': 0, 'Banho e Tosa': 0, 'Consulta': 0, 'Outros': 0 };
             const historyContainer = document.getElementById('finance-history');
             if(historyContainer) historyContainer.innerHTML = '';
 
-            compromissos.paraCada(aplicativo => {
-                if (app.status === 'concluído') {
+            appointments.forEach(app => {
+                if (app.status === 'concluido') {
                     ganhos += app.serviceValue;
                     if(serviceTotals[app.serviceType] !== undefined) serviceTotals[app.serviceType] += app.serviceValue;
                     
-                    se(containerDeHistórico) {
+                    if(historyContainer) {
                         historyContainer.innerHTML += `
                             <div class="flex justify-between items-center border-b border-gray-50 pb-2">
                                 <span class="text-gray-600 font-medium">${app.petName} (${app.serviceType})</span>
@@ -438,7 +421,7 @@
                     }
                 } else if (app.status === 'cancelado') {
                     perdas += app.serviceValue;
-                    se(containerDeHistórico) {
+                    if(historyContainer) {
                         historyContainer.innerHTML += `
                             <div class="flex justify-between items-center border-b border-gray-50 pb-2">
                                 <span class="text-gray-400 line-through">${app.petName} (${app.serviceType})</span>
@@ -457,24 +440,24 @@
             document.getElementById('kpi-perdas').innerText = `R$ ${perdas.toFixed(2)}`;
             document.getElementById('kpi-saldo').innerText = `R$ ${(ganhos - perdas).toFixed(2)}`;
 
-            se (financeChart) financeChart.destroy();
+            if (financeChart) financeChart.destroy();
             const ctx = document.getElementById('financeChart').getContext('2d');
-            financeChart = novo Chart(ctx, {
-                tipo: 'barra',
-                dados: {
-                    rótulos: Object.keys(serviceTotals),
-                    conjuntos de dados: [{
-                        rótulo: 'Faturamento (R$)',
-                        dados: Object.values(serviceTotals),
+            financeChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(serviceTotals),
+                    datasets: [{
+                        label: 'Faturamento (R$)',
+                        data: Object.values(serviceTotals),
                         backgroundColor: ['#e0e7ff', '#c7d2fe', '#818cf8', '#4f46e5', '#312e81'],
-                        raioDaBorda: 6
+                        borderRadius: 6
                     }]
                 },
-                opções: {
-                    responsivo: verdadeiro,
-                    manterProporção: falso,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    escalas: { y: { inícioEmZero: verdadeiro, grade: { cor: '#f3f4f6' } }, x: { grade: { exibir: falso } } }
+                    scales: { y: { beginAtZero: true, grid: { color: '#f3f4f6' } }, x: { grid: { display: false } } }
                 }
             });
         }
