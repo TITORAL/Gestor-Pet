@@ -20,13 +20,6 @@
         .client-card-2 { border-left: 4px solid #10b981; }
         .client-card-3 { border-left: 4px solid #f59e0b; }
         .client-card-4 { border-left: 4px solid #8b5cf6; }
-
-        /* Estilos específicos para o Dashboard Dark */
-        .dashboard-dark { background-color: #0f172a; color: #f8fafc; margin: -2rem; padding: 2rem; min-height: 100vh; }
-        .card-dark { background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 1rem; }
-        .text-neon-green { color: #10b981; }
-        .text-neon-pink { color: #f43f5e; }
-        .text-neon-blue { color: #3b82f6; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
@@ -71,7 +64,7 @@
         </div>
 
         <div class="flex-1 flex flex-col overflow-y-auto">
-            <header id="main-header" class="bg-white border-b border-gray-200 px-8 py-5 flex justify-between items-center sticky top-0 z-10">
+            <header class="bg-white border-b border-gray-200 px-8 py-5 flex justify-between items-center sticky top-0 z-10">
                 <div class="flex items-center gap-4">
                     <div class="w-2 h-8 bg-indigo-600 rounded-full"></div> 
                     <h2 id="page-title" class="text-2xl font-black text-gray-800 uppercase tracking-tight font-sans">Cadastro de Cliente</h2>
@@ -135,14 +128,257 @@
                     </div>
                 </div>
 
-                <div id="tab-dashboard" class="hidden dashboard-dark">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <div class="card-dark p-6">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Receita Hoje</p>
-                            <h3 class="text-3xl font-black text-neon-blue mt-2" id="kpi-ganhos">R$ 0,00</h3>
+                <div id="tab-dashboard" class="hidden space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Faturamento Hoje</p>
+                            <h3 class="text-2xl font-black text-emerald-600 mt-1" id="kpi-ganhos">R$ 0,00</h3>
                         </div>
-                        <div class="card-dark p-6">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Margem (Concluídos)</p>
-                            <h3 class="text-3xl font-black text-neon-green mt-2" id="kpi-concluidos">0</h3>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Concluídos</p>
+                            <h3 class="text-2xl font-black text-indigo-600 mt-1" id="kpi-concluidos">0</h3>
                         </div>
-                        <div class="card-dark p-6">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Cancelados</p>
+                            <h3 class="text-2xl font-black text-rose-500 mt-1" id="kpi-cancelados">0</h3>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Ticket Médio</p>
+                            <h3 class="text-2xl font-black text-gray-800 mt-1" id="kpi-ticket-medio">R$ 0,00</h3>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <h3 class="font-bold text-gray-800 mb-6">Desempenho Financeiro Mensal</h3>
+                            <div class="h-[300px]"><canvas id="financeChart"></canvas></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <h3 class="font-bold text-gray-800 mb-6">Mix de Serviços</h3>
+                            <div class="h-[300px]"><canvas id="serviceMixChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-6 border-b border-gray-50"><h3 class="font-bold text-gray-800">Últimos Atendimentos</h3></div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-gray-50 text-gray-400 text-xs font-bold uppercase">
+                                    <tr>
+                                        <th class="px-6 py-4">Data</th>
+                                        <th class="px-6 py-4">Cliente/Pet</th>
+                                        <th class="px-6 py-4">Serviço</th>
+                                        <th class="px-6 py-4 text-right">Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-transactions" class="divide-y divide-gray-50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const MASTER_KEY = "1234";
+        let appointments = JSON.parse(localStorage.getItem('pet_appointments')) || [];
+        let clients = JSON.parse(localStorage.getItem('pet_clients')) || [];
+        let financeChart = null, serviceMixChart = null;
+        let editingId = null;
+
+        window.onload = () => {
+            lucide.createIcons();
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+            if (localStorage.getItem('pet_activated') === 'true') showApp();
+        };
+
+        function validateLicenseKey() {
+            if (document.getElementById('license-key-input').value === MASTER_KEY) {
+                localStorage.setItem('pet_activated', 'true');
+                showApp();
+            } else {
+                document.getElementById('activation-error').classList.remove('hidden');
+            }
+        }
+
+        function showApp() {
+            document.getElementById('activation-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            switchTab('clientes');
+            renderClients();
+            renderAppointments();
+        }
+
+        function switchTab(tab) {
+            ['agenda', 'clientes', 'dashboard'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`btn-${t}`).classList.remove('bg-pet-active');
+            });
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`btn-${tab}`).classList.add('bg-pet-active');
+            document.getElementById('page-title').innerText = tab === 'dashboard' ? 'Dashboard & Finanças' : tab === 'agenda' ? 'Agenda de Serviços' : 'Gestão de Clientes';
+            if (tab === 'dashboard') renderDashboard();
+        }
+
+        // --- CLIENTES ---
+        function saveClient(e) {
+            e.preventDefault();
+            clients.push({ id: Date.now(), name: document.getElementById('regClientName').value, phone: document.getElementById('regClientPhone').value, pet: document.getElementById('regPetName').value, colorIndex: clients.length % 5 });
+            localStorage.setItem('pet_clients', JSON.stringify(clients));
+            renderClients(); e.target.reset();
+        }
+
+        function renderClients() {
+            document.getElementById('clients-list-container').innerHTML = clients.map(c => `
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 client-card-${c.colorIndex}">
+                    <div class="flex justify-between items-start">
+                        <div><h4 class="font-bold text-gray-800">${c.name}</h4><p class="text-sm text-gray-500">Pet: ${c.pet}</p></div>
+                        <button onclick="deleteClient(${c.id})" class="text-gray-300 hover:text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function deleteClient(id) {
+            clients = clients.filter(c => c.id !== id);
+            localStorage.setItem('pet_clients', JSON.stringify(clients));
+            renderClients();
+        }
+
+        // --- AGENDA & EDIÇÃO ---
+        function autocompleteClient(val) {
+            const list = document.getElementById('autocomplete-list');
+            if (!val) { list.classList.add('hidden'); return; }
+            const matches = clients.filter(c => c.name.toLowerCase().includes(val.toLowerCase()));
+            list.innerHTML = matches.map(c => `<div onclick="selectClient('${c.name}', '${c.pet}')" class="px-4 py-2 hover:bg-indigo-50 cursor-pointer border-b text-sm"><b>${c.name}</b> (Pet: ${c.pet})</div>`).join('');
+            list.classList.toggle('hidden', matches.length === 0);
+        }
+
+        function selectClient(n, p) {
+            document.getElementById('clientName').value = n;
+            document.getElementById('petName').value = p;
+            document.getElementById('autocomplete-list').classList.add('hidden');
+        }
+
+        function editAppointment(id) {
+            const app = appointments.find(a => a.id === id);
+            editingId = id;
+            document.getElementById('clientName').value = app.clientName;
+            document.getElementById('petName').value = app.petName;
+            document.getElementById('serviceType').value = app.serviceType;
+            document.getElementById('serviceValue').value = app.serviceValue;
+            document.getElementById('serviceDate').value = app.serviceDate;
+            document.getElementById('serviceTime').value = app.serviceTime;
+            document.getElementById('submit-appointment-btn').innerText = "Atualizar Agendamento";
+            document.getElementById('form-agenda-title').innerText = "Editando Registro";
+        }
+
+        function saveAppointment(e) {
+            e.preventDefault();
+            const data = {
+                clientName: document.getElementById('clientName').value,
+                petName: document.getElementById('petName').value,
+                serviceType: document.getElementById('serviceType').value,
+                serviceValue: parseFloat(document.getElementById('serviceValue').value),
+                serviceDate: document.getElementById('serviceDate').value,
+                serviceTime: document.getElementById('serviceTime').value
+            };
+
+            if (editingId) {
+                appointments = appointments.map(a => a.id === editingId ? {...a, ...data} : a);
+                editingId = null;
+                document.getElementById('submit-appointment-btn').innerText = "Confirmar Agendamento";
+                document.getElementById('form-agenda-title').innerText = "Agendar Horário";
+            } else {
+                appointments.push({ id: Date.now(), ...data, status: 'pendente' });
+            }
+
+            localStorage.setItem('pet_appointments', JSON.stringify(appointments));
+            renderAppointments(); e.target.reset();
+        }
+
+        function renderAppointments() {
+            const container = document.getElementById('appointments-container');
+            container.innerHTML = appointments.sort((a,b) => a.serviceTime.localeCompare(b.serviceTime)).map(app => `
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center ${app.status !== 'pendente' ? 'opacity-50' : 'border-l-4 border-l-indigo-500'}">
+                    <div class="flex items-center gap-4">
+                        <div class="text-center bg-gray-50 p-2 rounded-lg min-w-[60px] font-bold text-indigo-600">
+                            <span class="text-xs block text-gray-400 font-normal">${app.serviceTime}</span>
+                            ${app.serviceDate.split('-').reverse().slice(0,2).join('/')}
+                        </div>
+                        <div>
+                            <h4 class="font-bold">${app.petName}</h4>
+                            <p class="text-xs text-gray-500">${app.clientName} • ${app.serviceType}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="editAppointment(${app.id})" class="p-2 text-amber-500 hover:bg-amber-50 rounded-full"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                        <button onclick="updateStatus(${app.id}, 'concluido')" class="p-2 text-emerald-500 hover:bg-emerald-50 rounded-full"><i data-lucide="check" class="w-4 h-4"></i></button>
+                        <button onclick="updateStatus(${app.id}, 'cancelado')" class="p-2 text-rose-500 hover:bg-rose-50 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function updateStatus(id, s) {
+            appointments = appointments.map(a => a.id === id ? {...a, status: a.status === s ? 'pendente' : s} : a);
+            localStorage.setItem('pet_appointments', JSON.stringify(appointments));
+            renderAppointments();
+        }
+
+        // --- DASHBOARD EMPRESARIAL ---
+        function renderDashboard() {
+            const hoje = new Date().toISOString().split('T')[0];
+            let ganhosDia = 0, concluidoQtde = 0, canceladoQtde = 0;
+            const mix = { "Banho": 0, "Tosa": 0, "Banho e Tosa": 0, "Consulta": 0 };
+            const faturamentoMensal = new Array(12).fill(0);
+
+            const concluidos = appointments.filter(a => a.status === 'concluido');
+
+            appointments.forEach(app => {
+                if (app.status === 'concluido') {
+                    mix[app.serviceType]++;
+                    faturamentoMensal[new Date(app.serviceDate).getMonth()] += app.serviceValue;
+                    if (app.serviceDate === hoje) { ganhosDia += app.serviceValue; concluidoQtde++; }
+                } else if (app.status === 'cancelado' && app.serviceDate === hoje) {
+                    canceladoQtde++;
+                }
+            });
+
+            document.getElementById('kpi-ganhos').innerText = `R$ ${ganhosDia.toFixed(2)}`;
+            document.getElementById('kpi-concluidos').innerText = concluidoQtde;
+            document.getElementById('kpi-cancelados').innerText = canceladoQtde;
+            document.getElementById('kpi-ticket-medio').innerText = `R$ ${concluidoQtde > 0 ? (ganhosDia / concluidoQtde).toFixed(2) : '0,00'}`;
+
+            document.getElementById('recent-transactions').innerHTML = concluidos.slice(-5).reverse().map(app => `
+                <tr class="text-sm">
+                    <td class="px-6 py-4 text-gray-400">${app.serviceDate.split('-').reverse().join('/')}</td>
+                    <td class="px-6 py-4 font-bold">${app.clientName} <span class="text-xs font-normal block text-gray-400">${app.petName}</span></td>
+                    <td class="px-6 py-4 uppercase text-[10px] font-black tracking-widest">${app.serviceType}</td>
+                    <td class="px-6 py-4 text-right font-bold text-emerald-600">R$ ${app.serviceValue.toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            // Gráfico Barras
+            if(financeChart) financeChart.destroy();
+            financeChart = new Chart(document.getElementById('financeChart'), {
+                type: 'bar',
+                data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'], datasets: [{ label: 'Faturamento R$', data: faturamentoMensal, backgroundColor: '#4338ca', borderRadius: 5 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+            });
+
+            // Gráfico Rosca
+            if(serviceMixChart) serviceMixChart.destroy();
+            serviceMixChart = new Chart(document.getElementById('serviceMixChart'), {
+                type: 'doughnut',
+                data: { labels: Object.keys(mix), datasets: [{ data: Object.values(mix), backgroundColor: ['#3b82f6','#8b5cf6','#10b981','#f59e0b'] }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+            });
+        }
+    </script>
+</body>
+</html>
