@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetManager Pro - Agenda & Gestão</title>
+    <!-- Tailwind CSS para estilização rápida -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js para renderização de gráficos do dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Biblioteca de ícones modernos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* Personalizações para barras de rolagem elegantes e transições suaves */
+        ::-webkit-scrollbar {
+            largura: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            fundo: transparente;
+        }
+        ::-webkit-scrollbar-thumb {
+            cor de fundo: #cbd5e1;
+            raio da borda: 20px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            cor de fundo: #94a3b8;
+        }
+        principal > div {
+            transição: opacidade 0,2s entrada e saída suaves;
+        }
+        .escondido {
+            exibir: nenhum !importante;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- TELA DE BLOQUEIO / VALIDAÇÃO DE LICENÇA REMOTA -->
+    <div id="activation-screen" class="fixed inset-0 bg-indigo-950 flex items-center justify-center z-50 p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center space-y-6">
+            <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                <i data-lucide="shield-check" class="w-8 h-8"></i>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">Ativação do Sistema</h2>
+                <p class="text-sm text-gray-500 mt-2">Insira a chave de segurança fornecida para liberar o acesso à sua agenda.</p>
+            </div>
+            <div class="space-y-3">
+                <input type="text" id="license-key-input" placeholder="XXXX-XXXX-XXXX-XXXX" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-600 text-center font-mono tracking-widest text-lg uppercase">
+                <p id="activation-error" class="text-sm text-rose-600 font-medium hidden">Chave inválida! Verifique e tente novamente.</p>
+            </div>
+            <button onclick="validateLicenseKey()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl transition shadow-lg shadow-indigo-200">
+                Agenda Virtual Ativar
+            </button>
+        </div>
+    </div>
+
+    <!-- PAINEL PRINCIPAL DO APLICATIVO -->
+    <div id="main-app" class="flex h-screen overflow-hidden hidden">
+        
+        <!-- BARRA LATERAL (DESKTOP) -->
+        <div class="w-64 bg-indigo-900 text-white flex flex-col justify-between hidden md:flex">
+            <div class="p-5">
+                <div class="flex items-center gap-3 mb-8">
+                    <i data-lucide="dog" class="w-8 h-8 text-indigo-400"></i>
+                    <h1 class="text-xl font-bold tracking-wider">Gerente de Animais de Estimação</h1>
+                </div>
+                <nav class="space-y-2">
+                    <button onclick="switchTab('agenda')" id="btn-agenda" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-indigo-800 text-white font-medium transition">
+                        <i data-lucide="calendar" class="w-5 h-5"></i> Agenda de Serviços
+                    </button>
+                    <button onclick="switchTab('dashboard')" id="btn-dashboard" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-white font-medium transition">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Painel de Controle e Finanças
+                    </button>
+                </nav>
+            </div>
+            <div class="p-5 border-t border-indigo-800 text-xs text-indigo-300 text-center flex flex-col gap-1">
+                <span>© 2026 PetManager Pro</span>
+                <span class="text-[10px] text-emerald-400 font-medium flex items-center justify-center gap-1">
+                    <span class="w-2 h-2 bg-emerald-400 rounded-full inline-block animate-pulse"></span> Licença Verificada
+                </span>
+            </div>
+        </div>
+
+        <!-- CONTEÚDO À DIREITA -->
+        <div class="flex-1 flex flex-col overflow-y-auto">
+            
+            <!-- CABEÇALHO SUPERIOR -->
+            <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center sticky top-0 z-10">
+                <div class="flex items-center gap-2 md:hidden">
+                    <i data-lucide="dog" class="w-6 h-6 text-indigo-600"></i>
+                    <span class="font-bold text-lg">Gerente de Animais de Estimação</span>
+                </div>
+                <h2 id="page-title" class="text-xl font-bold text-gray-800 hidden md:block">Agenda de Serviços</h2>
+                
+                <!-- NAVEGAÇÃO MOBILE -->
+                <div class="flex gap-2 md:hidden">
+                    <button onclick="switchTab('agenda')" class="p-2 text-indigo-900"><i data-lucide="calendar"></i></button>
+                    <button onclick="switchTab('dashboard')" class="p-2 text-indigo-900"><i data-lucide="layout-dashboard"></i></button>
+                </div>
+                <span class="text-sm bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium" id="current-date"></span>
+            </header>
+
+            <!-- ÁREA DE CONTEÚDO DINÂMICO -->
+            <main class="p-6 max-w-7xl w-full mx-auto space-y-6">
+
+                <!-- ABA DE AGENDAMENTOS -->
+                <div id="tab-agenda" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!--->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-fit">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-900">
+                            <i data-lucide="plus-circle" class="w-5 h-5"></i> Novo Agendamento
+                        </h3>
+                        <form id="appointment-form" onsubmit="saveAppointment(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Cliente / Doação</label>
+                                <input type="text" id="clientName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Nome do Pet</label>
+                                <input type="text" id="petName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Serviço</label>
+                                    <select id="serviceType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="Banho">Banho</option>
+                                        <option value="Tosa">Tosa</option>
+                                        <option value="Banho e Tosa">Banho e Tosa</option>
+                                        <option value="Consulta">Consulta</option>
+                                        <option value="Outros">Outros</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Valor (R$)</label>
+                                    <input type="number" id="serviceValue" step="0.01" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Dados</label>
+                                    <input type="date" id="serviceDate" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Horário</label>
+                                    <input type="time" id="serviceTime" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition mt-2">
+                                Agendar Entrada
+                            </button>
+                        </formulário>
+                    </div>
+
+                    <!-- Lista de Cards -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-gray-800">Próximos Serviços</h3>
+                            <span id="appointment-count" class="text-xs bg-gray-200 text-gray-700 font-bold px-2.5 py-1 rounded-full">0 ativo</span>
+                        </div>
+                        <div id="appointments-container" class="space-y-3 max-h-[calc(100vh-220px)] overflow-y-auto pr-1"></div>
+                    </div>
+                </div>
+
+                <!-- ABA DO DASHBOARD FINANCEIRO -->
+                <div id="tab-dashboard" class="hidden space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Ganhos (Concluídos)</p>
+                                <h3 class="text-2xl font-bold text-emerald-600 mt-1" id="kpi-ganhos">R$ 0,00</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center">
+                                <i data-lucide="trending-up" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Perdas / Cancelados</p>
+                                <h3 class="text-2xl font-bold text-rose-600 mt-1" id="kpi-perdas">R$ 0,00</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center">
+                                <i data-lucide="trending-down" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Saldo Operacional</p>
+                                <h3 class="text-2xl font-bold text-indigo-600 mt-1" id="kpi-saldo">R$ 0,00</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center">
+                                <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
+                            <h4 class="text-md font-bold mb-4 text-gray-700">Fluxo Financeiro por Serviço</h4>
+                            <div class="h-64 relative">
+                                <canvas id="financeChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <h4 class="text-md font-bold mb-4 text-gray-700">Histórico recente da Caixa</h4>
+                            <div id="finance-history" class="space-y-3 max-h-64 overflow-y-auto text-sm"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- REGRAS DE NEGÓCIO E CONTROLE REMOTO -->
+    <script>
+        // URL DO CONTROLE REMOTO (Cole o link 'Raw' do seu JSON do Gist aqui)
+        const REMOTE_CONTROL_URL = "SUA_URL_RAW_DO_GIST_AQUI";
+
+        let appointments = JSON.parse(localStorage.getItem('pet_appointments')) || [];
+        seja financeChart = nulo;
+
+        // Monitoramento de inicialização do sistema
+        window.addEventListener('DOMContentLoaded', async () => {
+            lucide.createIcons();
+            definirDataHoje();
+            
+            se (localStorage.getItem('pet_app_activated') === 'true') {
+                const savedKey = localStorage.getItem('pet_app_license_key');
+                const isAuthorized = await checkRemoteAuthorization(savedKey);
+                
+                se (isAuthorized) {
+                    liberarApp();
+                } outro {
+                    localStorage.removeItem('pet_app_activated');
+                    localStorage.removeItem('pet_app_license_key');
+                    showBlockError("Esta licença foi revogada ou encontra-se com pendências financeiras.");
+                }
+            }
+        });
+
+        função definirDataHoje() {
+            const dateEl = document.getElementById('current-date');
+            se(dateEl) {
+                dateEl.innerText = new Date().toLocaleDateString('pt-BR', {
+                    dia da semana: 'comprimento', ano: 'numérico', mês: 'comprimento', dia: 'numérico'
+                });
+            }
+        }
+
+        // Validador Remoto Anti-Burlar Cache (?t=...)
+        função assíncrona verificarAutorizaçãoRemota(chave) {
+            if (!REMOTE_CONTROL_URL || REMOTE_CONTROL_URL.includes("SUA_URL_RAW")) {
+                console.warn("Controle remoto offline: Operando localmente.");
+                retornar verdadeiro;
+            }
+            tentar {
+                const response = await fetch(`${REMOTE_CONTROL_URL}?t=${Date.now()}`);
+                Se (!response.ok) retorne falso;
+                
+                const database = await response.json();
+                se (database[key] && database[key].status === "ativo") {
+                    retornar verdadeiro;
+                }
+                retornar falso;
+            } catch (erro) {
+                console.error("Erro de comunicação com o servidor:", erro);
+                return localStorage.getItem('pet_app_activated') === 'true';
+            }
+        }
+
+        função assíncrona validateLicenseKey() {
+            const inputKey = document.getElementById('license-key-input').value.trim().toUpperCase();
+            const errorElement = document.getElementById('activation-error');
+            
+            se (!inputKey) retornar;
+            errorElement.classList.add('hidden');
+            
+            const isAuthorized = await checkRemoteAuthorization(inputKey);
+
+            se (isAuthorized) {
+                localStorage.setItem('pet_app_activated', 'true');
+                localStorage.setItem('pet_app_license_key', inputKey);
+                liberarApp();
+            } outro {
+                showBlockError("Chave inválida, expirada ou suspensa temporariamente.");
+            }
+        }
+
+        função mostrarErroDeBloco(mensagem) {
+            const errorElement = document.getElementById('activation-error');
+            se(elemento de erro) {
+                errorElement.innerText = mensagem;
+                errorElement.classList.remove('hidden');
+            }
+        }
+
+        função liberarApp() {
+            document.getElementById('activation-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            renderAppointments();
+        }
+
+        função switchTab(tab) {
+            const btnAgenda = document.getElementById('btn-agenda');
+            const btnDashboard = document.getElementById('btn-dashboard');
+            const tabAgenda = document.getElementById('tab-agenda');
+            const tabDashboard = document.getElementById('tab-dashboard');
+            const pageTitle = document.getElementById('page-title');
+
+            se (tab === 'agenda') {
+                tabAgenda.classList.remove('hidden');
+                tabDashboard.classList.add('hidden');
+                btnAgenda.className = "flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-indigo-800 text-white font-medium transition";
+                btnDashboard.className = "flex items-center gap-3 w-full px-4 py-3 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-white font-medium transition";
+                pageTitle.innerText = "Agenda de Serviços";
+            } outro {
+                tabAgenda.classList.add('hidden');
+                tabDashboard.classList.remove('hidden');
+                btnDashboard.className = "flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-indigo-800 text-white font-medium transition";
+                btnAgenda.className = "flex items-center gap-3 w-full px-4 py-3 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-white font-medium transition";
+                pageTitle.innerText = "Painel e Finanças";
+                renderDashboard();
+            }
+        }
+
+        função salvarCompromisso(e) {
+            e.preventDefault();
+            const novoAplicativo = {
+                id: Date.now(),
+                clientName: document.getElementById('clientName').value,
+                petName: document.getElementById('petName').value,
+                serviceType: document.getElementById('serviceType').value,
+                serviceValue: parseFloat(document.getElementById('serviceValue').value),
+                serviceDate: document.getElementById('serviceDate').value,
+                serviceTime: document.getElementById('serviceTime').value,
+                status: 'pendente'
+            };
+
+            compromissos.push(novoApp);
+            atualizarArmazenamento();
+            renderAppointments();
+            document.getElementById('appointment-form').reset();
+        }
+
+        função alterarStatus(id, novoStatus) {
+            compromissos = compromissos.map(app => app.id === id ? { ...app, status: novoStatus } : app);
+            atualizarArmazenamento();
+            renderAppointments();
+        }
+
+        função excluirCompromisso(id) {
+            compromissos = compromissos.filter(app => app.id !== id);
+            atualizarArmazenamento();
+            renderAppointments();
+        }
+
+        função atualizarArmazenamento() {
+            localStorage.setItem('pet_appointments', JSON.stringify(appointments));
+        }
+
+        função renderizarCompromissos() {
+            const container = document.getElementById('appointments-container');
+            se(!container) retornar;
+            container.innerHTML = '';
+            
+            const sorted = [...appointments].sort((a, b) => new Date(`${a.serviceDate}T${a.serviceTime}`) - new Date(`${b.serviceDate}T${b.serviceTime}`));
+            const activeCount = sorted.filter(a => a.status === 'pendente').length;
+            document.getElementById('appointment-count').innerText = `${activeCount} ativo${activeCount !== 1 ? 's' : ''}`;
+
+            se(sorted.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-400 bg-white round-xl border border-dashed border-gray-200">Nenhum serviço agendado até o momento.</div>`;
+                retornar;
+            }
+
+            sorted.forEach(app => {
+                const dateBr = app.serviceDate.split('-').reverse().slice(0,2).join('/');
+                let statusBadge = '', actionButtons = '';
+
+                if (app.status === 'pendente') {
+                    statusBadge = `<span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Agenda</span>`;
+                    actionButtons = `
+                        <button onclick="changeStatus(${app.id}, 'concluido')" class="text-emerald-600 hover:bg-emerald-50 p-1.5 rounded-lg transition"><i data-lucide="check-square" class="w-5 h-5"></i></button>
+                        <button onclick="changeStatus(${app.id}, 'cancelado')" class="text-rose-600 hover:bg-rose-50 p-1.5 rounded-lg transition"><i data-lucide="x-circle" class="w-5 h-5"></i></button>
+                    `;
+                } else if (app.status === 'concluído') {
+                    statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Concluído</span>`;
+                    actionButtons = `<button onclick="deleteAppointment(${app.id})" class="text-gray-400 hover:text-gray-600 p-1.5"><i data-lucide="trash-2" class="w-5 h-5"></i></button>`;
+                } outro {
+                    statusBadge = `<span class="bg-gray-100 text-gray-500 text-xs font-semibold px-2.5 py-0.5 rounded-full">Cancelado</span>`;
+                    actionButtons = `<button onclick="deleteAppointment(${app.id})" class="text-gray-400 hover:text-gray-600 p-1.5"><i data-lucide="trash-2" class="w-5 h-5"></i></button>`;
+                }
+
+                container.innerHTML += `
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between gap-4 hover:border-indigo-100 transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-indigo-50 rounded-lg flex flex-col items-center justify-center text-indigo-700 font-bold text-xs">
+                                <span>${app.serviceTime}</span>
+                                <span class="text-[10px] font-normal text-indigo-400">${dateBr}</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 flex items-center gap-1.5">${app.petName} <span class="font-normal text-sm text-gray-500">(Doação: ${app.clientName})</span></h4>
+                                <p class="text-sm text-gray-600 flex items-center gap-1">
+                                    <span class="bg-indigo-100 text-indigo-800 text-[11px] font-medium px-2 py-0.5 rounded">${app.serviceType}</span>
+                                    <span class="font-semibold text-gray-700 ml-1">R$ ${app.serviceValue.toFixed(2)}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            ${statusBadge}
+                            <div class="flex items-center border-l pl-2 border-gray-100 ml-1">${actionButtons}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        função renderizarPainel() {
+            seja ganhos = 0, perdas = 0;
+            const serviceTotals = { 'Banho': 0, 'Tosa': 0, 'Banho e Tosa': 0, 'Consulta': 0, 'Outros': 0 };
+            const historyContainer = document.getElementById('finance-history');
+            if(historyContainer) historyContainer.innerHTML = '';
+
+            compromissos.paraCada(aplicativo => {
+                if (app.status === 'concluído') {
+                    ganhos += app.serviceValue;
+                    if(serviceTotals[app.serviceType] !== undefined) serviceTotals[app.serviceType] += app.serviceValue;
+                    
+                    se(containerDeHistórico) {
+                        historyContainer.innerHTML += `
+                            <div class="flex justify-between items-center border-b border-gray-50 pb-2">
+                                <span class="text-gray-600 font-medium">${app.petName} (${app.serviceType})</span>
+                                <span class="text-emerald-600 font-bold">+ R$ ${app.serviceValue.toFixed(2)}</span>
+                            </div>
+                        `;
+                    }
+                } else if (app.status === 'cancelado') {
+                    perdas += app.serviceValue;
+                    se(containerDeHistórico) {
+                        historyContainer.innerHTML += `
+                            <div class="flex justify-between items-center border-b border-gray-50 pb-2">
+                                <span class="text-gray-400 line-through">${app.petName} (${app.serviceType})</span>
+                                <span class="text-rose-500 font-semibold">- R$ ${app.serviceValue.toFixed(2)}</span>
+                            </div>
+                        `;
+                    }
+                }
+            });
+
+            if(historyContainer && historyContainer.innerHTML === '') {
+                historyContainer.innerHTML = '<p class="text-gray-400 text-center py-4">Nenhuma movimentação finalizada.</p>';
+            }
+
+            document.getElementById('kpi-ganhos').innerText = `R$ ${ganhos.toFixed(2)}`;
+            document.getElementById('kpi-perdas').innerText = `R$ ${perdas.toFixed(2)}`;
+            document.getElementById('kpi-saldo').innerText = `R$ ${(ganhos - perdas).toFixed(2)}`;
+
+            se (financeChart) financeChart.destroy();
+            const ctx = document.getElementById('financeChart').getContext('2d');
+            financeChart = novo Chart(ctx, {
+                tipo: 'barra',
+                dados: {
+                    rótulos: Object.keys(serviceTotals),
+                    conjuntos de dados: [{
+                        rótulo: 'Faturamento (R$)',
+                        dados: Object.values(serviceTotals),
+                        backgroundColor: ['#e0e7ff', '#c7d2fe', '#818cf8', '#4f46e5', '#312e81'],
+                        raioDaBorda: 6
+                    }]
+                },
+                opções: {
+                    responsivo: verdadeiro,
+                    manterProporção: falso,
+                    plugins: { legend: { display: false } },
+                    escalas: { y: { inícioEmZero: verdadeiro, grade: { cor: '#f3f4f6' } }, x: { grade: { exibir: falso } } }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
