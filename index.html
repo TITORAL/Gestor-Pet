@@ -21,7 +21,7 @@
             .sidebar span, .sidebar h1 { display: none; }
             .main-content { padding: 15px; }
             .card-servico { flex-direction: column; align-items: flex-start; gap: 15px; }
-            .actions-container { width: 100%; justify-content: flex-end; border-top: 1px solid #f1f5f9; pt-3; }
+            .actions-container { width: 100%; justify-content: flex-end; border-top: 1px solid #f1f5f9; padding-top: 12px; }
         }
     </style>
 </head>
@@ -40,6 +40,9 @@
                     </button>
                     <button onclick="switchTab('clientes')" id="btn-clientes" class="flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium">
                         <i data-lucide="users" class="w-6 h-6"></i> <span>Cadastro de Cliente</span>
+                    </button>
+                    <button onclick="switchTab('dashboard')" id="btn-dashboard" class="flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium">
+                        <i data-lucide="bar-chart-3" class="w-6 h-6"></i> <span>Dashboard & Finanças</span>
                     </button>
                 </nav>
             </div>
@@ -97,16 +100,14 @@
                                 </div>
                             </div>
 
-                            <button type="submit" id="submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-lg transition-all transform active:scale-95">
+                            <button type="submit" id="submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-lg transition-all">
                                 CONFIRMAR AGENDAMENTO
                             </button>
                         </form>
                     </div>
 
                     <div class="lg:col-span-2 space-y-4">
-                        <div class="flex justify-between items-end mb-2">
-                            <h3 class="text-xl font-black text-gray-800 uppercase tracking-tighter">Serviços do Dia</h3>
-                        </div>
+                        <h3 class="text-xl font-black text-gray-800 uppercase tracking-tighter">Serviços do Dia</h3>
                         <div id="appointments-container" class="space-y-3"></div>
                     </div>
                 </div>
@@ -124,6 +125,27 @@
                     </div>
                 </div>
 
+                <div id="tab-dashboard" class="hidden space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border-b-4 border-emerald-500">
+                            <p class="text-[10px] font-black text-gray-400 uppercase">Ganhos (Concluídos)</p>
+                            <h3 class="text-3xl font-black text-emerald-600" id="kpi-ganhos">R$ 0,00</h3>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border-b-4 border-rose-500">
+                            <p class="text-[10px] font-black text-gray-400 uppercase">Perdas (Cancelados)</p>
+                            <h3 class="text-3xl font-black text-rose-600" id="kpi-perdas">R$ 0,00</h3>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border-b-4 border-indigo-500">
+                            <p class="text-[10px] font-black text-gray-400 uppercase">Saldo Total</p>
+                            <h3 class="text-3xl font-black text-indigo-600" id="kpi-saldo">R$ 0,00</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl border border-gray-100 text-center text-gray-400">
+                        <i data-lucide="info" class="mx-auto mb-2 opacity-20"></i>
+                        Os valores são calculados com base nos serviços marcados como concluídos ou cancelados.
+                    </div>
+                </div>
+
             </main>
         </div>
     </div>
@@ -133,13 +155,17 @@
         let clients = JSON.parse(localStorage.getItem('pet_clients')) || [];
 
         function switchTab(tab) {
-            ['agenda', 'clientes'].forEach(t => {
+            ['agenda', 'clientes', 'dashboard'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
                 document.getElementById(`btn-${t}`).classList.remove('bg-pet-active');
             });
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             document.getElementById(`btn-${tab}`).classList.add('bg-pet-active');
-            document.getElementById('page-title').innerText = tab === 'agenda' ? 'Agendamento' : 'Cadastro de Cliente';
+            
+            const titles = { 'agenda': 'Agendamento', 'clientes': 'Cadastro de Cliente', 'dashboard': 'Dashboard & Finanças' };
+            document.getElementById('page-title').innerText = titles[tab];
+            
+            if(tab === 'dashboard') updateDashboard();
         }
 
         function saveClient(e) {
@@ -190,7 +216,6 @@
         function editApp(id) {
             const app = appointments.find(a => a.id === id);
             if (!app) return;
-
             document.getElementById('edit-id').value = app.id;
             document.getElementById('clientNameSearch').value = app.clientName;
             document.getElementById('petName').value = app.petName;
@@ -198,13 +223,9 @@
             document.getElementById('serviceValue').value = app.serviceValue;
             document.getElementById('serviceDate').value = app.serviceDate;
             document.getElementById('serviceTime').value = app.serviceTime;
-
             document.getElementById('form-title').innerText = "Alterar Serviço";
             document.getElementById('submit-btn').innerText = "SALVAR ALTERAÇÕES";
-            document.getElementById('submit-btn').classList.replace('bg-indigo-600', 'bg-amber-500');
             document.getElementById('cancel-edit').classList.remove('hidden');
-            
-            // Scroll suave para o topo no mobile
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -213,30 +234,25 @@
             document.getElementById('edit-id').value = '';
             document.getElementById('form-title').innerText = "Novo Agendamento";
             document.getElementById('submit-btn').innerText = "CONFIRMAR AGENDAMENTO";
-            document.getElementById('submit-btn').classList.replace('bg-amber-500', 'bg-indigo-600');
             document.getElementById('cancel-edit').classList.add('hidden');
         }
 
         function renderAppointments() {
             const container = document.getElementById('appointments-container');
             container.innerHTML = '';
-            
-            // Ordenar por hora
             const sorted = [...appointments].sort((a,b) => a.serviceTime.localeCompare(b.serviceTime));
-
             sorted.forEach(app => {
                 const isConcluido = app.status === 'concluido';
                 const isCancelado = app.status === 'cancelado';
-                
                 container.innerHTML += `
-                    <div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 flex card-servico justify-between items-center shadow-sm hover:shadow-md transition-shadow">
+                    <div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 flex card-servico justify-between items-center shadow-sm">
                         <div class="flex items-center gap-4">
                             <div class="bg-indigo-50 text-indigo-700 font-black p-3 rounded-2xl text-center min-w-[70px]">
                                 <span class="text-[10px] block uppercase opacity-60">${app.serviceTime}</span>
                                 <span class="text-lg">${app.serviceDate.split('-')[2]}</span>
                             </div>
                             <div>
-                                <h4 class="font-black text-gray-900 text-lg leading-tight">${app.petName} <span class="font-medium text-gray-400 text-sm italic">(${app.clientName})</span></h4>
+                                <h4 class="font-black text-gray-900 text-lg">${app.petName} <span class="font-medium text-gray-400 text-xs italic">(${app.clientName})</span></h4>
                                 <div class="flex items-center gap-2 mt-1">
                                     <span class="bg-indigo-100 text-indigo-700 text-[10px] font-black uppercase px-2 py-0.5 rounded-lg">${app.serviceType}</span>
                                     <span class="text-sm font-black text-gray-600">R$ ${app.serviceValue.toFixed(2)}</span>
@@ -244,18 +260,14 @@
                             </div>
                         </div>
                         <div class="flex gap-2 actions-container">
-                            <button onclick="updateStatus(${app.id}, 'concluido')" class="p-3 rounded-xl border border-emerald-100 text-emerald-600 transition-all ${isConcluido ? 'status-concluido shadow-lg scale-105' : 'hover:bg-emerald-50'}">
+                            <button onclick="updateStatus(${app.id}, 'concluido')" class="p-3 rounded-xl border border-emerald-100 text-emerald-600 ${isConcluido ? 'status-concluido' : 'hover:bg-emerald-50'}">
                                 <i data-lucide="check-circle" class="w-6 h-6"></i>
                             </button>
-                            <button onclick="updateStatus(${app.id}, 'cancelado')" class="p-3 rounded-xl border border-rose-100 text-rose-600 transition-all ${isCancelado ? 'status-cancelado shadow-lg scale-105' : 'hover:bg-rose-50'}">
+                            <button onclick="updateStatus(${app.id}, 'cancelado')" class="p-3 rounded-xl border border-rose-100 text-rose-600 ${isCancelado ? 'status-cancelado' : 'hover:bg-rose-50'}">
                                 <i data-lucide="x-circle" class="w-6 h-6"></i>
                             </button>
-                            <button onclick="editApp(${app.id})" class="p-3 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all">
-                                <i data-lucide="pencil" class="w-6 h-6"></i>
-                            </button>
-                            <button onclick="deleteApp(${app.id})" class="p-3 text-gray-300 hover:text-rose-600 transition-colors">
-                                <i data-lucide="trash-2" class="w-6 h-6"></i>
-                            </button>
+                            <button onclick="editApp(${app.id})" class="p-3 text-blue-600 bg-blue-50 rounded-xl"><i data-lucide="pencil" class="w-6 h-6"></i></button>
+                            <button onclick="deleteApp(${app.id})" class="p-3 text-gray-300 hover:text-rose-600"><i data-lucide="trash-2" class="w-6 h-6"></i></button>
                         </div>
                     </div>
                 `;
@@ -269,8 +281,19 @@
             renderAppointments();
         }
 
+        function updateDashboard() {
+            let ganhos = 0, perdas = 0;
+            appointments.forEach(app => {
+                if(app.status === 'concluido') ganhos += app.serviceValue;
+                if(app.status === 'cancelado') perdas += app.serviceValue;
+            });
+            document.getElementById('kpi-ganhos').innerText = `R$ ${ganhos.toFixed(2)}`;
+            document.getElementById('kpi-perdas').innerText = `R$ ${perdas.toFixed(2)}`;
+            document.getElementById('kpi-saldo').innerText = `R$ ${(ganhos - perdas).toFixed(2)}`;
+        }
+
         function deleteApp(id) {
-            if(confirm("Deseja excluir este agendamento?")) {
+            if(confirm("Excluir agendamento?")) {
                 appointments = appointments.filter(a => a.id !== id);
                 localStorage.setItem('pet_appointments', JSON.stringify(appointments));
                 renderAppointments();
