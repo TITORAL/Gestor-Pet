@@ -4,278 +4,169 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PetManager Pro - Agenda & Gestão</title>
-    <!-- Tailwind CSS para estilização rápida -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js para renderização de gráficos do dashboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Biblioteca de ícones modernos Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        /* Personalizações para barras de rolagem elegantes e transições suaves */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 20px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background-color: #94a3b8;
-        }
-        main > div {
-            transition: opacity 0.2s ease-in-out;
-        }
-        .hidden {
-            display: none !important;
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+        .hidden { display: none !important; }
+        /* Cor exata da imagem: indigo-950 aproximado */
+        .bg-pet-sidebar { background-color: #312e81; } 
+        .bg-pet-active { background-color: #4338ca; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
 
-    <!-- TELA DE BLOQUEIO / VALIDAÇÃO DE LICENÇA -->
     <div id="activation-screen" class="fixed inset-0 bg-indigo-950 flex items-center justify-center z-50 p-4">
         <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center space-y-6">
-            <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+            <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto">
                 <i data-lucide="shield-check" class="w-8 h-8"></i>
             </div>
-            <div>
-                <h2 class="text-2xl font-bold text-gray-900">Ativação do Sistema</h2>
-                <p class="text-sm text-gray-500 mt-2">Insira a chave de segurança fornecida para liberar o acesso à sua agenda.</p>
-            </div>
-            <div class="space-y-3">
-                <input type="text" id="license-key-input" placeholder="XXXX-XXXX-XXXX-XXXX" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-600 text-center font-mono tracking-widest text-lg uppercase">
-                <p id="activation-error" class="text-sm text-rose-600 font-medium hidden">Chave inválida! Verifique e tente novamente.</p>
-            </div>
-            <button onclick="validateLicenseKey()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl transition shadow-lg shadow-indigo-200">
+            <h2 class="text-2xl font-bold text-gray-900">Ativação PetManager</h2>
+            <input type="text" id="license-key-input" placeholder="DIGITE 1234" class="w-full px-4 py-3 border rounded-xl text-center font-mono text-lg uppercase">
+            <p id="activation-error" class="text-sm text-rose-600 font-medium hidden">Chave inválida!</p>
+            <button onclick="validateLicenseKey()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-lg">
                 Ativar Agenda Virtual
             </button>
         </div>
     </div>
 
-    <!-- PAINEL PRINCIPAL DO APLICATIVO -->
     <div id="main-app" class="flex h-screen overflow-hidden hidden">
         
-        <!-- BARRA LATERAL (DESKTOP) -->
-        <div class="w-64 bg-indigo-900 text-white flex flex-col justify-between hidden md:flex">
-            <div class="p-5">
-                <div class="flex items-center gap-3 mb-8">
-                    <i data-lucide="dog" class="w-8 h-8 text-indigo-400"></i>
-                    <h1 class="text-xl font-bold tracking-wider">Gerente de Pets</h1>
+        <div class="w-72 bg-pet-sidebar text-white flex flex-col">
+            <div class="p-6">
+                <div class="flex items-center gap-3 mb-10">
+                    <div class="bg-indigo-400/20 p-2 rounded-xl">
+                        <i data-lucide="dog" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold tracking-tight">PetManager</h1>
                 </div>
-                <nav class="space-y-2">
-                    <button onclick="switchTab('agenda')" id="btn-agenda" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-indigo-800 text-white font-medium transition">
-                        <i data-lucide="calendar" class="w-5 h-5"></i> Agenda de Serviços
+
+                <nav class="space-y-3">
+                    <button onclick="switchTab('agenda')" id="btn-agenda" class="flex items-center gap-4 w-full px-5 py-4 rounded-xl bg-pet-active text-white font-medium transition shadow-lg">
+                        <i data-lucide="calendar" class="w-6 h-6"></i> Agenda de Serviços
                     </button>
-                    <button onclick="switchTab('dashboard')" id="btn-dashboard" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-white font-medium transition">
-                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Painel de Controle e Finanças
+                    
+                    <button class="flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium">
+                        <i data-lucide="users" class="w-6 h-6"></i> Cadastro de Cliente
+                    </button>
+
+                    <button onclick="switchTab('dashboard')" id="btn-dashboard" class="flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium">
+                        <i data-lucide="layout-grid" class="w-6 h-6"></i> Dashboard & Finanças
                     </button>
                 </nav>
             </div>
-            <div class="p-5 border-t border-indigo-800 text-xs text-indigo-300 text-center flex flex-col gap-1">
-                <span>© 2026 PetManager Pro</span>
-                <span class="text-[10px] text-emerald-400 font-medium flex items-center justify-center gap-1">
-                    <span class="w-2 h-2 bg-emerald-400 rounded-full inline-block animate-pulse"></span> Licença Verificada
-                </span>
-            </div>
         </div>
 
-        <!-- CONTEÚDO À DIREITA -->
         <div class="flex-1 flex flex-col overflow-y-auto">
             
-            <!-- CABEÇALHO SUPERIOR -->
-            <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center sticky top-0 z-10">
-                <div class="flex items-center gap-2 md:hidden">
-                    <i data-lucide="dog" class="w-6 h-6 text-indigo-600"></i>
-                    <span class="font-bold text-lg">Gerente de Pets</span>
+            <header class="bg-white border-b border-gray-200 px-8 py-5 flex justify-between items-center sticky top-0 z-10">
+                <div class="flex items-center gap-4">
+                    <div class="w-2 h-8 bg-blue-600 rounded-full"></div> <h2 id="page-title" class="text-2xl font-black text-gray-800 uppercase tracking-tight">Agenda Pet</h2>
                 </div>
-                <h2 id="page-title" class="text-xl font-bold text-gray-800 hidden md:block">Agenda de Serviços</h2>
-                
-                <!-- NAVEGAÇÃO MOBILE -->
-                <div class="flex gap-2 md:hidden">
-                    <button onclick="switchTab('agenda')" class="p-2 text-indigo-900"><i data-lucide="calendar"></i></button>
-                    <button onclick="switchTab('dashboard')" class="p-2 text-indigo-900"><i data-lucide="layout-dashboard"></i></button>
-                </div>
-                <span class="text-sm bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium" id="current-date"></span>
+                <span class="text-sm font-bold bg-indigo-50 text-indigo-700 px-4 py-2 rounded-full" id="current-date"></span>
             </header>
 
-            <!-- ÁREA DE CONTEÚDO DINÂMICO -->
-            <main class="p-6 max-w-7xl w-full mx-auto space-y-6">
+            <main class="p-8 max-w-7xl w-full mx-auto space-y-6">
 
-                <!-- ABA DE AGENDAMENTOS -->
-                <div id="tab-agenda" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-fit">
-                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-900">
-                            <i data-lucide="plus-circle" class="w-5 h-5"></i> Novo Agendamento
+                <div id="tab-agenda" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
+                        <h3 class="text-lg font-bold mb-5 flex items-center gap-2 text-indigo-950">
+                            <i data-lucide="plus-circle" class="w-5 h-5 text-blue-600"></i> Novo Agendamento
                         </h3>
                         <form id="appointment-form" onsubmit="saveAppointment(event)" class="space-y-4">
                             <div>
-                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Cliente / Tutor</label>
-                                <input type="text" id="clientName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Cliente / Tutor</label>
+                                <input type="text" id="clientName" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Nome do Pet</label>
-                                <input type="text" id="petName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Nome do Pet</label>
+                                <input type="text" id="petName" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Serviço</label>
-                                    <select id="serviceType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Serviço</label>
+                                    <select id="serviceType" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none">
                                         <option value="Banho">Banho</option>
                                         <option value="Tosa">Tosa</option>
                                         <option value="Banho e Tosa">Banho e Tosa</option>
                                         <option value="Consulta">Consulta</option>
-                                        <option value="Outros">Outros</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Valor (R$)</label>
-                                    <input type="number" id="serviceValue" step="0.01" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Valor (R$)</label>
+                                    <input type="number" id="serviceValue" step="0.01" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none">
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Data</label>
-                                    <input type="date" id="serviceDate" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Horário</label>
-                                    <input type="time" id="serviceTime" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                </div>
+                                <input type="date" id="serviceDate" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none">
+                                <input type="time" id="serviceTime" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none">
                             </div>
-                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition mt-2">
-                                Agendar Entrada
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-md">
+                                Confirmar Agendamento
                             </button>
                         </form>
                     </div>
 
-                    <!-- Lista de Cards -->
                     <div class="lg:col-span-2 space-y-4">
                         <div class="flex justify-between items-center">
-                            <h3 class="text-lg font-bold text-gray-800">Próximos Serviços</h3>
-                            <span id="appointment-count" class="text-xs bg-gray-200 text-gray-700 font-bold px-2.5 py-1 rounded-full">0 ativo</span>
+                            <h3 class="text-xl font-bold text-gray-800">Serviços do Dia</h3>
+                            <span id="appointment-count" class="text-sm bg-blue-100 text-blue-700 font-bold px-4 py-1 rounded-full">0 ativos</span>
                         </div>
-                        <div id="appointments-container" class="space-y-3 max-h-[calc(100vh-220px)] overflow-y-auto pr-1"></div>
+                        <div id="appointments-container" class="space-y-4"></div>
                     </div>
                 </div>
 
-                <!-- ABA DO DASHBOARD FINANCEIRO -->
                 <div id="tab-dashboard" class="hidden space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Ganhos (Concluídos)</p>
-                                <h3 class="text-2xl font-bold text-emerald-600 mt-1" id="kpi-ganhos">R$ 0,00</h3>
-                            </div>
-                            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center">
-                                <i data-lucide="trending-up" class="w-6 h-6"></i>
-                            </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <p class="text-xs font-bold text-gray-400 uppercase">Ganhos</p>
+                            <h3 class="text-3xl font-black text-emerald-600" id="kpi-ganhos">R$ 0,00</h3>
                         </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Perdas / Cancelados</p>
-                                <h3 class="text-2xl font-bold text-rose-600 mt-1" id="kpi-perdas">R$ 0,00</h3>
-                            </div>
-                            <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center">
-                                <i data-lucide="trending-down" class="w-6 h-6"></i>
-                            </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <p class="text-xs font-bold text-gray-400 uppercase">Perdas</p>
+                            <h3 class="text-3xl font-black text-rose-600" id="kpi-perdas">R$ 0,00</h3>
                         </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Saldo Operacional</p>
-                                <h3 class="text-2xl font-bold text-indigo-600 mt-1" id="kpi-saldo">R$ 0,00</h3>
-                            </div>
-                            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center">
-                                <i data-lucide="dollar-sign" class="w-6 h-6"></i>
-                            </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <p class="text-xs font-bold text-gray-400 uppercase">Saldo Total</p>
+                            <h3 class="text-3xl font-black text-blue-600" id="kpi-saldo">R$ 0,00</h3>
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
-                            <h4 class="text-md font-bold mb-4 text-gray-700">Fluxo Financeiro por Serviço</h4>
-                            <div class="h-64 relative">
-                                <canvas id="financeChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                            <h4 class="text-md font-bold mb-4 text-gray-700">Histórico recente de Caixa</h4>
-                            <div id="finance-history" class="space-y-3 max-h-64 overflow-y-auto text-sm"></div>
-                        </div>
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                        <h4 class="text-lg font-bold mb-6">Desempenho Financeiro</h4>
+                        <div class="h-80"><canvas id="financeChart"></canvas></div>
                     </div>
                 </div>
-
             </main>
         </div>
     </div>
 
-    <!-- REGRAS DE NEGÓCIO E CONTROLE DE ACESSO -->
     <script>
-        // Chave de segurança definida localmente no sistema
         const MASTER_LICENSE_KEY = "1234";
-
         let appointments = JSON.parse(localStorage.getItem('pet_appointments')) || [];
         let financeChart = null;
 
-        // Monitoramento de inicialização do sistema
-        window.addEventListener('DOMContentLoaded', async () => {
+        window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
-            definirDataHoje();
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString('pt-BR', {
+                weekday: 'long', day: 'numeric', month: 'long'
+            });
             
             if (localStorage.getItem('pet_app_activated') === 'true') {
-                const savedKey = localStorage.getItem('pet_app_license_key');
-                const isAuthorized = checkRemoteAuthorization(savedKey);
-                
-                if (isAuthorized) {
-                    liberarApp();
-                } else {
-                    localStorage.removeItem('pet_app_activated');
-                    localStorage.removeItem('pet_app_license_key');
-                    mostrarErroDeBloco("Esta licença foi revogada ou encontra-se expirada.");
-                }
+                liberarApp();
             }
         });
 
-        function definirDataHoje() {
-            const dateEl = document.getElementById('current-date');
-            if(dateEl) {
-                dateEl.innerText = new Date().toLocaleDateString('pt-BR', {
-                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-                });
-            }
-        }
-
-        // Validador local adaptado para aceitar a chave 1234
-        function checkRemoteAuthorization(key) {
-            return key === MASTER_LICENSE_KEY;
-        }
-
         function validateLicenseKey() {
-            const inputKey = document.getElementById('license-key-input').value.trim().toUpperCase();
-            const errorElement = document.getElementById('activation-error');
-            
-            if (!inputKey) return;
-            errorElement.classList.add('hidden');
-            
-            const isAuthorized = checkRemoteAuthorization(inputKey);
-
-            if (isAuthorized) {
+            const input = document.getElementById('license-key-input').value;
+            if (input === MASTER_LICENSE_KEY) {
                 localStorage.setItem('pet_app_activated', 'true');
-                localStorage.setItem('pet_app_license_key', inputKey);
                 liberarApp();
             } else {
-                mostrarErroDeBloco("Chave inválida! Digite a chave correta para liberar.");
-            }
-        }
-
-        function mostrarErroDeBloco(mensagem) {
-            const errorElement = document.getElementById('activation-error');
-            if(errorElement) {
-                errorElement.innerText = mensaje || mensagem;
-                errorElement.classList.remove('hidden');
+                document.getElementById('activation-error').classList.remove('hidden');
             }
         }
 
@@ -286,26 +177,20 @@
         }
 
         function switchTab(tab) {
-            const btnAgenda = document.getElementById('btn-agenda');
-            const btnDashboard = document.getElementById('btn-dashboard');
-            const tabAgenda = document.getElementById('tab-agenda');
-            const tabDashboard = document.getElementById('tab-dashboard');
-            const pageTitle = document.getElementById('page-title');
-
-            if (tab === 'agenda') {
-                tabAgenda.classList.remove('hidden');
-                tabDashboard.classList.add('hidden');
-                btnAgenda.className = "flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-indigo-800 text-white font-medium transition";
-                btnDashboard.className = "flex items-center gap-3 w-full px-4 py-3 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-white font-medium transition";
-                pageTitle.innerText = "Agenda de Serviços";
-            } else {
-                tabAgenda.classList.add('hidden');
-                tabDashboard.classList.remove('hidden');
-                btnDashboard.className = "flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-indigo-800 text-white font-medium transition";
-                btnAgenda.className = "flex items-center gap-3 w-full px-4 py-3 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-white font-medium transition";
-                pageTitle.innerText = "Painel e Finanças";
-                renderDashboard();
-            }
+            const isAgenda = tab === 'agenda';
+            document.getElementById('tab-agenda').classList.toggle('hidden', !isAgenda);
+            document.getElementById('tab-dashboard').classList.toggle('hidden', isAgenda);
+            
+            document.getElementById('btn-agenda').className = isAgenda ? 
+                "flex items-center gap-4 w-full px-5 py-4 rounded-xl bg-pet-active text-white font-medium shadow-lg" : 
+                "flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium";
+            
+            document.getElementById('btn-dashboard').className = !isAgenda ? 
+                "flex items-center gap-4 w-full px-5 py-4 rounded-xl bg-pet-active text-white font-medium shadow-lg" : 
+                "flex items-center gap-4 w-full px-5 py-4 rounded-xl text-indigo-100 hover:bg-indigo-800 transition font-medium";
+            
+            document.getElementById('page-title').innerText = isAgenda ? "Agenda Pet" : "Dashboard Financeiro";
+            if(!isAgenda) renderDashboard();
         }
 
         function saveAppointment(e) {
@@ -320,79 +205,37 @@
                 serviceTime: document.getElementById('serviceTime').value,
                 status: 'pendente'
             };
-
             appointments.push(newApp);
-            atualizarArmazenamento();
-            renderAppointments();
-            document.getElementById('appointment-form').reset();
-        }
-
-        function changeStatus(id, novoStatus) {
-            appointments = appointments.map(app => app.id === id ? { ...app, status: novoStatus } : app);
-            atualizarArmazenamento();
-            renderAppointments();
-        }
-
-        function deleteAppointment(id) {
-            appointments = appointments.filter(app => app.id !== id);
-            atualizarArmazenamento();
-            renderAppointments();
-        }
-
-        function atualizarArmazenamento() {
             localStorage.setItem('pet_appointments', JSON.stringify(appointments));
+            renderAppointments();
+            e.target.reset();
         }
 
         function renderAppointments() {
             const container = document.getElementById('appointments-container');
-            if(!container) return;
             container.innerHTML = '';
-            
-            const sorted = [...appointments].sort((a, b) => new Date(`${a.serviceDate}T${a.serviceTime}`) - new Date(`${b.serviceDate}T${b.serviceTime}`));
-            const activeCount = sorted.filter(a => a.status === 'pendente').length;
+            const activeCount = appointments.filter(a => a.status === 'pendente').length;
             document.getElementById('appointment-count').innerText = `${activeCount} ativo${activeCount !== 1 ? 's' : ''}`;
 
-            if(sorted.length === 0) {
-                container.innerHTML = `<div class="text-center py-12 text-gray-400 bg-white rounded-xl border border-dashed border-gray-200">Nenhum serviço agendado até o momento.</div>`;
-                return;
-            }
-
-            sorted.forEach(app => {
-                const dateBr = app.serviceDate.split('-').reverse().slice(0,2).join('/');
-                let statusBadge = '', actionButtons = '';
-
-                if (app.status === 'pendente') {
-                    statusBadge = `<span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Agendado</span>`;
-                    actionButtons = `
-                        <button onclick="changeStatus(${app.id}, 'concluido')" class="text-emerald-600 hover:bg-emerald-50 p-1.5 rounded-lg transition"><i data-lucide="check-square" class="w-5 h-5"></i></button>
-                        <button onclick="changeStatus(${app.id}, 'cancelado')" class="text-rose-600 hover:bg-rose-50 p-1.5 rounded-lg transition"><i data-lucide="x-circle" class="w-5 h-5"></i></button>
-                    `;
-                } else if (app.status === 'concluido') {
-                    statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Concluído</span>`;
-                    actionButtons = `<button onclick="deleteAppointment(${app.id})" class="text-gray-400 hover:text-gray-600 p-1.5"><i data-lucide="trash-2" class="w-5 h-5"></i></button>`;
-                } else {
-                    statusBadge = `<span class="bg-gray-100 text-gray-500 text-xs font-semibold px-2.5 py-0.5 rounded-full">Cancelado</span>`;
-                    actionButtons = `<button onclick="deleteAppointment(${app.id})" class="text-gray-400 hover:text-gray-600 p-1.5"><i data-lucide="trash-2" class="w-5 h-5"></i></button>`;
-                }
-
+            appointments.forEach(app => {
                 container.innerHTML += `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between gap-4 hover:border-indigo-100 transition">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-indigo-50 rounded-lg flex flex-col items-center justify-center text-indigo-700 font-bold text-xs">
-                                <span>${app.serviceTime}</span>
-                                <span class="text-[10px] font-normal text-indigo-400">${dateBr}</span>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-indigo-50 p-3 rounded-xl text-indigo-700 font-bold text-center leading-tight">
+                                <span class="text-xs block uppercase">${app.serviceTime}</span>
+                                <span class="text-lg">${app.serviceDate.split('-')[2]}</span>
                             </div>
                             <div>
-                                <h4 class="font-bold text-gray-800 flex items-center gap-1.5">${app.petName} <span class="font-normal text-sm text-gray-500">(Tutor: ${app.clientName})</span></h4>
-                                <p class="text-sm text-gray-600 flex items-center gap-1">
-                                    <span class="bg-indigo-100 text-indigo-800 text-[11px] font-medium px-2 py-0.5 rounded">${app.serviceType}</span>
-                                    <span class="font-semibold text-gray-700 ml-1">R$ ${app.serviceValue.toFixed(2)}</span>
-                                </p>
+                                <h4 class="text-lg font-bold text-gray-900">${app.petName} <span class="text-sm font-normal text-gray-500">(${app.clientName})</span></h4>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="bg-blue-100 text-blue-700 text-[10px] font-black uppercase px-2 py-0.5 rounded">${app.serviceType}</span>
+                                    <span class="text-sm font-bold text-gray-700">R$ ${app.serviceValue.toFixed(2)}</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            ${statusBadge}
-                            <div class="flex items-center border-l pl-2 border-gray-100 ml-1">${actionButtons}</div>
+                        <div class="flex gap-2">
+                            <button onclick="updateStatus(${app.id}, 'concluido')" class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg"><i data-lucide="check-circle"></i></button>
+                            <button onclick="deleteApp(${app.id})" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg"><i data-lucide="trash-2"></i></button>
                         </div>
                     </div>
                 `;
@@ -400,66 +243,27 @@
             lucide.createIcons();
         }
 
+        function updateStatus(id, status) {
+            appointments = appointments.map(a => a.id === id ? {...a, status} : a);
+            localStorage.setItem('pet_appointments', JSON.stringify(appointments));
+            renderAppointments();
+        }
+
+        function deleteApp(id) {
+            appointments = appointments.filter(a => a.id !== id);
+            localStorage.setItem('pet_appointments', JSON.stringify(appointments));
+            renderAppointments();
+        }
+
         function renderDashboard() {
             let ganhos = 0, perdas = 0;
-            const serviceTotals = { 'Banho': 0, 'Tosa': 0, 'Banho e Tosa': 0, 'Consulta': 0, 'Outros': 0 };
-            const historyContainer = document.getElementById('finance-history');
-            if(historyContainer) historyContainer.innerHTML = '';
-
             appointments.forEach(app => {
-                if (app.status === 'concluido') {
-                    ganhos += app.serviceValue;
-                    if(serviceTotals[app.serviceType] !== undefined) serviceTotals[app.serviceType] += app.serviceValue;
-                    
-                    if(historyContainer) {
-                        historyContainer.innerHTML += `
-                            <div class="flex justify-between items-center border-b border-gray-50 pb-2">
-                                <span class="text-gray-600 font-medium">${app.petName} (${app.serviceType})</span>
-                                <span class="text-emerald-600 font-bold">+ R$ ${app.serviceValue.toFixed(2)}</span>
-                            </div>
-                        `;
-                    }
-                } else if (app.status === 'cancelado') {
-                    perdas += app.serviceValue;
-                    if(historyContainer) {
-                        historyContainer.innerHTML += `
-                            <div class="flex justify-between items-center border-b border-gray-50 pb-2">
-                                <span class="text-gray-400 line-through">${app.petName} (${app.serviceType})</span>
-                                <span class="text-rose-500 font-semibold">- R$ ${app.serviceValue.toFixed(2)}</span>
-                            </div>
-                        `;
-                    }
-                }
+                if(app.status === 'concluido') ganhos += app.serviceValue;
+                else if(app.status === 'cancelado') perdas += app.serviceValue;
             });
-
-            if(historyContainer && historyContainer.innerHTML === '') {
-                historyContainer.innerHTML = '<p class="text-gray-400 text-center py-4">Nenhuma movimentação finalizada.</p>';
-            }
-
             document.getElementById('kpi-ganhos').innerText = `R$ ${ganhos.toFixed(2)}`;
             document.getElementById('kpi-perdas').innerText = `R$ ${perdas.toFixed(2)}`;
-            document.getElementById('kpi-saldo').innerText = `R$ ${(ganhos - perdas).toFixed(2)}`;
-
-            if (financeChart) financeChart.destroy();
-            const ctx = document.getElementById('financeChart').getContext('2d');
-            financeChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(serviceTotals),
-                    datasets: [{
-                        label: 'Faturamento (R$)',
-                        data: Object.values(serviceTotals),
-                        backgroundColor: ['#e0e7ff', '#c7d2fe', '#818cf8', '#4f46e5', '#312e81'],
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, grid: { color: '#f3f4f6' } }, x: { grid: { display: false } } }
-                }
-            });
+            document.getElementById('kpi-saldo').innerText = `R$ ${(ganhos-perdas).toFixed(2)}`;
         }
     </script>
 </body>
