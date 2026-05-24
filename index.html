@@ -336,8 +336,25 @@
         }
 
         function handleFormSubmit(e) {
-            e.preventDefault(); const editId = document.getElementById('edit-id').value;
-            const data = { id: editId ? parseInt(editId) : Date.now(), clientName: document.getElementById('clientNameSearch').value, petName: document.getElementById('petName').value, serviceType: document.getElementById('serviceType').value, serviceValue: parseFloat(document.getElementById('serviceValue').value), serviceDate: document.getElementById('serviceDate').value, serviceTime: document.getElementById('serviceTime').value, status: editId ? (appointments.find(a => a.id == editId).status) : 'pendente' };
+            e.preventDefault(); 
+            const editId = document.getElementById('edit-id').value;
+            const date = document.getElementById('serviceDate').value;
+            const time = document.getElementById('serviceTime').value;
+
+            // BLOQUEIO DE HORÁRIO REPETIDO
+            const isConflict = appointments.some(a => 
+                a.serviceDate === date && 
+                a.serviceTime === time && 
+                a.id != editId &&
+                a.status !== 'cancelado'
+            );
+
+            if(isConflict) {
+                alert("Atenção: Já existe um agendamento para este dia e horário!");
+                return;
+            }
+
+            const data = { id: editId ? parseInt(editId) : Date.now(), clientName: document.getElementById('clientNameSearch').value, petName: document.getElementById('petName').value, serviceType: document.getElementById('serviceType').value, serviceValue: parseFloat(document.getElementById('serviceValue').value), serviceDate: date, serviceTime: time, status: editId ? (appointments.find(a => a.id == editId).status) : 'pendente' };
             if (editId) appointments = appointments.map(a => a.id == editId ? data : a); else appointments.push(data);
             localStorage.setItem('pet_appointments', JSON.stringify(appointments)); e.target.reset(); document.getElementById('edit-id').value = ''; renderCalendar(); if(selectedDateStr) showDayDetails(selectedDateStr);
         }
