@@ -13,54 +13,65 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
         .hidden { display: none !important; }
-        .bg-pet-sidebar { background-color: #1e1b4b; } 
-        .bg-pet-active { background-color: #3730a3; }
+        
+        /* Cores Originais da Lateral */
+        .bg-pet-sidebar { background-color: #312e81; } 
+        .bg-pet-active { background-color: #4338ca; }
+        
         .fita-azul { width: 3px; height: 20px; background-color: #3b82f6; border-radius: 4px; margin-right: 12px; }
         
-        /* Estilo da Data Tom sobre Tom */
         .header-date-badge {
-            background-color: #e0f2fe; /* Azul clarinho */
-            color: #0369a1; /* Azul escuro */
+            background-color: #e0f2fe;
+            color: #0369a1;
             padding: 8px 16px;
             border-radius: 12px;
             font-weight: 600;
         }
 
-        /* Calendário Expandido */
+        /* Calendário Refinado */
         .calendar-grid-container {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 1px;
-            background-color: #f1f5f9;
-            border: 1px solid #f1f5f9;
+            background-color: #e2e8f0;
+            border: 1px solid #e2e8f0;
         }
         .calendar-cell {
             background: white;
-            min-height: 100px;
-            padding: 6px;
+            min-height: 80px;
+            padding: 8px;
             transition: all 0.2s;
-        }
-        .calendar-cell:hover { background-color: #f8fafc; }
-        .cell-day-number { font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 4px; }
-        .event-tag {
-            font-size: 9px;
-            padding: 2px 6px;
-            background: #eef2ff;
-            color: #4338ca;
-            border-radius: 4px;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-weight: 600;
             cursor: pointer;
         }
-        .event-tag:hover { background: #e0e7ff; }
+        .calendar-cell:hover { background-color: #f1f5f9; }
+        .calendar-cell.selected { background-color: #eef2ff; border: 1px solid #4338ca; }
+        
+        .cell-day-number { 
+            font-size: 13px; 
+            font-weight: 800; 
+            color: #1e293b; /* Número mais escuro */
+            margin-bottom: 4px; 
+        }
+        
+        .event-dot {
+            width: 6px;
+            height: 6px;
+            background: #4338ca;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 2px;
+        }
+
+        /* Botões de Status em Bolinha */
+        .btn-status { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .btn-check { background-color: #ecfdf5; color: #10b981; border: 1px solid #10b981; }
+        .btn-check.active { background-color: #10b981; color: white; }
+        .btn-x { background-color: #fef2f2; color: #ef4444; border: 1px solid #ef4444; }
+        .btn-x.active { background-color: #ef4444; color: white; }
 
         @media (max-width: 768px) {
             .sidebar-desktop { display: none; }
             .mobile-nav { display: flex; }
-            .main-content { padding-bottom: 90px; }
         }
     </style>
 </head>
@@ -69,18 +80,18 @@
     <div id="main-app" class="flex flex-col md:flex-row h-screen overflow-hidden">
         
         <aside class="sidebar-desktop w-64 bg-pet-sidebar text-white flex flex-col p-6">
-            <div class="flex items-center gap-3 mb-10 opacity-90">
-                <i data-lucide="dog" class="w-7 h-7 text-indigo-400"></i>
-                <h1 class="text-sm font-extrabold tracking-widest uppercase">Pet Manager</h1>
+            <div class="flex items-center gap-3 mb-10">
+                <i data-lucide="dog" class="w-8 h-8 text-indigo-300"></i>
+                <h1 class="text-lg font-black tracking-tight uppercase">Agenda Pet</h1>
             </div>
             <nav class="space-y-1">
                 <button onclick="switchTab('agenda')" id="btn-agenda-dt" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-pet-active transition text-sm font-semibold">
                     <i data-lucide="calendar" class="w-4 h-4"></i> Agendamentos
                 </button>
-                <button onclick="switchTab('clientes')" id="btn-clientes-dt" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-indigo-900/50 transition text-sm font-semibold opacity-70">
+                <button onclick="switchTab('clientes')" id="btn-clientes-dt" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-indigo-800 transition text-sm font-semibold opacity-70">
                     <i data-lucide="users" class="w-4 h-4"></i> Clientes
                 </button>
-                <button onclick="switchTab('dashboard')" id="btn-dashboard-dt" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-indigo-900/50 transition text-sm font-semibold opacity-70">
+                <button onclick="switchTab('dashboard')" id="btn-dashboard-dt" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-indigo-800 transition text-sm font-semibold opacity-70">
                     <i data-lucide="pie-chart" class="w-4 h-4"></i> Financeiro
                 </button>
             </nav>
@@ -123,58 +134,49 @@
                                     <option value="Tosa">Tosa</option>
                                     <option value="Completo">Banho e Tosa</option>
                                 </select>
-                                <input type="number" id="serviceValue" placeholder="R$ 0,00" step="0.01" required class="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm outline-none">
-                                <button type="submit" id="submit-btn" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all text-xs uppercase tracking-widest">Confirmar</button>
+                                <input type="number" id="serviceValue" placeholder="Valor R$" step="0.01" required class="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm outline-none">
+                                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all text-xs uppercase tracking-widest">Confirmar</button>
                             </form>
                         </div>
                     </div>
 
-                    <div class="lg:col-span-9 bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-                        <div class="p-6 border-b border-slate-50 flex justify-between items-center bg-white">
-                            <span id="cal-month" class="text-sm font-black uppercase tracking-widest text-slate-800">Maio 2026</span>
-                            <div class="flex gap-4">
-                                <button onclick="changeMonth(-1)" class="p-2 hover:bg-slate-100 rounded-xl transition"><i data-lucide="chevron-left" class="w-5 h-5 text-slate-400"></i></button>
-                                <button onclick="changeMonth(1)" class="p-2 hover:bg-slate-100 rounded-xl transition"><i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i></button>
+                    <div class="lg:col-span-9 space-y-6">
+                        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                            <div class="p-6 border-b border-slate-50 flex justify-between items-center">
+                                <span id="cal-month" class="text-sm font-black uppercase tracking-widest text-slate-800">Maio 2026</span>
+                                <div class="flex gap-4">
+                                    <button onclick="changeMonth(-1)" class="p-2 hover:bg-slate-100 rounded-xl transition"><i data-lucide="chevron-left" class="w-5 h-5 text-slate-400"></i></button>
+                                    <button onclick="changeMonth(1)" class="p-2 hover:bg-slate-100 rounded-xl transition"><i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i></button>
+                                </div>
                             </div>
+                            <div class="grid grid-cols-7 text-center py-3 bg-slate-50 border-b border-slate-100 text-[11px] font-extrabold text-slate-500 uppercase">
+                                <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+                            </div>
+                            <div id="calendar-grid" class="calendar-grid-container"></div>
                         </div>
-                        <div class="grid grid-cols-7 text-center py-3 bg-slate-50/50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-tighter">
-                            <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+
+                        <div id="day-details-card" class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 hidden">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 id="selected-day-title" class="font-bold text-indigo-600 text-xs uppercase tracking-widest">Serviços do Dia</h3>
+                                <button onclick="closeDayDetails()" class="text-slate-300 hover:text-slate-500"><i data-lucide="x" class="w-5 h-5"></i></button>
+                            </div>
+                            <div id="day-appointments-list" class="space-y-3"></div>
                         </div>
-                        <div id="calendar-grid" class="calendar-grid-container"></div>
                     </div>
                 </div>
 
                 <div id="tab-clientes" class="hidden flex flex-col items-center space-y-6">
-                    <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm w-full max-w-md">
-                        <h3 id="client-form-title" class="font-bold text-slate-800 uppercase mb-6 text-center text-xs tracking-[0.2em]">Cadastro</h3>
-                        <form id="client-form" onsubmit="saveClient(event)" class="space-y-3">
-                            <input type="hidden" id="edit-client-index">
+                    <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm w-full max-w-md text-center">
+                        <h3 class="font-bold text-slate-800 uppercase mb-6 text-xs tracking-[0.2em]">Cadastro de Cliente</h3>
+                        <form onsubmit="saveClient(event)" class="space-y-3">
                             <input type="text" id="regClientName" placeholder="Nome do Tutor" required class="w-full px-4 py-4 bg-slate-50 border-none rounded-2xl outline-none text-sm">
                             <input type="tel" id="regPhone" placeholder="WhatsApp" required class="w-full px-4 py-4 bg-slate-50 border-none rounded-2xl outline-none text-sm">
                             <input type="text" id="regPet" placeholder="Nome do Pet" required class="w-full px-4 py-4 bg-slate-50 border-none rounded-2xl outline-none text-sm">
-                            <button id="client-submit-btn" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl mt-2 text-xs uppercase">Salvar Cliente</button>
+                            <button class="w-full bg-indigo-900 text-white font-bold py-4 rounded-2xl mt-2 text-xs uppercase tracking-widest">Salvar</button>
                         </form>
                     </div>
-                    <div class="w-full max-w-md bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-                        <div id="client-list-bi" class="divide-y divide-slate-50"></div>
-                    </div>
+                    <div id="client-list-bi" class="w-full max-w-md bg-white rounded-3xl border border-slate-100 shadow-sm divide-y"></div>
                 </div>
-
-                <div id="tab-dashboard" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-8 rounded-3xl border-b-4 border-emerald-500 shadow-sm">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Receita</p>
-                        <h3 class="text-2xl font-black text-slate-800" id="kpi-ganhos">R$ 0,00</h3>
-                    </div>
-                    <div class="bg-white p-8 rounded-3xl border-b-4 border-rose-500 shadow-sm">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Cancelados</p>
-                        <h3 class="text-2xl font-black text-slate-800" id="kpi-perdas">R$ 0,00</h3>
-                    </div>
-                    <div class="bg-white p-8 rounded-3xl border-b-4 border-indigo-500 shadow-sm">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Saldo</p>
-                        <h3 class="text-2xl font-black text-slate-800" id="kpi-saldo">R$ 0,00</h3>
-                    </div>
-                </div>
-
             </main>
         </div>
     </div>
@@ -183,6 +185,7 @@
         let appointments = JSON.parse(localStorage.getItem('pet_appointments')) || [];
         let clients = JSON.parse(localStorage.getItem('pet_clients')) || [];
         let currentCalDate = new Date();
+        let selectedDateStr = "";
 
         function switchTab(tab) {
             ['agenda', 'clientes', 'dashboard'].forEach(t => {
@@ -191,13 +194,11 @@
             });
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             document.getElementById(`btn-${tab}-dt`).classList.add('bg-pet-active');
-            if(tab === 'dashboard') updateDashboard();
             if(tab === 'clientes') renderClientList();
             if(tab === 'agenda') renderCalendar();
             lucide.createIcons();
         }
 
-        // --- CALENDÁRIO COM SERVIÇOS DENTRO ---
         function renderCalendar() {
             const grid = document.getElementById('calendar-grid');
             const monthLabel = document.getElementById('cal-month');
@@ -210,32 +211,77 @@
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-            for (let i = 0; i < firstDay; i++) grid.innerHTML += '<div class="calendar-cell bg-slate-50/30"></div>';
+            for (let i = 0; i < firstDay; i++) grid.innerHTML += '<div class="calendar-cell bg-slate-50/50"></div>';
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const dailyApps = appointments.filter(a => a.serviceDate === dateStr);
+                const isSelected = selectedDateStr === dateStr;
                 
-                let eventsHtml = dailyApps.map(app => `
-                    <div onclick="editApp(${app.id})" class="event-tag" title="${app.serviceTime} - ${app.clientName}">
-                        ${app.serviceTime} ${app.petName}
-                    </div>
-                `).join('');
+                let dots = dailyApps.slice(0, 4).map(() => '<span class="event-dot"></span>').join('');
 
                 grid.innerHTML += `
-                    <div class="calendar-cell">
+                    <div onclick="showDayDetails('${dateStr}')" class="calendar-cell ${isSelected ? 'selected' : ''}">
                         <div class="cell-day-number">${day}</div>
-                        <div class="flex flex-col">${eventsHtml}</div>
+                        <div class="flex flex-wrap gap-0.5">${dots}</div>
                     </div>`;
             }
         }
 
-        function changeMonth(dir) {
-            currentCalDate.setMonth(currentCalDate.getMonth() + dir);
+        function showDayDetails(dateStr) {
+            selectedDateStr = dateStr;
+            const detailsCard = document.getElementById('day-details-card');
+            const list = document.getElementById('day-appointments-list');
+            const [y, m, d] = dateStr.split('-');
+            
+            document.getElementById('selected-day-title').innerText = `Serviços de ${d}/${m}/${y}`;
+            detailsCard.classList.remove('hidden');
+            renderCalendar();
+
+            const dailyApps = appointments.filter(a => a.serviceDate === dateStr);
+            list.innerHTML = dailyApps.length ? '' : '<p class="text-slate-400 text-sm italic">Nenhum serviço para este dia.</p>';
+
+            dailyApps.sort((a,b) => a.serviceTime.localeCompare(b.serviceTime)).forEach(app => {
+                const isConcluido = app.status === 'concluido';
+                const isCancelado = app.status === 'cancelado';
+                
+                list.innerHTML += `
+                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div class="flex items-center gap-4">
+                            <span class="text-xs font-black text-indigo-600 bg-white px-2 py-1 rounded-lg border">${app.serviceTime}</span>
+                            <div>
+                                <p class="text-sm font-black text-slate-800">${app.petName} <span class="text-[10px] text-slate-400 font-normal">(${app.clientName})</span></p>
+                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">${app.serviceType}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="updateStatus(${app.id}, 'concluido')" class="btn-status btn-check ${isConcluido ? 'active' : ''}"><i data-lucide="check" class="w-4 h-4"></i></button>
+                            <button onclick="updateStatus(${app.id}, 'cancelado')" class="btn-status btn-x ${isCancelado ? 'active' : ''}"><i data-lucide="x" class="w-4 h-4"></i></button>
+                            <button onclick="editApp(${app.id})" class="p-2 text-slate-300 hover:text-blue-500"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>`;
+            });
+            lucide.createIcons();
+            detailsCard.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function closeDayDetails() {
+            selectedDateStr = "";
+            document.getElementById('day-details-card').classList.add('hidden');
             renderCalendar();
         }
 
-        // --- PERSISTÊNCIA E DADOS ---
+        function updateStatus(id, status) {
+            appointments = appointments.map(a => a.id === id ? {...a, status: a.status === status ? 'pendente' : status} : a);
+            localStorage.setItem('pet_appointments', JSON.stringify(appointments));
+            showDayDetails(selectedDateStr);
+        }
+
+        function changeMonth(dir) {
+            currentCalDate.setMonth(currentCalDate.getMonth() + dir);
+            closeDayDetails();
+        }
+
         function handleFormSubmit(e) {
             e.preventDefault();
             const editId = document.getElementById('edit-id').value;
@@ -247,31 +293,14 @@
                 serviceValue: parseFloat(document.getElementById('serviceValue').value),
                 serviceDate: document.getElementById('serviceDate').value,
                 serviceTime: document.getElementById('serviceTime').value,
-                status: 'pendente'
+                status: editId ? (appointments.find(a => a.id == editId).status) : 'pendente'
             };
             if (editId) appointments = appointments.map(a => a.id == editId ? data : a);
             else appointments.push(data);
             localStorage.setItem('pet_appointments', JSON.stringify(appointments));
-            resetForm();
-            renderCalendar();
-        }
-
-        function editApp(id) {
-            const app = appointments.find(a => a.id === id);
-            document.getElementById('edit-id').value = app.id;
-            document.getElementById('clientNameSearch').value = app.clientName;
-            document.getElementById('petName').value = app.petName;
-            document.getElementById('serviceType').value = app.serviceType;
-            document.getElementById('serviceValue').value = app.serviceValue;
-            document.getElementById('serviceDate').value = app.serviceDate;
-            document.getElementById('serviceTime').value = app.serviceTime;
-            document.getElementById('form-title').innerText = "Editar " + app.petName;
-        }
-
-        function resetForm() {
             document.getElementById('appointment-form').reset();
             document.getElementById('edit-id').value = '';
-            document.getElementById('form-title').innerText = "Agendar";
+            renderCalendar();
         }
 
         function saveClient(e) {
@@ -286,22 +315,26 @@
             const list = document.getElementById('client-list-bi');
             list.innerHTML = '';
             clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
-                list.innerHTML += `
-                    <div class="px-6 py-4 flex justify-between items-center">
-                        <div><p class="text-sm font-extrabold">${c.name}</p><p class="text-xs text-indigo-500 font-bold">${c.pet}</p></div>
-                        <span class="text-sm text-slate-400 font-bold">${c.phone}</span>
-                    </div>`;
+                list.innerHTML += `<div class="px-6 py-4 flex justify-between items-center"><div class="text-sm font-black uppercase">${c.name}<p class="text-[10px] text-indigo-500">${c.pet}</p></div><span class="text-xs text-slate-400 font-bold">${c.phone}</span></div>`;
             });
-        }
-
-        function updateDashboard() {
-            let g = appointments.reduce((acc, a) => acc + (a.status === 'concluido' ? a.serviceValue : 0), 0);
-            document.getElementById('kpi-ganhos').innerText = `R$ ${g.toFixed(2)}`;
         }
 
         function autoFillPet(name) {
             const found = clients.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
             if (found && name.length > 2) document.getElementById('petName').value = found.pet;
+        }
+
+        function editApp(id) {
+            const app = appointments.find(a => a.id === id);
+            document.getElementById('edit-id').value = app.id;
+            document.getElementById('clientNameSearch').value = app.clientName;
+            document.getElementById('petName').value = app.petName;
+            document.getElementById('serviceType').value = app.serviceType;
+            document.getElementById('serviceValue').value = app.serviceValue;
+            document.getElementById('serviceDate').value = app.serviceDate;
+            document.getElementById('serviceTime').value = app.serviceTime;
+            document.getElementById('form-title').innerText = "Editar " + app.petName;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         window.onload = () => {
