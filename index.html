@@ -55,6 +55,11 @@
             margin-right: 2px;
         }
 
+        /* Indicadores de Status ao lado do Dono */
+        .status-indicator { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-left: 6px; }
+        .status-done { background-color: #10b981; box-shadow: 0 0 8px #10b98166; }
+        .status-canceled { background-color: #ef4444; box-shadow: 0 0 8px #ef444466; }
+
         .btn-status { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .btn-check { background-color: #ecfdf5; color: #10b981; border: 1px solid #10b981; }
         .btn-check.active { background-color: #10b981; color: white; }
@@ -163,7 +168,7 @@
                 </div>
 
                 <div id="tab-dashboard" class="hidden bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-100 min-h-[600px]">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="kpi-container">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="p-8 bg-emerald-50 rounded-3xl border border-emerald-100">
                             <p class="text-[10px] font-black text-emerald-600 uppercase mb-2">Receita Total</p>
                             <h3 class="text-3xl font-black text-emerald-700" id="kpi-ganhos">R$ 0,00</h3>
@@ -196,9 +201,8 @@
                 document.getElementById(`btn-${t}-dt`).style.opacity = "0.7";
             });
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            const btn = document.getElementById(`btn-${tab}-dt`);
-            btn.classList.add('bg-pet-active');
-            btn.style.opacity = "1";
+            document.getElementById(`btn-${tab}-dt`).classList.add('bg-pet-active');
+            document.getElementById(`btn-${tab}-dt`).style.opacity = "1";
             
             if(tab === 'clientes') renderClientList();
             if(tab === 'dashboard') updateDashboard();
@@ -210,13 +214,10 @@
             const grid = document.getElementById('calendar-grid');
             const monthLabel = document.getElementById('cal-month');
             grid.innerHTML = '';
-            
-            const year = currentCalDate.getFullYear();
-            const month = currentCalDate.getMonth();
+            const year = currentCalDate.getFullYear(), month = currentCalDate.getMonth();
             monthLabel.innerText = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(currentCalDate).toUpperCase();
 
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDay = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
 
             for (let i = 0; i < firstDay; i++) grid.innerHTML += '<div class="calendar-cell bg-slate-50/50"></div>';
 
@@ -251,52 +252,33 @@
                 const isConcluido = app.status === 'concluido';
                 const isCancelado = app.status === 'cancelado';
                 
+                // Bolinha de status ao lado do dono
+                let statusBadge = "";
+                if(isConcluido) statusBadge = '<span class="status-indicator status-done"></span>';
+                else if(isCancelado) statusBadge = '<span class="status-indicator status-canceled"></span>';
+
                 list.innerHTML += `
                     <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
                         <div class="flex items-center gap-4">
                             <span class="text-xs font-black text-indigo-600 bg-white px-2 py-1 rounded-lg border">${app.serviceTime}</span>
                             <div>
-                                <p class="text-sm font-black text-slate-800">${app.petName} <span class="text-[10px] text-slate-400 font-normal">(${app.clientName})</span></p>
+                                <p class="text-sm font-black text-slate-800">
+                                    ${app.petName} 
+                                    <span class="text-[10px] text-slate-400 font-normal ml-1">
+                                        (${app.clientName})${statusBadge}
+                                    </span>
+                                </p>
+                                <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-tighter">${app.serviceType}</p>
                             </div>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="updateStatus(${app.id}, 'concluido')" class="btn-status btn-check ${isConcluido ? 'active' : ''}">
-                                <i data-lucide="check" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="updateStatus(${app.id}, 'cancelado')" class="btn-status btn-x ${isCancelado ? 'active' : ''}">
-                                <i data-lucide="x" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="editApp(${app.id})" class="btn-status bg-blue-50 text-blue-600 border border-blue-200">
-                                <i data-lucide="pencil" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="deleteApp(${app.id})" class="btn-status bg-slate-100 text-slate-400 border border-slate-200">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
+                            <button onclick="updateStatus(${app.id}, 'concluido')" class="btn-status btn-check ${isConcluido ? 'active' : ''}"><i data-lucide="check" class="w-4 h-4"></i></button>
+                            <button onclick="updateStatus(${app.id}, 'cancelado')" class="btn-status btn-x ${isCancelado ? 'active' : ''}"><i data-lucide="x" class="w-4 h-4"></i></button>
+                            <button onclick="editApp(${app.id})" class="btn-status bg-blue-50 text-blue-600 border border-blue-100"><i data-lucide="pencil" class="w-4 h-4"></i></button>
                         </div>
                     </div>`;
             });
             lucide.createIcons();
-        }
-
-        function editApp(id) {
-            const app = appointments.find(a => a.id === id);
-            document.getElementById('edit-id').value = app.id;
-            document.getElementById('clientNameSearch').value = app.clientName;
-            document.getElementById('petName').value = app.petName;
-            document.getElementById('serviceType').value = app.serviceType;
-            document.getElementById('serviceValue').value = app.serviceValue;
-            document.getElementById('serviceDate').value = app.serviceDate;
-            document.getElementById('serviceTime').value = app.serviceTime;
-            document.getElementById('form-title').innerText = "Ajustar: " + app.petName;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function deleteApp(id) {
-            if(confirm("Deseja realmente excluir este agendamento?")) {
-                appointments = appointments.filter(a => a.id !== id);
-                localStorage.setItem('pet_appointments', JSON.stringify(appointments));
-                showDayDetails(selectedDateStr);
-            }
         }
 
         function updateStatus(id, status) {
@@ -318,10 +300,8 @@
                 serviceTime: document.getElementById('serviceTime').value,
                 status: editId ? (appointments.find(a => a.id == editId).status) : 'pendente'
             };
-            
             if (editId) appointments = appointments.map(a => a.id == editId ? data : a);
             else appointments.push(data);
-            
             localStorage.setItem('pet_appointments', JSON.stringify(appointments));
             e.target.reset();
             document.getElementById('edit-id').value = '';
@@ -330,7 +310,19 @@
             if(selectedDateStr) showDayDetails(selectedDateStr);
         }
 
-        // Funções Auxiliares
+        function editApp(id) {
+            const app = appointments.find(a => a.id === id);
+            document.getElementById('edit-id').value = app.id;
+            document.getElementById('clientNameSearch').value = app.clientName;
+            document.getElementById('petName').value = app.petName;
+            document.getElementById('serviceType').value = app.serviceType;
+            document.getElementById('serviceValue').value = app.serviceValue;
+            document.getElementById('serviceDate').value = app.serviceDate;
+            document.getElementById('serviceTime').value = app.serviceTime;
+            document.getElementById('form-title').innerText = "Ajustar: " + app.petName;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function closeDayDetails() { selectedDateStr = ""; document.getElementById('day-details-card').classList.add('hidden'); renderCalendar(); }
         function changeMonth(dir) { currentCalDate.setMonth(currentCalDate.getMonth() + dir); closeDayDetails(); }
         function saveClient(e) { e.preventDefault(); clients.push({name: document.getElementById('regClientName').value, phone: document.getElementById('regPhone').value, pet: document.getElementById('regPet').value}); localStorage.setItem('pet_clients', JSON.stringify(clients)); e.target.reset(); renderClientList(); }
