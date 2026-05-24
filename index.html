@@ -22,6 +22,20 @@
             padding: 8px 16px; border-radius: 12px; font-weight: 600;
         }
 
+        /* Estilo UX para erro */
+        .error-field {
+            border: 2px solid #ef4444 !important;
+            animation: shake 0.2s ease-in-out 0s 2;
+            background-color: #fef2f2 !important;
+        }
+
+        @keyframes shake {
+            0% { margin-left: 0rem; }
+            25% { margin-left: 0.5rem; }
+            75% { margin-left: -0.5rem; }
+            100% { margin-left: 0rem; }
+        }
+
         .client-card {
             background: #fff;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -98,20 +112,20 @@
                     <div class="lg:col-span-3">
                         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
                             <h3 id="form-title" class="font-bold text-slate-800 text-xs uppercase mb-4 tracking-widest">Agendar</h3>
-                            <form id="appointment-form" onsubmit="handleFormSubmit(event)" class="space-y-3">
+                            <form id="appointment-form" onsubmit="handleFormSubmit(event)" class="space-y-3" novalidate>
                                 <input type="hidden" id="edit-id">
-                                <input type="text" id="clientNameSearch" placeholder="Tutor" oninput="autoFillPet(this.value)" required class="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl outline-none text-sm">
-                                <input type="text" id="petName" placeholder="Pet" required class="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl outline-none text-sm">
+                                <input type="text" id="clientNameSearch" placeholder="Tutor" oninput="autoFillPet(this.value); clearError(this)" class="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl outline-none text-sm">
+                                <input type="text" id="petName" placeholder="Pet" oninput="clearError(this)" class="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl outline-none text-sm">
                                 <div class="grid grid-cols-2 gap-2">
-                                    <input type="date" id="serviceDate" required class="w-full px-3 py-3 bg-slate-50 border-none rounded-2xl text-xs outline-none">
-                                    <input type="time" id="serviceTime" required class="w-full px-3 py-3 bg-slate-50 border-none rounded-2xl text-xs outline-none">
+                                    <input type="date" id="serviceDate" oninput="clearError(this)" class="w-full px-3 py-3 bg-slate-50 border-none rounded-2xl text-xs outline-none">
+                                    <input type="time" id="serviceTime" oninput="clearError(this)" class="w-full px-3 py-3 bg-slate-50 border-none rounded-2xl text-xs outline-none">
                                 </div>
                                 <select id="serviceType" class="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm outline-none">
                                     <option value="Banho">Banho</option>
                                     <option value="Tosa">Tosa</option>
                                     <option value="Completo">Banho e Tosa</option>
                                 </select>
-                                <input type="number" id="serviceValue" placeholder="Valor R$" step="0.01" required class="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm outline-none">
+                                <input type="number" id="serviceValue" placeholder="Valor R$" step="0.01" oninput="clearError(this)" class="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm outline-none">
                                 <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all text-xs uppercase tracking-widest">Confirmar</button>
                             </form>
                         </div>
@@ -215,6 +229,8 @@
         let currentCalDate = new Date();
         let selectedDateStr = "";
 
+        function clearError(el) { el.classList.remove('error-field'); }
+
         function switchTab(tab) {
             localStorage.setItem('pet_last_tab', tab);
             ['agenda', 'clientes', 'dashboard'].forEach(t => {
@@ -236,12 +252,10 @@
             const list = document.getElementById('client-list-bi');
             list.innerHTML = '';
             const filtered = clients.filter(c => c.name.toLowerCase().includes(filterText.toLowerCase()));
-            
             if(filtered.length === 0) {
                 list.innerHTML = `<div class="col-span-full py-10 text-center opacity-30"><p class="text-xs font-bold uppercase tracking-widest">Nenhum cliente encontrado</p></div>`;
                 return;
             }
-
             filtered.sort((a,b) => a.name.localeCompare(b.name)).forEach((c) => {
                 const realIndex = clients.indexOf(c);
                 list.innerHTML += `
@@ -267,7 +281,6 @@
         }
 
         function toggleClientForm() { document.getElementById('client-form-container').classList.toggle('hidden'); }
-
         function editClient(index) {
             const c = clients[index];
             document.getElementById('edit-client-index').value = index;
@@ -336,10 +349,32 @@
         function handleFormSubmit(e) {
             e.preventDefault(); 
             const editId = document.getElementById('edit-id').value;
+            const fields = [
+                document.getElementById('clientNameSearch'),
+                document.getElementById('petName'),
+                document.getElementById('serviceDate'),
+                document.getElementById('serviceTime'),
+                document.getElementById('serviceValue')
+            ];
+
+            // VALIDAÇÃO UX DE CAMPOS VAZIOS
+            let hasEmpty = false;
+            fields.forEach(f => {
+                if(!f.value || f.value.trim() === "") {
+                    f.classList.add('error-field');
+                    hasEmpty = true;
+                } else {
+                    f.classList.remove('error-field');
+                }
+            });
+
+            if(hasEmpty) return;
+
             const date = document.getElementById('serviceDate').value;
             const time = document.getElementById('serviceTime').value;
             const isConflict = appointments.some(a => a.serviceDate === date && a.serviceTime === time && a.id != editId && a.status !== 'cancelado');
             if(isConflict) { alert("Atenção: Já existe um agendamento para este dia e horário!"); return; }
+
             const data = { id: editId ? parseInt(editId) : Date.now(), clientName: document.getElementById('clientNameSearch').value, petName: document.getElementById('petName').value, serviceType: document.getElementById('serviceType').value, serviceValue: parseFloat(document.getElementById('serviceValue').value), serviceDate: date, serviceTime: time, status: editId ? (appointments.find(a => a.id == editId).status) : 'pendente' };
             if (editId) appointments = appointments.map(a => a.id == editId ? data : a); else appointments.push(data);
             localStorage.setItem('pet_appointments', JSON.stringify(appointments)); e.target.reset(); document.getElementById('edit-id').value = ''; renderCalendar(); if(selectedDateStr) showDayDetails(selectedDateStr);
