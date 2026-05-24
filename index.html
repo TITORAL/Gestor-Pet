@@ -17,18 +17,50 @@
         .bg-pet-active { background-color: #3730a3; }
         .fita-azul { width: 3px; height: 20px; background-color: #3b82f6; border-radius: 4px; margin-right: 12px; }
         
-        /* Estilo Calendário */
-        .calendar-day { cursor: pointer; transition: all 0.2s; border-radius: 8px; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; position: relative; }
-        .calendar-day:hover { background-color: #e0e7ff; color: #4338ca; }
-        .calendar-day.active { background-color: #4338ca; color: white; font-weight: bold; }
-        .has-event::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background: #3b82f6; border-radius: 50%; }
+        /* Estilo da Data Tom sobre Tom */
+        .header-date-badge {
+            background-color: #e0f2fe; /* Azul clarinho */
+            color: #0369a1; /* Azul escuro */
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        /* Calendário Expandido */
+        .calendar-grid-container {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #f1f5f9;
+            border: 1px solid #f1f5f9;
+        }
+        .calendar-cell {
+            background: white;
+            min-height: 100px;
+            padding: 6px;
+            transition: all 0.2s;
+        }
+        .calendar-cell:hover { background-color: #f8fafc; }
+        .cell-day-number { font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 4px; }
+        .event-tag {
+            font-size: 9px;
+            padding: 2px 6px;
+            background: #eef2ff;
+            color: #4338ca;
+            border-radius: 4px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .event-tag:hover { background: #e0e7ff; }
 
         @media (max-width: 768px) {
             .sidebar-desktop { display: none; }
             .mobile-nav { display: flex; }
             .main-content { padding-bottom: 90px; }
-            .card-servico { flex-direction: column; align-items: flex-start; gap: 10px; }
-            .actions-container { width: 100%; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 8px; }
         }
     </style>
 </head>
@@ -67,20 +99,20 @@
                     <h2 id="page-title" class="text-lg font-light text-slate-500 uppercase tracking-[0.2em]">Agendamento</h2>
                 </div>
                 <div class="text-right">
-                    <p id="current-date" class="text-sm md:text-base font-semibold text-slate-800 tracking-tight"></p>
+                    <span id="current-date" class="header-date-badge text-sm"></span>
                 </div>
             </header>
 
-            <main class="p-4 md:p-8 max-w-7xl w-full mx-auto space-y-6">
+            <main class="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-6">
 
-                <div id="tab-agenda" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div id="tab-agenda" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                     
-                    <div class="lg:col-span-4 space-y-6">
+                    <div class="lg:col-span-3">
                         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
                             <h3 id="form-title" class="font-bold text-slate-800 text-xs uppercase mb-4 tracking-widest">Agendar</h3>
                             <form id="appointment-form" onsubmit="handleFormSubmit(event)" class="space-y-3">
                                 <input type="hidden" id="edit-id">
-                                <input type="text" id="clientNameSearch" placeholder="Tutor" oninput="autoFillPet(this.value)" required class="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl outline-none text-sm focus:ring-2 focus:ring-indigo-100">
+                                <input type="text" id="clientNameSearch" placeholder="Tutor" oninput="autoFillPet(this.value)" required class="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl outline-none text-sm">
                                 <input type="text" id="petName" placeholder="Pet" required class="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl outline-none text-sm">
                                 <div class="grid grid-cols-2 gap-2">
                                     <input type="date" id="serviceDate" required class="w-full px-3 py-3 bg-slate-50 border-none rounded-2xl text-xs outline-none">
@@ -92,31 +124,23 @@
                                     <option value="Completo">Banho e Tosa</option>
                                 </select>
                                 <input type="number" id="serviceValue" placeholder="R$ 0,00" step="0.01" required class="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm outline-none">
-                                <button type="submit" id="submit-btn" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-100 active:scale-95 transition-all text-xs uppercase tracking-widest">Confirmar</button>
+                                <button type="submit" id="submit-btn" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all text-xs uppercase tracking-widest">Confirmar</button>
                             </form>
-                        </div>
-
-                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-                            <div class="flex justify-between items-center mb-4">
-                                <span id="cal-month" class="text-xs font-bold uppercase tracking-widest text-indigo-600">Maio 2026</span>
-                                <div class="flex gap-2">
-                                    <button onclick="changeMonth(-1)" class="p-1 hover:bg-slate-100 rounded-md"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-                                    <button onclick="changeMonth(1)" class="p-1 hover:bg-slate-100 rounded-md"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-300 mb-2">
-                                <div>D</div><div>S</div><div>T</div><div>Q</div><div>Q</div><div>S</div><div>S</div>
-                            </div>
-                            <div id="calendar-grid" class="grid grid-cols-7 gap-1"></div>
                         </div>
                     </div>
 
-                    <div class="lg:col-span-8 space-y-4">
-                        <div class="flex justify-between items-center px-2">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Próximos Serviços</h3>
-                            <button onclick="filterByDate(null)" class="text-[10px] font-bold text-indigo-500 uppercase">Ver Todos</button>
+                    <div class="lg:col-span-9 bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                        <div class="p-6 border-b border-slate-50 flex justify-between items-center bg-white">
+                            <span id="cal-month" class="text-sm font-black uppercase tracking-widest text-slate-800">Maio 2026</span>
+                            <div class="flex gap-4">
+                                <button onclick="changeMonth(-1)" class="p-2 hover:bg-slate-100 rounded-xl transition"><i data-lucide="chevron-left" class="w-5 h-5 text-slate-400"></i></button>
+                                <button onclick="changeMonth(1)" class="p-2 hover:bg-slate-100 rounded-xl transition"><i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i></button>
+                            </div>
                         </div>
-                        <div id="appointments-container" class="space-y-4"></div>
+                        <div class="grid grid-cols-7 text-center py-3 bg-slate-50/50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-tighter">
+                            <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+                        </div>
+                        <div id="calendar-grid" class="calendar-grid-container"></div>
                     </div>
                 </div>
 
@@ -131,7 +155,6 @@
                             <button id="client-submit-btn" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl mt-2 text-xs uppercase">Salvar Cliente</button>
                         </form>
                     </div>
-
                     <div class="w-full max-w-md bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
                         <div id="client-list-bi" class="divide-y divide-slate-50"></div>
                     </div>
@@ -160,25 +183,21 @@
         let appointments = JSON.parse(localStorage.getItem('pet_appointments')) || [];
         let clients = JSON.parse(localStorage.getItem('pet_clients')) || [];
         let currentCalDate = new Date();
-        let selectedFilterDate = null;
 
         function switchTab(tab) {
             ['agenda', 'clientes', 'dashboard'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
                 document.getElementById(`btn-${t}-dt`).classList.remove('bg-pet-active');
-                document.getElementById(`btn-${t}-mb`).classList.replace('text-indigo-900', 'text-slate-400');
             });
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             document.getElementById(`btn-${tab}-dt`).classList.add('bg-pet-active');
-            document.getElementById(`btn-${tab}-mb`).classList.replace('text-slate-400', 'text-indigo-900');
-            document.getElementById('page-title').innerText = { 'agenda': 'Agendamentos', 'clientes': 'Clientes', 'dashboard': 'Financeiro' }[tab];
             if(tab === 'dashboard') updateDashboard();
             if(tab === 'clientes') renderClientList();
-            if(tab === 'agenda') { renderAppointments(); renderCalendar(); }
+            if(tab === 'agenda') renderCalendar();
             lucide.createIcons();
         }
 
-        // --- LÓGICA DO CALENDÁRIO ---
+        // --- CALENDÁRIO COM SERVIÇOS DENTRO ---
         function renderCalendar() {
             const grid = document.getElementById('calendar-grid');
             const monthLabel = document.getElementById('cal-month');
@@ -191,16 +210,22 @@
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-            for (let i = 0; i < firstDay; i++) grid.innerHTML += '<div></div>';
+            for (let i = 0; i < firstDay; i++) grid.innerHTML += '<div class="calendar-cell bg-slate-50/30"></div>';
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const hasEvent = appointments.some(a => a.serviceDate === dateStr);
-                const isSelected = selectedFilterDate === dateStr;
+                const dailyApps = appointments.filter(a => a.serviceDate === dateStr);
                 
+                let eventsHtml = dailyApps.map(app => `
+                    <div onclick="editApp(${app.id})" class="event-tag" title="${app.serviceTime} - ${app.clientName}">
+                        ${app.serviceTime} ${app.petName}
+                    </div>
+                `).join('');
+
                 grid.innerHTML += `
-                    <div onclick="filterByDate('${dateStr}')" class="calendar-day ${isSelected ? 'active' : ''} ${hasEvent ? 'has-event' : ''}">
-                        ${day}
+                    <div class="calendar-cell">
+                        <div class="cell-day-number">${day}</div>
+                        <div class="flex flex-col">${eventsHtml}</div>
                     </div>`;
             }
         }
@@ -210,65 +235,7 @@
             renderCalendar();
         }
 
-        function filterByDate(date) {
-            selectedFilterDate = date;
-            renderCalendar();
-            renderAppointments();
-        }
-
-        // --- LÓGICA DE AGENDAMENTOS ---
-        function renderAppointments() {
-            const container = document.getElementById('appointments-container');
-            container.innerHTML = '';
-            let filtered = [...appointments].sort((a,b) => a.serviceTime.localeCompare(b.serviceTime));
-            
-            if(selectedFilterDate) {
-                filtered = filtered.filter(a => a.serviceDate === selectedFilterDate);
-            }
-
-            if(filtered.length === 0) {
-                container.innerHTML = `<div class="bg-white p-10 rounded-3xl text-center text-slate-300 text-sm italic border border-dashed border-slate-200">Nenhum serviço agendado para esta seleção.</div>`;
-                return;
-            }
-
-            filtered.forEach(app => {
-                const isConcluido = app.status === 'concluido';
-                const isCancelado = app.status === 'cancelado';
-                container.innerHTML += `
-                    <div class="bg-white p-6 rounded-[2rem] border border-slate-100 flex card-servico justify-between items-center shadow-sm hover:shadow-md transition-all">
-                        <div class="flex items-center gap-5">
-                            <div class="bg-slate-50 text-indigo-600 font-extrabold p-3 rounded-2xl text-center min-w-[70px]">
-                                <span class="text-[10px] block uppercase opacity-40">${app.serviceTime}</span>
-                                <span class="text-xl">${app.serviceDate.split('-')[2]}</span>
-                            </div>
-                            <div>
-                                <h4 class="font-extrabold text-slate-800 text-base">${app.petName} <span class="text-slate-400 font-normal text-sm italic ml-1">${app.clientName}</span></h4>
-                                <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.15em] mt-0.5">${app.serviceType} • R$ ${app.serviceValue.toFixed(2)}</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-2 actions-container">
-                            <button onclick="updateStatus(${app.id}, 'concluido')" class="p-3 rounded-xl border border-slate-50 ${isConcluido ? 'status-concluido' : 'text-emerald-500 hover:bg-emerald-50'}"><i data-lucide="check" class="w-5 h-5"></i></button>
-                            <button onclick="updateStatus(${app.id}, 'cancelado')" class="p-3 rounded-xl border border-slate-50 ${isCancelado ? 'status-cancelado' : 'text-rose-500 hover:bg-rose-50'}"><i data-lucide="x" class="w-5 h-5"></i></button>
-                            <button onclick="editApp(${app.id})" class="p-3 bg-blue-50 text-blue-600 rounded-xl"><i data-lucide="pencil" class="w-5 h-5"></i></button>
-                            <button onclick="deleteApp(${app.id})" class="p-3 text-slate-200 hover:text-rose-600"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
-                        </div>
-                    </div>`;
-            });
-            lucide.createIcons();
-        }
-
-        // --- FUNÇÕES DE APOIO ---
-        function updateDashboard() {
-            let g = 0, p = 0;
-            appointments.forEach(a => {
-                if(a.status === 'concluido') g += a.serviceValue;
-                if(a.status === 'cancelado') p += a.serviceValue;
-            });
-            document.getElementById('kpi-ganhos').innerText = `R$ ${g.toFixed(2)}`;
-            document.getElementById('kpi-perdas').innerText = `R$ ${p.toFixed(2)}`;
-            document.getElementById('kpi-saldo').innerText = `R$ ${(g-p).toFixed(2)}`;
-        }
-
+        // --- PERSISTÊNCIA E DADOS ---
         function handleFormSubmit(e) {
             e.preventDefault();
             const editId = document.getElementById('edit-id').value;
@@ -280,65 +247,14 @@
                 serviceValue: parseFloat(document.getElementById('serviceValue').value),
                 serviceDate: document.getElementById('serviceDate').value,
                 serviceTime: document.getElementById('serviceTime').value,
-                status: editId ? (appointments.find(a => a.id == editId).status) : 'pendente'
+                status: 'pendente'
             };
             if (editId) appointments = appointments.map(a => a.id == editId ? data : a);
             else appointments.push(data);
             localStorage.setItem('pet_appointments', JSON.stringify(appointments));
             resetForm();
-            renderAppointments();
             renderCalendar();
         }
-
-        function saveClient(e) {
-            e.preventDefault();
-            const index = document.getElementById('edit-client-index').value;
-            const clientData = { name: document.getElementById('regClientName').value, pet: document.getElementById('regPet').value, phone: document.getElementById('regPhone').value };
-            if (index !== "") clients[index] = clientData;
-            else clients.push(clientData);
-            localStorage.setItem('pet_clients', JSON.stringify(clients));
-            e.target.reset();
-            document.getElementById('edit-client-index').value = "";
-            renderClientList();
-        }
-
-        function renderClientList() {
-            const list = document.getElementById('client-list-bi');
-            list.innerHTML = '';
-            const sorted = clients.map((c, i) => ({...c, originalIndex: i})).sort((a,b) => a.name.localeCompare(b.name));
-            sorted.forEach(c => {
-                list.innerHTML += `
-                    <div class="px-6 py-5 flex justify-between items-center hover:bg-slate-50 transition">
-                        <div>
-                            <p class="text-sm font-extrabold text-slate-800 uppercase">${c.name}</p>
-                            <p class="text-xs text-indigo-500 font-bold tracking-tight">${c.pet}</p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-sm font-bold text-slate-500 tracking-tight">${c.phone}</span>
-                            <div class="flex gap-1">
-                                <button onclick="editClient(${c.originalIndex})" class="p-2 text-indigo-400 hover:bg-indigo-50 rounded-lg"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                                <button onclick="deleteClient(${c.originalIndex})" class="p-2 text-rose-300 hover:bg-rose-50 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                            </div>
-                        </div>
-                    </div>`;
-            });
-            lucide.createIcons();
-        }
-
-        function editClient(index) {
-            const c = clients[index];
-            document.getElementById('regClientName').value = c.name;
-            document.getElementById('regPet').value = c.pet;
-            document.getElementById('regPhone').value = c.phone;
-            document.getElementById('edit-client-index').value = index;
-            document.getElementById('client-form-title').innerText = "Editar Cliente";
-        }
-
-        function deleteClient(index) { if(confirm("Excluir cliente?")) { clients.splice(index, 1); localStorage.setItem('pet_clients', JSON.stringify(clients)); renderClientList(); } }
-        function updateStatus(id, status) { appointments = appointments.map(a => a.id === id ? {...a, status: a.status === status ? 'pendente' : status} : a); localStorage.setItem('pet_appointments', JSON.stringify(appointments)); renderAppointments(); }
-        function deleteApp(id) { if(confirm("Excluir agendamento?")) { appointments = appointments.filter(a => a.id !== id); localStorage.setItem('pet_appointments', JSON.stringify(appointments)); renderAppointments(); renderCalendar(); } }
-        function resetForm() { document.getElementById('appointment-form').reset(); document.getElementById('edit-id').value = ''; document.getElementById('form-title').innerText = "Agendar"; }
-        function autoFillPet(name) { const found = clients.find(c => c.name.toLowerCase().includes(name.toLowerCase())); if (found && name.length > 2) document.getElementById('petName').value = found.pet; }
 
         function editApp(id) {
             const app = appointments.find(a => a.id === id);
@@ -349,16 +265,49 @@
             document.getElementById('serviceValue').value = app.serviceValue;
             document.getElementById('serviceDate').value = app.serviceDate;
             document.getElementById('serviceTime').value = app.serviceTime;
-            document.getElementById('form-title').innerText = "Editar";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('form-title').innerText = "Editar " + app.petName;
+        }
+
+        function resetForm() {
+            document.getElementById('appointment-form').reset();
+            document.getElementById('edit-id').value = '';
+            document.getElementById('form-title').innerText = "Agendar";
+        }
+
+        function saveClient(e) {
+            e.preventDefault();
+            clients.push({ name: document.getElementById('regClientName').value, pet: document.getElementById('regPet').value, phone: document.getElementById('regPhone').value });
+            localStorage.setItem('pet_clients', JSON.stringify(clients));
+            e.target.reset();
+            renderClientList();
+        }
+
+        function renderClientList() {
+            const list = document.getElementById('client-list-bi');
+            list.innerHTML = '';
+            clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
+                list.innerHTML += `
+                    <div class="px-6 py-4 flex justify-between items-center">
+                        <div><p class="text-sm font-extrabold">${c.name}</p><p class="text-xs text-indigo-500 font-bold">${c.pet}</p></div>
+                        <span class="text-sm text-slate-400 font-bold">${c.phone}</span>
+                    </div>`;
+            });
+        }
+
+        function updateDashboard() {
+            let g = appointments.reduce((acc, a) => acc + (a.status === 'concluido' ? a.serviceValue : 0), 0);
+            document.getElementById('kpi-ganhos').innerText = `R$ ${g.toFixed(2)}`;
+        }
+
+        function autoFillPet(name) {
+            const found = clients.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
+            if (found && name.length > 2) document.getElementById('petName').value = found.pet;
         }
 
         window.onload = () => {
             const d = new Date();
             const formatada = d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-            // Deixar primeira letra maiúscula: "Domingo, 24 de maio" -> "Domingo, 24 de Maio"
             document.getElementById('current-date').innerText = formatada.split(' ').map(w => w.length > 2 ? w.charAt(0).toUpperCase() + w.slice(1) : w).join(' ');
-            renderAppointments();
             renderCalendar();
             lucide.createIcons();
         };
