@@ -284,12 +284,7 @@
         function saveClient(e) {
             e.preventDefault();
             const index = document.getElementById('edit-client-index').value;
-            const data = { 
-                name: document.getElementById('regClientName').value, 
-                pet: document.getElementById('regPet').value, 
-                phone: document.getElementById('regPhone').value,
-                address: document.getElementById('regAddress').value 
-            };
+            const data = { name: document.getElementById('regClientName').value, pet: document.getElementById('regPet').value, phone: document.getElementById('regPhone').value, address: document.getElementById('regAddress').value };
             if(index !== "") clients[index] = data; else clients.push(data);
             localStorage.setItem('pet_clients', JSON.stringify(clients));
             e.target.reset(); document.getElementById('edit-client-index').value = "";
@@ -329,31 +324,22 @@
                         <button onclick="updateStatus(${app.id}, 'concluido')" class="btn-status btn-check ${isConcluido ? 'active' : ''}"><i data-lucide="check" class="w-4 h-4"></i></button>
                         <button onclick="updateStatus(${app.id}, 'cancelado')" class="btn-status btn-x ${isCancelado ? 'active' : ''}"><i data-lucide="x" class="w-4 h-4"></i></button>
                         <button onclick="editApp(${app.id})" class="btn-status bg-blue-50 text-blue-600 border border-blue-100"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                        <button onclick="deleteApp(${app.id})" class="btn-status bg-rose-50 text-rose-600 border border-rose-100"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                     </div>
                 </div>`;
             });
             lucide.createIcons();
         }
 
+        function deleteApp(id) { if(confirm("Remover este agendamento?")) { appointments = appointments.filter(a => a.id !== id); localStorage.setItem('pet_appointments', JSON.stringify(appointments)); showDayDetails(selectedDateStr); } }
+
         function handleFormSubmit(e) {
             e.preventDefault(); 
             const editId = document.getElementById('edit-id').value;
             const date = document.getElementById('serviceDate').value;
             const time = document.getElementById('serviceTime').value;
-
-            // BLOQUEIO DE HORÁRIO REPETIDO
-            const isConflict = appointments.some(a => 
-                a.serviceDate === date && 
-                a.serviceTime === time && 
-                a.id != editId &&
-                a.status !== 'cancelado'
-            );
-
-            if(isConflict) {
-                alert("Atenção: Já existe um agendamento para este dia e horário!");
-                return;
-            }
-
+            const isConflict = appointments.some(a => a.serviceDate === date && a.serviceTime === time && a.id != editId && a.status !== 'cancelado');
+            if(isConflict) { alert("Atenção: Já existe um agendamento para este dia e horário!"); return; }
             const data = { id: editId ? parseInt(editId) : Date.now(), clientName: document.getElementById('clientNameSearch').value, petName: document.getElementById('petName').value, serviceType: document.getElementById('serviceType').value, serviceValue: parseFloat(document.getElementById('serviceValue').value), serviceDate: date, serviceTime: time, status: editId ? (appointments.find(a => a.id == editId).status) : 'pendente' };
             if (editId) appointments = appointments.map(a => a.id == editId ? data : a); else appointments.push(data);
             localStorage.setItem('pet_appointments', JSON.stringify(appointments)); e.target.reset(); document.getElementById('edit-id').value = ''; renderCalendar(); if(selectedDateStr) showDayDetails(selectedDateStr);
