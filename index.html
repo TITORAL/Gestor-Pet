@@ -13,21 +13,15 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
         .hidden { display: none !important; }
-        
         .bg-pet-sidebar { background-color: #312e81; } 
         .bg-pet-active { background-color: #4338ca; }
-        
         .fita-azul { width: 3px; height: 20px; background-color: #3b82f6; border-radius: 4px; margin-right: 12px; }
         
         .header-date-badge {
-            background-color: #e0f2fe;
-            color: #0369a1;
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-weight: 600;
+            background-color: #e0f2fe; color: #0369a1;
+            padding: 8px 16px; border-radius: 12px; font-weight: 600;
         }
 
-        /* Estilo Elegante Clientes */
         .client-card {
             background: #fff;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -40,32 +34,17 @@
         }
         
         .calendar-grid-container {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 1px;
-            background-color: #e2e8f0;
-            border: 1px solid #e2e8f0;
+            display: grid; grid-template-columns: repeat(7, 1fr);
+            gap: 1px; background-color: #e2e8f0; border: 1px solid #e2e8f0;
         }
         .calendar-cell {
-            background: white;
-            min-height: 80px;
-            padding: 8px;
-            transition: all 0.2s;
-            cursor: pointer;
+            background: white; min-height: 80px; padding: 8px;
+            transition: all 0.2s; cursor: pointer;
         }
         .calendar-cell:hover { background-color: #f1f5f9; }
         .calendar-cell.selected { background-color: #eef2ff; border: 1px solid #4338ca; }
-        
         .cell-day-number { font-size: 13px; font-weight: 800; color: #1e293b; margin-bottom: 4px; }
-        
-        .event-dot {
-            width: 6px;
-            height: 6px;
-            background: #4338ca;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 2px;
-        }
+        .event-dot { width: 6px; height: 6px; background: #4338ca; border-radius: 50%; display: inline-block; margin-right: 2px; }
 
         .status-indicator { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-left: 6px; }
         .status-done { background-color: #10b981; box-shadow: 0 0 8px #10b98166; }
@@ -77,9 +56,7 @@
         .btn-x { background-color: #fef2f2; color: #ef4444; border: 1px solid #ef4444; }
         .btn-x.active { background-color: #ef4444; color: white; }
 
-        @media (max-width: 768px) {
-            .sidebar-desktop { display: none; }
-        }
+        @media (max-width: 768px) { .sidebar-desktop { display: none; } }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -149,9 +126,6 @@
                                     <button onclick="changeMonth(1)" class="p-2 hover:bg-slate-100 rounded-xl transition"><i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i></button>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-7 text-center py-3 bg-slate-50 border-b border-slate-100 text-[11px] font-extrabold text-slate-500 uppercase">
-                                <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
-                            </div>
                             <div id="calendar-grid" class="calendar-grid-container"></div>
                         </div>
 
@@ -167,7 +141,7 @@
 
                 <div id="tab-clientes" class="hidden bg-white p-6 md:p-12 rounded-[2.5rem] shadow-sm border border-slate-100 min-h-[70vh]">
                     <div class="max-w-4xl mx-auto">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
                             <div>
                                 <h3 class="text-2xl font-black text-slate-800 tracking-tight">Base de Clientes</h3>
                                 <p class="text-slate-400 text-sm">Gerencie tutores e pets registrados.</p>
@@ -177,29 +151,36 @@
                             </button>
                         </div>
 
+                        <div class="relative mb-10">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                            </div>
+                            <input type="text" id="clientSearchInput" oninput="renderClientList(this.value)" placeholder="Procurar nome do tutor..." class="w-full pl-11 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none text-sm focus:bg-white focus:border-indigo-200 transition-all">
+                        </div>
+
                         <div id="client-form-container" class="hidden mb-12 bg-slate-50 p-8 rounded-3xl border border-dashed border-slate-200">
-                            <form onsubmit="saveClient(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <form id="reg-client-form" onsubmit="saveClient(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <input type="hidden" id="edit-client-index">
                                 <div class="space-y-1">
                                     <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Nome do Tutor</label>
-                                    <input type="text" id="regClientName" required class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl outline-none text-sm focus:border-indigo-400 transition-all">
+                                    <input type="text" id="regClientName" required class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl outline-none text-sm">
                                 </div>
                                 <div class="space-y-1">
                                     <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Nome do Pet</label>
-                                    <input type="text" id="regPet" required class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl outline-none text-sm focus:border-indigo-400 transition-all">
+                                    <input type="text" id="regPet" required class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl outline-none text-sm">
                                 </div>
                                 <div class="space-y-1">
                                     <label class="text-[10px] font-black uppercase text-slate-400 ml-2">WhatsApp</label>
-                                    <input type="tel" id="regPhone" required class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl outline-none text-sm focus:border-indigo-400 transition-all">
+                                    <input type="tel" id="regPhone" required class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl outline-none text-sm">
                                 </div>
                                 <div class="md:col-span-3 flex justify-end gap-3 mt-2">
                                     <button type="button" onclick="toggleClientForm()" class="px-6 py-3 text-xs font-bold text-slate-400 uppercase">Cancelar</button>
-                                    <button class="bg-indigo-900 text-white px-8 py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-black transition-all">Salvar Registro</button>
+                                    <button class="bg-indigo-900 text-white px-8 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Salvar</button>
                                 </div>
                             </form>
                         </div>
 
-                        <div id="client-list-bi" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            </div>
+                        <div id="client-list-bi" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                     </div>
                 </div>
 
@@ -231,121 +212,107 @@
         let selectedDateStr = "";
 
         function switchTab(tab) {
-            // Salva a aba atual para persistir no F5
             localStorage.setItem('pet_last_tab', tab);
-
             ['agenda', 'clientes', 'dashboard'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
                 document.getElementById(`btn-${t}-dt`).classList.remove('bg-pet-active');
                 document.getElementById(`btn-${t}-dt`).style.opacity = "0.7";
             });
-
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            const btn = document.getElementById(`btn-${tab}-dt`);
-            btn.classList.add('bg-pet-active');
-            btn.style.opacity = "1";
-            
+            document.getElementById(`btn-${tab}-dt`).classList.add('bg-pet-active');
+            document.getElementById(`btn-${tab}-dt`).style.opacity = "1";
             document.getElementById('page-title').innerText = { 'agenda': 'Agendamentos', 'clientes': 'Clientes', 'dashboard': 'Financeiro' }[tab];
-
             if(tab === 'clientes') renderClientList();
             if(tab === 'dashboard') updateDashboard();
             if(tab === 'agenda') renderCalendar();
             lucide.createIcons();
         }
 
-        function toggleClientForm() {
-            const container = document.getElementById('client-form-container');
-            container.classList.toggle('hidden');
-        }
-
-        function renderClientList() {
+        function renderClientList(filter = "") {
             const list = document.getElementById('client-list-bi');
             list.innerHTML = '';
+            const filtered = clients.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
             
-            if(clients.length === 0) {
-                list.innerHTML = `<div class="col-span-full py-20 text-center opacity-30"><i data-lucide="users-2" class="w-12 h-12 mx-auto mb-4"></i><p class="font-bold uppercase text-xs tracking-widest">Nenhum cliente cadastrado</p></div>`;
-                lucide.createIcons();
+            if(filtered.length === 0) {
+                list.innerHTML = `<div class="col-span-full py-10 text-center opacity-30"><p class="text-xs font-bold uppercase tracking-widest">Nenhum resultado</p></div>`;
                 return;
             }
 
-            clients.sort((a,b) => a.name.localeCompare(b.name)).forEach((c, index) => {
+            filtered.sort((a,b) => a.name.localeCompare(b.name)).forEach((c) => {
+                const realIndex = clients.indexOf(c);
                 list.innerHTML += `
                     <div class="client-card p-6 rounded-[2rem] flex items-center justify-between">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center font-black text-lg">
-                                ${c.name.charAt(0)}
-                            </div>
+                            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center font-black text-lg">${c.name.charAt(0)}</div>
                             <div>
                                 <h4 class="font-bold text-slate-800 leading-tight">${c.name}</h4>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-[10px] font-black text-indigo-500 uppercase tracking-tighter bg-indigo-50 px-2 py-0.5 rounded-md">${c.pet}</span>
-                                    <span class="text-[10px] font-medium text-slate-400 flex items-center gap-1"><i data-lucide="phone" class="w-2.5 h-2.5"></i> ${c.phone}</span>
+                                <div class="flex flex-col gap-0.5 mt-1">
+                                    <span class="text-[11px] font-black text-indigo-500 uppercase tracking-tighter">${c.pet}</span>
+                                    <span class="text-[12px] font-semibold text-slate-500 flex items-center gap-1"><i data-lucide="phone" class="w-3 h-3"></i> ${c.phone}</span>
                                 </div>
                             </div>
                         </div>
-                        <button onclick="deleteClient(${index})" class="p-2 text-slate-200 hover:text-rose-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        <div class="flex gap-1">
+                            <button onclick="editClient(${realIndex})" class="p-2 text-slate-300 hover:text-indigo-600 transition-colors"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                            <button onclick="deleteClient(${realIndex})" class="p-2 text-slate-300 hover:text-rose-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
                     </div>`;
             });
             lucide.createIcons();
         }
 
-        function deleteClient(index) {
-            if(confirm("Excluir este cliente?")) {
-                clients.splice(index, 1);
-                localStorage.setItem('pet_clients', JSON.stringify(clients));
-                renderClientList();
-            }
+        function toggleClientForm() { document.getElementById('client-form-container').classList.toggle('hidden'); }
+
+        function editClient(index) {
+            const c = clients[index];
+            document.getElementById('edit-client-index').value = index;
+            document.getElementById('regClientName').value = c.name;
+            document.getElementById('regPet').value = c.pet;
+            document.getElementById('regPhone').value = c.phone;
+            if(document.getElementById('client-form-container').classList.contains('hidden')) toggleClientForm();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        function deleteClient(index) { if(confirm("Excluir cliente?")) { clients.splice(index, 1); localStorage.setItem('pet_clients', JSON.stringify(clients)); renderClientList(); } }
 
         function saveClient(e) {
             e.preventDefault();
-            clients.push({
-                name: document.getElementById('regClientName').value,
-                pet: document.getElementById('regPet').value,
-                phone: document.getElementById('regPhone').value
-            });
+            const index = document.getElementById('edit-client-index').value;
+            const data = { name: document.getElementById('regClientName').value, pet: document.getElementById('regPet').value, phone: document.getElementById('regPhone').value };
+            if(index !== "") clients[index] = data; else clients.push(data);
             localStorage.setItem('pet_clients', JSON.stringify(clients));
-            e.target.reset();
-            toggleClientForm();
-            renderClientList();
+            e.target.reset(); document.getElementById('edit-client-index').value = "";
+            toggleClientForm(); renderClientList();
         }
 
-        // --- Lógica do Calendário ---
         function renderCalendar() {
             const grid = document.getElementById('calendar-grid');
-            const monthLabel = document.getElementById('cal-month');
             grid.innerHTML = '';
             const year = currentCalDate.getFullYear(), month = currentCalDate.getMonth();
-            monthLabel.innerText = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(currentCalDate).toUpperCase();
+            document.getElementById('cal-month').innerText = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(currentCalDate).toUpperCase();
             const firstDay = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
             for (let i = 0; i < firstDay; i++) grid.innerHTML += '<div class="calendar-cell bg-slate-50/50"></div>';
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const dailyApps = appointments.filter(a => a.serviceDate === dateStr);
-                const isSelected = selectedDateStr === dateStr;
                 let dots = dailyApps.map(() => '<span class="event-dot"></span>').join('');
-                grid.innerHTML += `<div onclick="showDayDetails('${dateStr}')" class="calendar-cell ${isSelected ? 'selected' : ''}"><div class="cell-day-number">${day}</div><div class="flex flex-wrap gap-0.5">${dots}</div></div>`;
+                grid.innerHTML += `<div onclick="showDayDetails('${dateStr}')" class="calendar-cell ${selectedDateStr === dateStr ? 'selected' : ''}"><div class="cell-day-number">${day}</div><div class="flex flex-wrap gap-0.5">${dots}</div></div>`;
             }
         }
 
         function showDayDetails(dateStr) {
-            selectedDateStr = dateStr;
-            const detailsCard = document.getElementById('day-details-card');
+            selectedDateStr = dateStr; document.getElementById('day-details-card').classList.remove('hidden'); renderCalendar();
             const list = document.getElementById('day-appointments-list');
-            const [y, m, d] = dateStr.split('-');
-            document.getElementById('selected-day-title').innerText = `Serviços de ${d}/${m}/${y}`;
-            detailsCard.classList.remove('hidden');
-            renderCalendar();
             const dailyApps = appointments.filter(a => a.serviceDate === dateStr);
             list.innerHTML = dailyApps.length ? '' : '<p class="text-slate-400 text-sm italic">Vazio.</p>';
             dailyApps.sort((a,b) => a.serviceTime.localeCompare(b.serviceTime)).forEach(app => {
-                const isConcluido = app.status === 'concluido';
-                const isCancelado = app.status === 'cancelado';
+                const isConcluido = app.status === 'concluido', isCancelado = app.status === 'cancelado';
                 let statusBadge = isConcluido ? '<span class="status-indicator status-done"></span>' : (isCancelado ? '<span class="status-indicator status-canceled"></span>' : "");
                 list.innerHTML += `<div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
                     <div class="flex items-center gap-4">
                         <span class="text-xs font-black text-indigo-600 bg-white px-2 py-1 rounded-lg border">${app.serviceTime}</span>
-                        <div><p class="text-sm font-black text-slate-800">${app.petName}<span class="text-[10px] text-slate-400 font-normal ml-1">(${app.clientName})${statusBadge}</span></p><p class="text-[10px] font-bold text-indigo-500 uppercase">${app.serviceType}</p></div>
+                        <div><p class="text-sm font-black text-slate-800">${app.petName}<span class="text-[10px] text-slate-400 font-normal ml-1">(${app.clientName})${statusBadge}</span></p>
+                        <p class="text-[12px] font-bold text-indigo-500 uppercase">${app.serviceType}</p></div>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="updateStatus(${app.id}, 'concluido')" class="btn-status btn-check ${isConcluido ? 'active' : ''}"><i data-lucide="check" class="w-4 h-4"></i></button>
@@ -357,48 +324,15 @@
             lucide.createIcons();
         }
 
-        function updateStatus(id, status) {
-            appointments = appointments.map(a => a.id === id ? {...a, status: a.status === status ? 'pendente' : status} : a);
-            localStorage.setItem('pet_appointments', JSON.stringify(appointments));
-            showDayDetails(selectedDateStr);
-        }
-
         function handleFormSubmit(e) {
-            e.preventDefault();
-            const editId = document.getElementById('edit-id').value;
-            const data = {
-                id: editId ? parseInt(editId) : Date.now(),
-                clientName: document.getElementById('clientNameSearch').value,
-                petName: document.getElementById('petName').value,
-                serviceType: document.getElementById('serviceType').value,
-                serviceValue: parseFloat(document.getElementById('serviceValue').value),
-                serviceDate: document.getElementById('serviceDate').value,
-                serviceTime: document.getElementById('serviceTime').value,
-                status: editId ? (appointments.find(a => a.id == editId).status) : 'pendente'
-            };
-            if (editId) appointments = appointments.map(a => a.id == editId ? data : a);
-            else appointments.push(data);
-            localStorage.setItem('pet_appointments', JSON.stringify(appointments));
-            e.target.reset();
-            document.getElementById('edit-id').value = '';
-            document.getElementById('form-title').innerText = "Agendar";
-            renderCalendar();
-            if(selectedDateStr) showDayDetails(selectedDateStr);
+            e.preventDefault(); const editId = document.getElementById('edit-id').value;
+            const data = { id: editId ? parseInt(editId) : Date.now(), clientName: document.getElementById('clientNameSearch').value, petName: document.getElementById('petName').value, serviceType: document.getElementById('serviceType').value, serviceValue: parseFloat(document.getElementById('serviceValue').value), serviceDate: document.getElementById('serviceDate').value, serviceTime: document.getElementById('serviceTime').value, status: editId ? (appointments.find(a => a.id == editId).status) : 'pendente' };
+            if (editId) appointments = appointments.map(a => a.id == editId ? data : a); else appointments.push(data);
+            localStorage.setItem('pet_appointments', JSON.stringify(appointments)); e.target.reset(); document.getElementById('edit-id').value = ''; renderCalendar(); if(selectedDateStr) showDayDetails(selectedDateStr);
         }
 
-        function editApp(id) {
-            const app = appointments.find(a => a.id === id);
-            document.getElementById('edit-id').value = app.id;
-            document.getElementById('clientNameSearch').value = app.clientName;
-            document.getElementById('petName').value = app.petName;
-            document.getElementById('serviceType').value = app.serviceType;
-            document.getElementById('serviceValue').value = app.serviceValue;
-            document.getElementById('serviceDate').value = app.serviceDate;
-            document.getElementById('serviceTime').value = app.serviceTime;
-            document.getElementById('form-title').innerText = "Ajustar: " + app.petName;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
+        function updateStatus(id, status) { appointments = appointments.map(a => a.id === id ? {...a, status: a.status === status ? 'pendente' : status} : a); localStorage.setItem('pet_appointments', JSON.stringify(appointments)); showDayDetails(selectedDateStr); }
+        function editApp(id) { const app = appointments.find(a => a.id === id); document.getElementById('edit-id').value = app.id; document.getElementById('clientNameSearch').value = app.clientName; document.getElementById('petName').value = app.petName; document.getElementById('serviceType').value = app.serviceType; document.getElementById('serviceValue').value = app.serviceValue; document.getElementById('serviceDate').value = app.serviceDate; document.getElementById('serviceTime').value = app.serviceTime; window.scrollTo({ top: 0, behavior: 'smooth' }); }
         function closeDayDetails() { selectedDateStr = ""; document.getElementById('day-details-card').classList.add('hidden'); renderCalendar(); }
         function changeMonth(dir) { currentCalDate.setMonth(currentCalDate.getMonth() + dir); closeDayDetails(); }
         function updateDashboard() { let g = 0, p = 0; appointments.forEach(a => { if(a.status === 'concluido') g += a.serviceValue; else if(a.status === 'cancelado') p += a.serviceValue; }); document.getElementById('kpi-ganhos').innerText = `R$ ${g.toFixed(2)}`; document.getElementById('kpi-perdas').innerText = `R$ ${p.toFixed(2)}`; document.getElementById('kpi-saldo').innerText = `R$ ${(g-p).toFixed(2)}`; }
@@ -408,8 +342,6 @@
             const d = new Date();
             const formatada = d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
             document.getElementById('current-date').innerText = formatada.split(' ').map(w => w.length > 2 ? w.charAt(0).toUpperCase() + w.slice(1) : w).join(' ');
-            
-            // Lógica de Persistência de Aba
             const lastTab = localStorage.getItem('pet_last_tab') || 'agenda';
             switchTab(lastTab);
         };
