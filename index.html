@@ -11,19 +11,9 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
         .hidden { display: none !important; }
-        
         .bg-pet-sidebar { background-color: #312e81; } 
         .bg-pet-active { background-color: #4338ca; }
-        
-        /* Fita azul no cabeçalho */
-        .fita-azul {
-            width: 4px;
-            height: 24px;
-            background-color: #3b82f6;
-            border-radius: 2px;
-            margin-right: 12px;
-        }
-
+        .fita-azul { width: 4px; height: 24px; background-color: #3b82f6; border-radius: 2px; margin-right: 12px; }
         .status-concluido { background-color: #10b981 !important; color: white !important; border-color: #10b981 !important; }
         .status-cancelado { background-color: #ef4444 !important; color: white !important; border-color: #ef4444 !important; }
 
@@ -71,15 +61,14 @@
         </nav>
 
         <div class="flex-1 flex flex-col overflow-y-auto main-content">
-            <header class="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-40">
+            <header class="bg-white border-b px-6 py-6 flex justify-between items-center sticky top-0 z-40">
                 <div class="flex items-center">
                     <div class="fita-azul"></div>
-                    <div>
-                        <h2 id="page-title" class="text-base font-black text-slate-800 uppercase tracking-tighter">Agendamento</h2>
-                        <p id="current-date" class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest"></p>
-                    </div>
+                    <h2 id="page-title" class="text-base font-black text-slate-800 uppercase tracking-tighter">Agendamento</h2>
                 </div>
-                <i data-lucide="dog" class="w-5 h-5 text-indigo-600 md:hidden"></i>
+                <div class="text-right">
+                    <p id="current-date" class="text-2xl md:text-3xl font-black text-indigo-600 uppercase tracking-tighter leading-none"></p>
+                </div>
             </header>
 
             <main class="p-4 md:p-8 max-w-5xl w-full mx-auto space-y-6">
@@ -96,7 +85,7 @@
                             <input type="text" id="petName" placeholder="Nome do Pet" required class="w-full px-4 py-3 border border-slate-200 rounded-2xl outline-none text-sm">
                             
                             <div class="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
-                                <label class="block text-[9px] font-black text-indigo-900 uppercase mb-2">Serviço</label>
+                                <label class="block text-[9px] font-black text-indigo-900 uppercase mb-2 text-center">Serviço</label>
                                 <select id="serviceType" class="w-full px-3 py-2 border rounded-xl mb-2 text-sm outline-none">
                                     <option value="Banho">Banho</option>
                                     <option value="Tosa">Tosa</option>
@@ -106,8 +95,8 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-3">
-                                <input type="date" id="serviceDate" required class="w-full px-3 py-3 border rounded-2xl text-xs outline-none bg-white">
-                                <input type="time" id="serviceTime" required class="w-full px-3 py-3 border rounded-2xl text-xs outline-none bg-white">
+                                <input type="date" id="serviceDate" required class="w-full px-3 py-3 border rounded-2xl text-xs outline-none">
+                                <input type="time" id="serviceTime" required class="w-full px-3 py-3 border rounded-2xl text-xs outline-none">
                             </div>
                             <button type="submit" id="submit-btn" class="w-full bg-indigo-600 text-white font-black py-3.5 rounded-2xl shadow-md active:scale-95 transition-transform text-sm">CONFIRMAR</button>
                         </form>
@@ -118,7 +107,7 @@
                     </div>
                 </div>
 
-                <div id="tab-clientes" class="hidden flex justify-center">
+                <div id="tab-clientes" class="hidden flex flex-col items-center space-y-6">
                     <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm w-full max-w-md">
                         <h3 class="font-black text-slate-800 uppercase mb-5 text-center text-sm tracking-widest">Cadastro de Cliente</h3>
                         <form onsubmit="saveClient(event)" class="space-y-3">
@@ -127,6 +116,15 @@
                             <input type="text" id="regPet" placeholder="Nome do Pet" required class="w-full px-4 py-3 border border-slate-200 rounded-2xl outline-none text-sm">
                             <button class="w-full bg-indigo-600 text-white font-black py-3.5 rounded-2xl mt-2 shadow-md text-sm">SALVAR CLIENTE</button>
                         </form>
+                    </div>
+
+                    <div class="w-full max-w-md bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+                        <div class="bg-slate-50 px-5 py-3 border-b border-slate-100 flex justify-between items-center">
+                            <span class="text-[10px] font-black text-slate-400 uppercase">Clientes Cadastrados (A-Z)</span>
+                            <i data-lucide="list-ordered" class="w-4 h-4 text-slate-300"></i>
+                        </div>
+                        <div id="client-list-bi" class="divide-y divide-slate-50 max-h-64 overflow-y-auto">
+                            </div>
                     </div>
                 </div>
 
@@ -161,7 +159,6 @@
                 document.getElementById(`btn-${t}-dt`).classList.remove('bg-pet-active');
                 document.getElementById(`btn-${t}-mb`).classList.replace('text-indigo-900', 'text-slate-400');
             });
-
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             document.getElementById(`btn-${tab}-dt`).classList.add('bg-pet-active');
             document.getElementById(`btn-${tab}-mb`).classList.replace('text-slate-400', 'text-indigo-900');
@@ -170,6 +167,7 @@
             document.getElementById('page-title').innerText = titles[tab];
             
             if(tab === 'dashboard') updateDashboard();
+            if(tab === 'clientes') renderClientList();
             lucide.createIcons();
         }
 
@@ -177,11 +175,34 @@
             e.preventDefault();
             clients.push({
                 name: document.getElementById('regClientName').value,
-                pet: document.getElementById('regPet').value
+                pet: document.getElementById('regPet').value,
+                phone: document.getElementById('regPhone').value
             });
             localStorage.setItem('pet_clients', JSON.stringify(clients));
-            alert('Cliente Salvo com Sucesso!');
             e.target.reset();
+            renderClientList();
+        }
+
+        function renderClientList() {
+            const list = document.getElementById('client-list-bi');
+            list.innerHTML = '';
+            const sorted = [...clients].sort((a,b) => a.name.localeCompare(b.name));
+            
+            if(sorted.length === 0) {
+                list.innerHTML = '<p class="p-5 text-center text-slate-300 text-xs">Nenhum cliente cadastrado.</p>';
+                return;
+            }
+
+            sorted.forEach(c => {
+                list.innerHTML += `
+                    <div class="px-5 py-3 flex justify-between items-center hover:bg-slate-50 transition">
+                        <div>
+                            <p class="text-xs font-black text-slate-700 uppercase">${c.name}</p>
+                            <p class="text-[10px] text-indigo-500 font-bold">${c.pet}</p>
+                        </div>
+                        <span class="text-[9px] text-slate-400">${c.phone || ''}</span>
+                    </div>`;
+            });
         }
 
         function autoFillPet(name) {
@@ -286,7 +307,10 @@
 
         window.onload = () => {
             const d = new Date();
-            document.getElementById('current-date').innerText = d.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'short'});
+            // Data formatada grande: ex "24 DE MAIO"
+            const dia = d.getDate();
+            const mes = d.toLocaleDateString('pt-BR', {month: 'short'}).replace('.','').toUpperCase();
+            document.getElementById('current-date').innerText = `${dia} ${mes}`;
             renderAppointments();
             lucide.createIcons();
         };
