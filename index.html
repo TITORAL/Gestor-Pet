@@ -102,29 +102,29 @@
                         </form>
                     </div>
 
-                    <div class="lg:col-span-2 space-y-3">
-                        <div id="appointments-container" class="space-y-3"></div>
+                    <div class="lg:col-span-2 space-y-4">
+                        <div id="appointments-container" class="space-y-4"></div>
                     </div>
                 </div>
 
                 <div id="tab-clientes" class="hidden flex flex-col items-center space-y-6">
                     <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm w-full max-w-md">
-                        <h3 class="font-black text-slate-800 uppercase mb-5 text-center text-sm tracking-widest">Cadastro de Cliente</h3>
-                        <form onsubmit="saveClient(event)" class="space-y-3">
+                        <h3 id="client-form-title" class="font-black text-slate-800 uppercase mb-5 text-center text-sm tracking-widest">Cadastro de Cliente</h3>
+                        <form id="client-form" onsubmit="saveClient(event)" class="space-y-3">
+                            <input type="hidden" id="edit-client-index">
                             <input type="text" id="regClientName" placeholder="Nome do Tutor" required class="w-full px-4 py-3 border border-slate-200 rounded-2xl outline-none text-sm">
                             <input type="tel" id="regPhone" placeholder="WhatsApp" required class="w-full px-4 py-3 border border-slate-200 rounded-2xl outline-none text-sm">
                             <input type="text" id="regPet" placeholder="Nome do Pet" required class="w-full px-4 py-3 border border-slate-200 rounded-2xl outline-none text-sm">
-                            <button class="w-full bg-indigo-600 text-white font-black py-3.5 rounded-2xl mt-2 shadow-md text-sm">SALVAR CLIENTE</button>
+                            <button id="client-submit-btn" class="w-full bg-indigo-600 text-white font-black py-3.5 rounded-2xl mt-2 shadow-md text-sm">SALVAR CLIENTE</button>
                         </form>
                     </div>
 
                     <div class="w-full max-w-md bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-                        <div class="bg-slate-50 px-5 py-3 border-b border-slate-100 flex justify-between items-center">
-                            <span class="text-[10px] font-black text-slate-400 uppercase">Clientes Cadastrados (A-Z)</span>
-                            <i data-lucide="list-ordered" class="w-4 h-4 text-slate-300"></i>
+                        <div class="bg-slate-50 px-5 py-4 border-b border-slate-100 flex justify-between items-center">
+                            <span class="text-xs font-black text-slate-500 uppercase tracking-wider">Clientes Salvos (A-Z)</span>
+                            <i data-lucide="users" class="w-4 h-4 text-slate-300"></i>
                         </div>
-                        <div id="client-list-bi" class="divide-y divide-slate-50 max-h-64 overflow-y-auto">
-                            </div>
+                        <div id="client-list-bi" class="divide-y divide-slate-50 max-h-96 overflow-y-auto"></div>
                     </div>
                 </div>
 
@@ -162,10 +162,7 @@
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             document.getElementById(`btn-${tab}-dt`).classList.add('bg-pet-active');
             document.getElementById(`btn-${tab}-mb`).classList.replace('text-slate-400', 'text-indigo-900');
-            
-            const titles = { 'agenda': 'Agendamento', 'clientes': 'Clientes', 'dashboard': 'Financeiro' };
-            document.getElementById('page-title').innerText = titles[tab];
-            
+            document.getElementById('page-title').innerText = { 'agenda': 'Agendamento', 'clientes': 'Clientes', 'dashboard': 'Financeiro' }[tab];
             if(tab === 'dashboard') updateDashboard();
             if(tab === 'clientes') renderClientList();
             lucide.createIcons();
@@ -173,36 +170,72 @@
 
         function saveClient(e) {
             e.preventDefault();
-            clients.push({
+            const index = document.getElementById('edit-client-index').value;
+            const clientData = {
                 name: document.getElementById('regClientName').value,
                 pet: document.getElementById('regPet').value,
                 phone: document.getElementById('regPhone').value
-            });
+            };
+
+            if (index !== "") clients[index] = clientData;
+            else clients.push(clientData);
+
             localStorage.setItem('pet_clients', JSON.stringify(clients));
-            e.target.reset();
+            document.getElementById('client-form').reset();
+            document.getElementById('edit-client-index').value = "";
+            document.getElementById('client-form-title').innerText = "Cadastro de Cliente";
+            document.getElementById('client-submit-btn').innerText = "SALVAR CLIENTE";
             renderClientList();
+        }
+
+        function editClient(index) {
+            const c = clients[index];
+            document.getElementById('regClientName').value = c.name;
+            document.getElementById('regPet').value = c.pet;
+            document.getElementById('regPhone').value = c.phone;
+            document.getElementById('edit-client-index').value = index;
+            document.getElementById('client-form-title').innerText = "Alterar Cadastro";
+            document.getElementById('client-submit-btn').innerText = "ATUALIZAR DADOS";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deleteClient(index) {
+            if(confirm("Deseja excluir este cliente permanentemente?")) {
+                clients.splice(index, 1);
+                localStorage.setItem('pet_clients', JSON.stringify(clients));
+                renderClientList();
+            }
         }
 
         function renderClientList() {
             const list = document.getElementById('client-list-bi');
             list.innerHTML = '';
-            const sorted = [...clients].sort((a,b) => a.name.localeCompare(b.name));
+            // Criar cópia com índice original para permitir edição após ordenação
+            const sorted = clients.map((c, i) => ({...c, originalIndex: i}))
+                                 .sort((a,b) => a.name.localeCompare(b.name));
             
             if(sorted.length === 0) {
-                list.innerHTML = '<p class="p-5 text-center text-slate-300 text-xs">Nenhum cliente cadastrado.</p>';
+                list.innerHTML = '<p class="p-8 text-center text-slate-300 text-sm italic">Nenhum cliente cadastrado.</p>';
                 return;
             }
 
             sorted.forEach(c => {
                 list.innerHTML += `
-                    <div class="px-5 py-3 flex justify-between items-center hover:bg-slate-50 transition">
+                    <div class="px-5 py-4 flex justify-between items-center hover:bg-slate-50 transition">
                         <div>
-                            <p class="text-xs font-black text-slate-700 uppercase">${c.name}</p>
-                            <p class="text-[10px] text-indigo-500 font-bold">${c.pet}</p>
+                            <p class="text-sm font-black text-slate-800 uppercase">${c.name}</p>
+                            <p class="text-xs text-indigo-500 font-bold tracking-tight">${c.pet}</p>
                         </div>
-                        <span class="text-[9px] text-slate-400">${c.phone || ''}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-bold text-slate-600">${c.phone}</span>
+                            <div class="flex gap-1">
+                                <button onclick="editClient(${c.originalIndex})" class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button onclick="deleteClient(${c.originalIndex})" class="p-2 text-rose-400 hover:bg-rose-50 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
                     </div>`;
             });
+            lucide.createIcons();
         }
 
         function autoFillPet(name) {
@@ -223,10 +256,8 @@
                 serviceTime: document.getElementById('serviceTime').value,
                 status: editId ? (appointments.find(a => a.id == editId).status) : 'pendente'
             };
-
             if (editId) appointments = appointments.map(a => a.id == editId ? data : a);
             else appointments.push(data);
-
             localStorage.setItem('pet_appointments', JSON.stringify(appointments));
             resetForm();
             renderAppointments();
@@ -260,25 +291,25 @@
                 const isConcluido = app.status === 'concluido';
                 const isCancelado = app.status === 'cancelado';
                 container.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl border border-slate-100 flex card-servico justify-between items-center shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-indigo-50 text-indigo-700 font-black p-2 rounded-xl text-center min-w-[55px]">
-                                <span class="text-[8px] block uppercase opacity-50">${app.serviceTime}</span>
-                                <span class="text-sm">${app.serviceDate.split('-')[2]}</span>
+                    <div class="bg-white p-5 rounded-3xl border border-slate-100 flex card-servico justify-between items-center shadow-sm hover:shadow-md transition-all">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-indigo-50 text-indigo-700 font-black p-3 rounded-2xl text-center min-w-[65px]">
+                                <span class="text-[10px] block uppercase opacity-50">${app.serviceTime}</span>
+                                <span class="text-lg">${app.serviceDate.split('-')[2]}</span>
                             </div>
                             <div>
-                                <h4 class="font-black text-slate-800 text-xs">${app.petName} <span class="text-slate-400 font-medium text-[9px]">(${app.clientName})</span></h4>
-                                <p class="text-[9px] font-black text-indigo-500 uppercase">${app.serviceType} • R$ ${app.serviceValue.toFixed(2)}</p>
+                                <h4 class="font-black text-slate-800 text-sm md:text-base">${app.petName} <span class="text-slate-400 font-medium text-xs">(${app.clientName})</span></h4>
+                                <p class="text-[10px] md:text-xs font-black text-indigo-500 uppercase tracking-wider">${app.serviceType} • R$ ${app.serviceValue.toFixed(2)}</p>
                             </div>
                         </div>
                         <div class="flex gap-2 actions-container">
                             <div class="flex gap-1">
-                                <button onclick="updateStatus(${app.id}, 'concluido')" class="p-2 rounded-lg border border-emerald-100 text-emerald-600 ${isConcluido ? 'status-concluido' : ''}"><i data-lucide="check" class="w-4 h-4"></i></button>
-                                <button onclick="updateStatus(${app.id}, 'cancelado')" class="p-2 rounded-lg border border-rose-100 text-rose-600 ${isCancelado ? 'status-cancelado' : ''}"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                <button onclick="updateStatus(${app.id}, 'concluido')" class="p-3 rounded-xl border border-emerald-100 text-emerald-600 ${isConcluido ? 'status-concluido' : ''}"><i data-lucide="check" class="w-5 h-5"></i></button>
+                                <button onclick="updateStatus(${app.id}, 'cancelado')" class="p-3 rounded-xl border border-rose-100 text-rose-600 ${isCancelado ? 'status-cancelado' : ''}"><i data-lucide="x" class="w-5 h-5"></i></button>
                             </div>
                             <div class="flex gap-1">
-                                <button onclick="editApp(${app.id})" class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                                <button onclick="deleteApp(${app.id})" class="p-2 text-slate-300"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                <button onclick="editApp(${app.id})" class="p-3 bg-blue-50 text-blue-600 rounded-xl"><i data-lucide="pencil" class="w-5 h-5"></i></button>
+                                <button onclick="deleteApp(${app.id})" class="p-3 text-slate-300"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
                             </div>
                         </div>
                     </div>`;
@@ -307,11 +338,9 @@
 
         window.onload = () => {
             const d = new Date();
-            // Data formatada grande: ex "24 DE MAIO"
-            const dia = d.getDate();
-            const mes = d.toLocaleDateString('pt-BR', {month: 'short'}).replace('.','').toUpperCase();
-            document.getElementById('current-date').innerText = `${dia} ${mes}`;
+            document.getElementById('current-date').innerText = `${d.getDate()} ${d.toLocaleDateString('pt-BR', {month: 'short'}).replace('.','').toUpperCase()}`;
             renderAppointments();
+            renderClientList();
             lucide.createIcons();
         };
     </script>
