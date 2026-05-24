@@ -155,7 +155,7 @@
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                 <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
                             </div>
-                            <input type="text" id="clientSearchInput" oninput="renderClientList(this.value)" placeholder="Procurar nome do tutor..." class="w-full pl-11 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none text-sm focus:bg-white focus:border-indigo-200 transition-all">
+                            <input type="text" id="clientSearchInput" oninput="renderClientList(this.value)" placeholder="Digite o nome para buscar..." class="w-full pl-11 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none text-sm focus:bg-white focus:border-indigo-200 transition-all">
                         </div>
 
                         <div id="client-form-container" class="hidden mb-12 bg-slate-50 p-8 rounded-3xl border border-dashed border-slate-200">
@@ -222,19 +222,28 @@
             document.getElementById(`btn-${tab}-dt`).classList.add('bg-pet-active');
             document.getElementById(`btn-${tab}-dt`).style.opacity = "1";
             document.getElementById('page-title').innerText = { 'agenda': 'Agendamentos', 'clientes': 'Clientes', 'dashboard': 'Financeiro' }[tab];
-            if(tab === 'clientes') renderClientList();
+            
+            if(tab === 'clientes') {
+                document.getElementById('clientSearchInput').value = ""; // Limpa busca ao entrar
+                renderClientList();
+            }
             if(tab === 'dashboard') updateDashboard();
             if(tab === 'agenda') renderCalendar();
             lucide.createIcons();
         }
 
-        function renderClientList(filter = "") {
+        // FUNÇÃO DE RENDERIZAÇÃO E FILTRO INSTANTÂNEO
+        function renderClientList(filterText = "") {
             const list = document.getElementById('client-list-bi');
             list.innerHTML = '';
-            const filtered = clients.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
+            
+            // Filtro reativo ignorando maiúsculas/minúsculas
+            const filtered = clients.filter(c => 
+                c.name.toLowerCase().includes(filterText.toLowerCase())
+            );
             
             if(filtered.length === 0) {
-                list.innerHTML = `<div class="col-span-full py-10 text-center opacity-30"><p class="text-xs font-bold uppercase tracking-widest">Nenhum resultado</p></div>`;
+                list.innerHTML = `<div class="col-span-full py-10 text-center opacity-30"><p class="text-xs font-bold uppercase tracking-widest">Nenhum cliente encontrado</p></div>`;
                 return;
             }
 
@@ -273,7 +282,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function deleteClient(index) { if(confirm("Excluir cliente?")) { clients.splice(index, 1); localStorage.setItem('pet_clients', JSON.stringify(clients)); renderClientList(); } }
+        function deleteClient(index) { if(confirm("Excluir cliente?")) { clients.splice(index, 1); localStorage.setItem('pet_clients', JSON.stringify(clients)); renderClientList(document.getElementById('clientSearchInput').value); } }
 
         function saveClient(e) {
             e.preventDefault();
@@ -282,7 +291,7 @@
             if(index !== "") clients[index] = data; else clients.push(data);
             localStorage.setItem('pet_clients', JSON.stringify(clients));
             e.target.reset(); document.getElementById('edit-client-index').value = "";
-            toggleClientForm(); renderClientList();
+            toggleClientForm(); renderClientList(document.getElementById('clientSearchInput').value);
         }
 
         function renderCalendar() {
