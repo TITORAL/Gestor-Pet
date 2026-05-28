@@ -179,6 +179,7 @@
                     </div>
                 </div>
 
+                <!-- Aba Clientes -->
                 <div id="tab-clientes" class="hidden space-y-6 max-w-4xl mx-auto">
                     
                     <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-slate-100">
@@ -243,7 +244,7 @@
                             </div>
                             
                             <div class="relative group">
-                                <select onchange="updateChartMonth(this.value)" class="appearance-none bg-indigo-50 text-indigo-600 px-8 py-2 rounded-xl text-xs font-bold uppercase tracking-widest border border-indigo-100 cursor-pointer hover:bg-indigo-100 transition-all outline-none">
+                                <select onchange="updateChartMonth(this.value)" id="chart-month-select" class="appearance-none bg-indigo-50 text-indigo-600 px-8 py-2 rounded-xl text-xs font-bold uppercase tracking-widest border border-indigo-100 cursor-pointer hover:bg-indigo-100 transition-all outline-none">
                                     <option value="0">Janeiro</option>
                                     <option value="1">Fevereiro</option>
                                     <option value="2">Março</option>
@@ -278,19 +279,71 @@
                     </div>
                 </div>
 
-                <div id="tab-dashboard" class="hidden bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-100 min-h-[600px]">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="p-8 bg-emerald-50 rounded-3xl border border-emerald-100">
-                            <p class="text-[10px] font-black text-emerald-600 uppercase mb-2">Receita Total</p>
-                            <h3 class="text-3xl font-black text-emerald-700" id="kpi-ganhos">R$ 0,00</h3>
+                <!-- Aba Dashboard & Finança Modificada -->
+                <div id="tab-dashboard" class="hidden space-y-6 max-w-[1600px] mx-auto">
+                    <!-- Parte Superior: Cards com Botões Seletores -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- Receita Total do Mês -->
+                        <div class="p-8 bg-emerald-50 rounded-[2rem] border border-emerald-100 flex flex-col justify-between h-48 relative">
+                            <div>
+                                <p class="text-[10px] font-black text-emerald-600 uppercase mb-2 tracking-widest">Receita Total do Mês</p>
+                                <h3 class="text-4xl font-black text-emerald-700" id="kpi-ganhos">R$ 0,00</h3>
+                            </div>
+                            
+                            <!-- Botão Seletor de Meses integrado -->
+                            <div class="absolute top-6 right-6">
+                                <div class="relative">
+                                    <select onchange="changeDashboardMonth(this.value)" id="dash-month-select" class="appearance-none bg-white text-emerald-700 pl-8 pr-7 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider border border-emerald-200/60 cursor-pointer hover:bg-emerald-100/50 transition-all outline-none shadow-sm">
+                                        <option value="0">Jan</option><option value="1">Fev</option><option value="2">Mar</option><option value="3">Abr</option>
+                                        <option value="4">Mai</option><option value="5">Jun</option><option value="6">Jul</option><option value="7">Ago</option>
+                                        <option value="8">Set</option><option value="9">Out</option><option value="10">Nov</option><option value="11">Dez</option>
+                                    </select>
+                                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-600 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-emerald-600 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-8 bg-rose-50 rounded-3xl border border-rose-100">
-                            <p class="text-[10px] font-black text-rose-600 uppercase mb-2">Cancelados</p>
-                            <h3 class="text-3xl font-black text-rose-700" id="kpi-perdas">R$ 0,00</h3>
+
+                        <!-- Receita do Dia -->
+                        <div class="p-8 bg-indigo-50 rounded-[2rem] border border-indigo-100 flex flex-col justify-between h-48 relative">
+                            <div>
+                                <p class="text-[10px] font-black text-indigo-600 uppercase mb-2 tracking-widest">Receita do Dia</p>
+                                <h3 class="text-4xl font-black text-indigo-700" id="kpi-receita-dia">R$ 0,00</h3>
+                            </div>
+                            
+                            <!-- Botão Seletor de Dias (Input Customizado) -->
+                            <div class="absolute top-6 right-6">
+                                <div class="relative">
+                                    <input type="date" onchange="changeDashboardDay(this.value)" id="dash-day-select" class="bg-white text-indigo-700 pl-8 pr-3 py-1.5 rounded-xl text-[11px] font-bold uppercase border border-indigo-200/60 cursor-pointer hover:bg-indigo-100/50 transition-all outline-none shadow-sm">
+                                    <i data-lucide="calendar-days" class="w-3.5 h-3.5 text-indigo-600 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-8 bg-indigo-50 rounded-3xl border border-indigo-100">
-                            <p class="text-[10px] font-black text-indigo-600 uppercase mb-2">Saldo Previsto</p>
-                            <h3 class="text-3xl font-black text-indigo-700" id="kpi-saldo">R$ 0,00</h3>
+                    </div>
+
+                    <!-- Parte de Baixo: Listagem de Clientes Ativos, Serviços e Valores -->
+                    <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-slate-100">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Detalhamento Financeiro</span>
+                                <h4 class="text-base font-bold text-slate-800 tracking-tight mt-0.5">Fluxo de Consumo por Cliente</h4>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-100">
+                                        <th class="py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Tutor / Pet</th>
+                                        <th class="py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Data e Horário</th>
+                                        <th class="py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Serviço Adquirido</th>
+                                        <th class="py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Valor Pago</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dash-consumption-table-body" class="divide-y divide-slate-50 text-sm">
+                                    <!-- Inserido Dinamicamente via JavaScript -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -304,6 +357,7 @@
         let clients = JSON.parse(localStorage.getItem('pet_clients')) || [];
         let currentCalDate = new Date();
         let selectedDateStr = new Date().toISOString().split('T')[0];
+        let currentDashDayStr = new Date().toISOString().split('T')[0];
 
         function clearError(el) { el.classList.remove('error-field'); }
 
@@ -323,8 +377,22 @@
 
         function updateChartMonth(monthIndex) {
             currentCalDate.setMonth(parseInt(monthIndex));
+            const selectDash = document.getElementById('dash-month-select');
+            const selectChart = document.getElementById('chart-month-select');
+            if(selectDash) selectDash.value = monthIndex;
+            if(selectChart) selectChart.value = monthIndex;
             renderConsumptionChart();
             renderCalendar();
+            updateDashboard();
+        }
+
+        function changeDashboardMonth(monthIndex) {
+            updateChartMonth(monthIndex);
+        }
+
+        function changeDashboardDay(dateString) {
+            if(!dateString) return;
+            currentDashDayStr = dateString;
             updateDashboard();
         }
 
@@ -480,19 +548,67 @@
         function editApp(id) { const app = appointments.find(a => a.id === id); document.getElementById('edit-id').value = app.id; document.getElementById('clientNameSearch').value = app.clientName; document.getElementById('petName').value = app.petName; document.getElementById('serviceType').value = app.serviceType; document.getElementById('serviceValue').value = app.serviceValue; document.getElementById('serviceDate').value = app.serviceDate; document.getElementById('serviceTime').value = app.serviceTime; window.scrollTo({ top: 0, behavior: 'smooth' }); }
         
         function changeMonth(dir) { currentCalDate.setMonth(currentCalDate.getMonth() + dir); renderCalendar(); }
+        
         function updateDashboard() { 
+            // Atualização de KPIs com base nos seletores ativos
             const currentMonthStr = `${currentCalDate.getFullYear()}-${String(currentCalDate.getMonth() + 1).padStart(2, '0')}`;
-            let g = 0, p = 0; 
+            
+            let receitaMes = 0; 
             appointments.forEach(a => { 
-                if(a.serviceDate.startsWith(currentMonthStr)) {
-                    if(a.status === 'concluido') g += a.serviceValue; 
-                    else if(a.status === 'cancelado') p += a.serviceValue; 
+                if(a.serviceDate.startsWith(currentMonthStr) && a.status === 'concluido') {
+                    receitaMes += a.serviceValue; 
                 }
             }); 
-            document.getElementById('kpi-ganhos').innerText = `R$ ${g.toFixed(2)}`; 
-            document.getElementById('kpi-perdas').innerText = `R$ ${p.toFixed(2)}`; 
-            document.getElementById('kpi-saldo').innerText = `R$ ${(g-p).toFixed(2)}`; 
+            
+            let receitaDia = 0;
+            appointments.forEach(a => {
+                if(a.serviceDate === currentDashDayStr && a.status === 'concluido') {
+                    receitaDia += a.serviceValue;
+                }
+            });
+
+            document.getElementById('kpi-ganhos').innerText = `R$ ${receitaMes.toFixed(2)}`; 
+            document.getElementById('kpi-receita-dia').innerText = `R$ ${receitaDia.toFixed(2)}`;
+
+            // Renderização da tabela inferior com os clientes que estão consumindo no mês selecionado
+            const tableBody = document.getElementById('dash-consumption-table-body');
+            tableBody.innerHTML = '';
+
+            const currentMonthApps = appointments.filter(a => a.serviceDate.startsWith(currentMonthStr));
+
+            if(currentMonthApps.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-400 italic">Nenhum consumo registrado para este mês.</td></tr>`;
+                return;
+            }
+
+            currentMonthApps.sort((a,b) => b.serviceDate.localeCompare(a.serviceDate)).forEach(app => {
+                const [y, m, d] = app.serviceDate.split('-');
+                const formattedDate = `${d}/${m}/${y}`;
+                
+                let statusText = '';
+                if(app.status === 'concluido') statusText = '<span class="text-emerald-600 font-bold ml-1">(Pago)</span>';
+                if(app.status === 'cancelado') statusText = '<span class="text-rose-500 font-bold line-through ml-1">(Cancelado)</span>';
+                if(app.status === 'pendente') statusText = '<span class="text-amber-500 font-bold ml-1">(Pendente)</span>';
+
+                tableBody.innerHTML += `
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                        <td class="py-4 font-bold text-slate-800">
+                            ${app.clientName}
+                            <span class="block text-[11px] font-black text-indigo-500 uppercase mt-0.5">${app.petName}</span>
+                        </td>
+                        <td class="py-4 text-slate-500 font-medium">
+                            ${formattedDate} <span class="text-xs bg-slate-100 px-1.5 py-0.5 rounded ml-1 font-semibold">${app.serviceTime}</span>
+                        </td>
+                        <td class="py-4 font-semibold text-slate-700">
+                            ${app.serviceType} ${statusText}
+                        </td>
+                        <td class="py-4 font-black text-slate-900 text-right">
+                            R$ ${app.serviceValue.toFixed(2)}
+                        </td>
+                    </tr>`;
+            });
         }
+        
         function autoFillPet(name) { const found = clients.find(c => c.name.toLowerCase().includes(name.toLowerCase())); if (found && name.length > 2) document.getElementById('petName').value = found.pet; }
 
         window.onload = () => {
@@ -500,9 +616,15 @@
             const formatada = d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
             document.getElementById('current-date').innerText = formatada.split(' ').map(w => w.length > 2 ? w.charAt(0).toUpperCase() + w.slice(1) : w).join(' ');
             
-            // Sincroniza o seletor visual com o mês atual
-            const monthSelector = document.querySelector('select[onchange="updateChartMonth(this.value)"]');
+            // Sincroniza visualmente os seletores de data e mês iniciais com a data atual do sistema
+            const monthSelector = document.getElementById('chart-month-select');
             if(monthSelector) monthSelector.value = d.getMonth();
+            
+            const dashMonthSelector = document.getElementById('dash-month-select');
+            if(dashMonthSelector) dashMonthSelector.value = d.getMonth();
+
+            const dashDaySelector = document.getElementById('dash-day-select');
+            if(dashDaySelector) dashDaySelector.value = d.toISOString().split('T')[0];
 
             const lastTab = localStorage.getItem('pet_last_tab') || 'agenda';
             switchTab(lastTab);
