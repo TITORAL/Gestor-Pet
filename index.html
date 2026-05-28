@@ -77,7 +77,6 @@
         .btn-x { background-color: #fef2f2; color: #ef4444; border: 1px solid #ef4444; }
         .btn-x.active { background-color: #ef4444; color: white; }
 
-        /* Transição suave para expansão do bloco de clientes */
         .expandable-clients {
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             max-height: 0;
@@ -110,7 +109,7 @@
                     <i data-lucide="users" class="w-4 h-4"></i> Clientes
                 </button>
                 <button onclick="switchTab('dashboard')" id="btn-dashboard-dt" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition text-sm font-semibold opacity-70">
-                    <i data-lucide="pie-chart" class="w-4 h-4"></i> Financeiro
+                    <i data-lucide="pie-chart" class="w-4 h-4"></i> Dashboard & Finança
                 </button>
             </nav>
         </aside>
@@ -180,10 +179,9 @@
                     </div>
                 </div>
 
-                <!-- Aba Clientes Modificada -->
+                <!-- Aba Clientes -->
                 <div id="tab-clientes" class="hidden space-y-6 max-w-4xl mx-auto">
                     
-                    <!-- Card Principal de Clientes (Limpo e Retrátil) -->
                     <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-slate-100">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <div class="flex items-center gap-4">
@@ -195,13 +193,11 @@
                                     <p class="text-slate-400 text-xs font-medium">Base de clientes: gerencie tutores e pets registrados.</p>
                                 </div>
                             </div>
-                            <!-- Botão que expande a listagem ocultada -->
                             <button onclick="toggleClientsView()" id="btn-toggle-clients" class="w-full sm:w-auto bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2">
                                 <i data-lucide="eye" class="w-4 h-4"></i> <span id="text-toggle-clients">Ver Clientes</span>
                             </button>
                         </div>
 
-                        <!-- Conteúdo Interno Oculto por Padrão para Manter a Tela Limpa -->
                         <div id="expanded-clients-container" class="expandable-clients">
                             <div class="flex justify-between items-center mb-6 pt-4 border-t border-slate-100">
                                 <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Listagem Ativa</span>
@@ -210,7 +206,6 @@
                                 </button>
                             </div>
 
-                            <!-- Formulário de cadastro encapsulado -->
                             <div id="client-form-container" class="hidden mb-6 bg-slate-50 p-6 rounded-2xl border border-dashed border-slate-200">
                                 <form id="reg-client-form" onsubmit="saveClient(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input type="hidden" id="edit-client-index">
@@ -241,21 +236,37 @@
                         </div>
                     </div>
 
-                    <!-- Card Inferior com Gráfico de Consumo Estiloso e Moderno -->
+                    <!-- Card com o Gráfico em Estilo BI Realista -->
                     <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-slate-100">
-                        <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center justify-between mb-6">
                             <div>
-                                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full">Dashboard Mensal</span>
-                                <h4 class="text-lg font-black text-slate-800 tracking-tight mt-2">Ranking de Clientes Ativos</h4>
+                                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Análise de Dados de Consumo</span>
+                                <h4 class="text-base font-bold text-slate-800 tracking-tight mt-0.5">Ranking de Clientes Ativos</h4>
                             </div>
-                            <i data-lucide="trending-up" class="w-6 h-6 text-slate-400"></i>
+                            <div class="flex items-center gap-1.5 text-xs text-slate-400 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border">
+                                <span class="w-2 h-2 rounded-full bg-indigo-600"></span> Vol. Mês Atual
+                            </div>
                         </div>
-                        <div id="client-consumption-chart" class="space-y-5">
-                            <!-- Gerado Dinamicamente com Design Moderno -->
+                        
+                        <!-- Estrutura de Gráfico de BI -->
+                        <div class="relative border-l border-b border-slate-200 pb-2 pl-2">
+                            <!-- Linhas de Grade de Fundo (BI Style) -->
+                            <div class="absolute inset-0 flex justify-between pointer-events-none pl-2 pr-12 border-b border-transparent">
+                                <div class="w-px h-full border-l border-dashed border-slate-100"></div>
+                                <div class="w-px h-full border-l border-dashed border-slate-100"></div>
+                                <div class="w-px h-full border-l border-dashed border-slate-100"></div>
+                                <div class="w-px h-full border-l border-dashed border-slate-100"></div>
+                            </div>
+
+                            <!-- Container de Barras -->
+                            <div id="client-consumption-chart" class="relative z-10 space-y-4 pt-2">
+                                <!-- Inserido por JS -->
+                            </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Aba Dashboard & Finança -->
                 <div id="tab-dashboard" class="hidden bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-100 min-h-[600px]">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="p-8 bg-emerald-50 rounded-3xl border border-emerald-100">
@@ -292,7 +303,6 @@
             btnText.innerText = isCollapsed ? 'Ver Calendário' : 'Recolher';
         }
 
-        // Controla a exibição retrátil da lista de clientes para manter a tela limpa
         function toggleClientsView() {
             const container = document.getElementById('expanded-clients-container');
             const btnText = document.getElementById('text-toggle-clients');
@@ -310,7 +320,10 @@
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             document.getElementById(`btn-${tab}-dt`).classList.add('bg-pet-active');
             document.getElementById(`btn-${tab}-dt`).style.opacity = "1";
-            document.getElementById('page-title').innerText = { 'agenda': 'Agendamentos', 'clientes': 'Clientes', 'dashboard': 'Financeiro' }[tab];
+            
+            // Alterado mapeamento para "Dashboard & Finança"
+            document.getElementById('page-title').innerText = { 'agenda': 'Agendamentos', 'clientes': 'Clientes', 'dashboard': 'Dashboard & Finança' }[tab];
+            
             if(tab === 'clientes') { renderClientList(); renderConsumptionChart(); }
             if(tab === 'dashboard') updateDashboard();
             if(tab === 'agenda') { renderCalendar(); showDayDetails(selectedDateStr); }
@@ -347,7 +360,7 @@
             lucide.createIcons();
         }
 
-        // Gráfico Moderno e Estiloso de Consumo
+        // Novo Gráfico Horizontal com Padrão Estiloso de BI
         function renderConsumptionChart() {
             const chartContainer = document.getElementById('client-consumption-chart');
             chartContainer.innerHTML = '';
@@ -374,22 +387,23 @@
                 return;
             }
 
-            sortedData.forEach((d, idx) => {
+            sortedData.forEach((d) => {
                 const percentage = (d.count / maxCount) * 100;
-                // Cores dinâmicas para o pódio do ranking
-                const barColor = idx === 0 ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : (idx === 1 ? 'bg-gradient-to-r from-blue-500 to-indigo-500' : 'bg-slate-400');
-                const badgeBg = idx === 0 ? 'bg-amber-100 text-amber-700' : (idx === 1 ? 'bg-slate-100 text-slate-700' : 'bg-slate-50 text-slate-400');
-
                 chartContainer.innerHTML += `
-                    <div class="flex items-center gap-4">
-                        <span class="w-6 h-6 rounded-lg font-black text-xs flex items-center justify-center ${badgeBg}">${idx + 1}</span>
-                        <div class="flex-1 space-y-1">
-                            <div class="flex justify-between items-baseline">
-                                <span class="text-sm font-bold text-slate-700">${d.name}</span>
-                                <span class="text-xs font-extrabold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">${d.count} ${d.count === 1 ? 'Atendimento' : 'Atendimentos'}</span>
+                    <div class="flex items-center">
+                        <!-- Rótulo do Eixo Y (Nome do Cliente) -->
+                        <div class="w-28 pr-3 text-right truncate text-xs font-semibold text-slate-600" title="${d.name}">
+                            ${d.name}
+                        </div>
+                        <!-- Barra de Gráfico de BI -->
+                        <div class="flex-1 flex items-center gap-3">
+                            <div class="flex-1 bg-slate-100 h-6 rounded border border-slate-200/60 overflow-hidden relative">
+                                <div class="bg-indigo-600 h-full rounded-r transition-all duration-500 shadow-inner" style="width: ${percentage}%"></div>
                             </div>
-                            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                                <div class="${barColor} h-full rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                            <!-- Rótulo do Eixo X (Valor/Quantidade de Serviços) -->
+                            <div class="w-28 text-xs font-bold text-slate-800 flex items-center gap-1">
+                                <span class="text-indigo-600 font-extrabold">${d.count}</span> 
+                                <span class="text-slate-400 font-normal text-[10px] uppercase">${d.count === 1 ? 'atend.' : 'atend.'}</span>
                             </div>
                         </div>
                     </div>`;
