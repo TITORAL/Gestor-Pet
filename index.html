@@ -48,7 +48,7 @@
         
         .calendar-grid-container {
             display: grid; grid-template-columns: repeat(7, 1fr);
-            gap: 1px; background-color: #e2e8f0; border: 1px solid #e2e8f0;
+            gap: 1px; background-color: #e2e2f0; border: 1px solid #e2e8f0;
             transition: max-height 0.3s ease-out;
             overflow: hidden;
         }
@@ -97,16 +97,18 @@
             display: flex;
             align-items: center;
             gap: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: transform 0.2s;
+            width: 100%;
         }
         .mobile-menu-card:active { transform: scale(0.97); }
 
         @media (max-width: 768px) { 
             .sidebar-desktop { display: none; }
             #header-main { display: none; }
-            .content-area { padding: 16px !important; }
+            .content-area { padding: 0px !important; }
+            .bg-mobile-full { background-color: #312e81; min-height: 100vh; }
         }
     </style>
 </head>
@@ -114,6 +116,7 @@
 
     <div id="main-app" class="flex flex-col md:flex-row h-screen overflow-hidden">
         
+        <!-- Sidebar Desktop -->
         <aside class="sidebar-desktop w-64 bg-pet-sidebar text-white flex flex-col p-6">
             <div class="flex items-center gap-3 mb-10">
                 <i data-lucide="dog" class="w-8 h-8 text-indigo-300"></i>
@@ -136,6 +139,7 @@
         </aside>
 
         <div class="flex-1 flex flex-col overflow-y-auto">
+            <!-- Header (Escondido no Mobile Home) -->
             <header id="header-main" class="bg-white border-b px-8 py-5 flex justify-between items-center sticky top-0 z-40">
                 <div class="flex items-center">
                     <button onclick="switchTab('home')" class="md:hidden mr-4 text-slate-400"><i data-lucide="chevron-left"></i></button>
@@ -149,17 +153,17 @@
 
             <main class="content-area p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-6">
 
-                <div id="tab-home" class="flex flex-col min-h-[90vh] md:min-h-0">
-                    <div class="md:hidden bg-pet-sidebar -mx-4 -mt-4 p-8 pb-12 rounded-b-[3rem] mb-8">
-                        <div class="flex items-center gap-4 text-white">
-                            <div class="bg-indigo-500/30 p-3 rounded-2xl">
-                                <i data-lucide="dog" class="w-10 h-10 text-white"></i>
-                            </div>
-                            <h1 class="text-2xl font-black tracking-tight uppercase">Agenda Pet</h1>
+                <!-- Tela Home Mobile / Inicial -->
+                <div id="tab-home" class="bg-mobile-full p-6 flex flex-col justify-start">
+                    <!-- Topo Mobile -->
+                    <div class="md:hidden flex items-center gap-4 text-white pt-6 pb-10">
+                        <div class="bg-indigo-500/30 p-3 rounded-2xl">
+                            <i data-lucide="dog" class="w-10 h-10 text-white"></i>
                         </div>
-                        <p class="text-indigo-200 text-xs mt-4 font-medium uppercase tracking-widest opacity-70">Gerenciamento Pet v1.0</p>
+                        <h1 class="text-2xl font-black tracking-tight uppercase">Agenda Pet</h1>
                     </div>
 
+                    <!-- Cards de Navegação Mobile -->
                     <div class="grid grid-cols-1 gap-4 md:hidden">
                         <button onclick="switchTab('agenda')" class="mobile-menu-card">
                             <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">
@@ -192,13 +196,14 @@
                         </button>
                     </div>
 
+                    <!-- Mensagem Desktop -->
                     <div class="hidden md:block text-center py-20 opacity-20">
                         <i data-lucide="dog" class="w-20 h-20 mx-auto mb-4"></i>
                         <p class="font-black uppercase tracking-[0.3em]">Selecione uma opção ao lado</p>
                     </div>
                 </div>
 
-                <div id="tab-agenda" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div id="tab-agenda" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-start p-4 md:p-0">
                     <div class="lg:col-span-3">
                         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
                             <h3 id="form-title" class="font-bold text-slate-800 text-xs uppercase mb-4 tracking-widest">Agendar</h3>
@@ -250,7 +255,8 @@
                     </div>
                 </div>
 
-                <div id="tab-clientes" class="hidden space-y-6 max-w-4xl mx-auto">
+                <!-- Aba Clientes -->
+                <div id="tab-clientes" class="hidden space-y-6 max-w-4xl mx-auto p-4 md:p-0">
                     <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-slate-100">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <div class="flex items-center gap-4">
@@ -307,7 +313,8 @@
                     </div>
                 </div>
 
-                <div id="tab-dashboard" class="hidden space-y-6 max-w-[1600px] mx-auto">
+                <!-- Aba Dashboard & Finança -->
+                <div id="tab-dashboard" class="hidden space-y-6 max-w-[1600px] mx-auto p-4 md:p-0">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="p-8 bg-emerald-50 rounded-[2rem] border border-emerald-100 flex flex-col justify-between h-48 relative">
                             <div>
@@ -555,7 +562,6 @@
             document.getElementById('dash-month-select').value = d.getMonth();
             document.getElementById('dash-day-select').value = d.toISOString().split('T')[0];
             
-            // Inicia na Home se for mobile, ou na última aba se for desktop
             const lastTab = (window.innerWidth < 768) ? 'home' : (localStorage.getItem('pet_last_tab') || 'agenda');
             switchTab(lastTab);
         };
