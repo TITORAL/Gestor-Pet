@@ -179,7 +179,6 @@
                     </div>
                 </div>
 
-                <!-- Aba Clientes -->
                 <div id="tab-clientes" class="hidden space-y-6 max-w-4xl mx-auto">
                     
                     <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-slate-100">
@@ -236,37 +235,49 @@
                         </div>
                     </div>
 
-                    <!-- Card com o Gráfico Modificado para Colunas Verticais e Barras de Grade (BI Style) -->
                     <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-slate-100">
                         <div class="flex items-center justify-between mb-8">
                             <div>
                                 <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Análise de Dados de Consumo</span>
                                 <h4 class="text-base font-bold text-slate-800 tracking-tight mt-0.5">Ranking de Clientes Ativos</h4>
                             </div>
-                            <div class="flex items-center gap-1.5 text-xs text-slate-400 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border">
-                                <span class="w-2 h-2 rounded-full bg-indigo-600"></span> Vol. Mês Atual
+                            
+                            <div class="relative group">
+                                <select onchange="updateChartMonth(this.value)" class="appearance-none bg-indigo-50 text-indigo-600 px-8 py-2 rounded-xl text-xs font-bold uppercase tracking-widest border border-indigo-100 cursor-pointer hover:bg-indigo-100 transition-all outline-none">
+                                    <option value="0">Janeiro</option>
+                                    <option value="1">Fevereiro</option>
+                                    <option value="2">Março</option>
+                                    <option value="3">Abril</option>
+                                    <option value="4">Maio</option>
+                                    <option value="5">Junho</option>
+                                    <option value="6">Julho</option>
+                                    <option value="7">Agosto</option>
+                                    <option value="8">Setembro</option>
+                                    <option value="9">Outubro</option>
+                                    <option value="10">Novembro</option>
+                                    <option value="11">Dezembro</option>
+                                </select>
+                                <div class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-indigo-400"></i>
+                                </div>
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-indigo-400"></i>
+                                </div>
                             </div>
                         </div>
                         
-                        <!-- Estrutura de BI Vertical (Colunas) -->
                         <div class="relative border-b border-l border-slate-200 h-64 px-4">
-                            <!-- Linhas de Grade Horizontais do Gráfico de BI -->
                             <div class="absolute inset-0 flex flex-col justify-between pointer-events-none pb-1 pt-2">
                                 <div class="w-full border-t border-dashed border-slate-100"></div>
                                 <div class="w-full border-t border-dashed border-slate-100"></div>
                                 <div class="w-full border-t border-dashed border-slate-100"></div>
                                 <div class="w-full border-t border-dashed border-slate-100"></div>
                             </div>
-
-                            <!-- Container de Colunas Gerado Dinamicamente -->
-                            <div id="client-consumption-chart" class="relative z-10 h-full flex justify-around items-end gap-2">
-                                <!-- Inserido por JS -->
-                            </div>
+                            <div id="client-consumption-chart" class="relative z-10 h-full flex justify-around items-end gap-2"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Aba Dashboard & Finança -->
                 <div id="tab-dashboard" class="hidden bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-100 min-h-[600px]">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="p-8 bg-emerald-50 rounded-3xl border border-emerald-100">
@@ -310,6 +321,13 @@
             btnText.innerText = isOpen ? 'Recolher' : 'Ver Clientes';
         }
 
+        function updateChartMonth(monthIndex) {
+            currentCalDate.setMonth(parseInt(monthIndex));
+            renderConsumptionChart();
+            renderCalendar();
+            updateDashboard();
+        }
+
         function switchTab(tab) {
             localStorage.setItem('pet_last_tab', tab);
             ['agenda', 'clientes', 'dashboard'].forEach(t => {
@@ -342,13 +360,9 @@
                     <div class="client-card p-5 rounded-2xl flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-black text-sm">${c.name.charAt(0)}</div>
-                            <div>
-                                <h4 class="font-bold text-slate-800 text-sm leading-tight">${c.name}</h4>
-                                <div class="flex flex-col gap-0.5 mt-0.5">
-                                    <span class="text-[10px] font-black text-indigo-500 uppercase">${c.pet}</span>
-                                    <span class="text-[11px] font-semibold text-slate-500 flex items-center gap-1"><i data-lucide="phone" class="w-2.5 h-2.5"></i> ${c.phone}</span>
-                                </div>
-                            </div>
+                            <div><h4 class="font-bold text-slate-800 text-sm leading-tight">${c.name}</h4>
+                            <div class="flex flex-col gap-0.5 mt-0.5"><span class="text-[10px] font-black text-indigo-500 uppercase">${c.pet}</span>
+                            <span class="text-[11px] font-semibold text-slate-500 flex items-center gap-1"><i data-lucide="phone" class="w-2.5 h-2.5"></i> ${c.phone}</span></div></div>
                         </div>
                         <div class="flex gap-0.5">
                             <button onclick="editClient(${realIndex})" class="p-1.5 text-slate-300 hover:text-indigo-600 transition-colors"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
@@ -359,55 +373,30 @@
             lucide.createIcons();
         }
 
-        // Gráfico Modificado para Colunas Verticais Estilo BI
         function renderConsumptionChart() {
             const chartContainer = document.getElementById('client-consumption-chart');
             chartContainer.innerHTML = '';
-
             const currentMonthStr = `${currentCalDate.getFullYear()}-${String(currentCalDate.getMonth() + 1).padStart(2, '0')}`;
             const monthlyApps = appointments.filter(a => a.serviceDate.startsWith(currentMonthStr) && a.status !== 'cancelado');
-
             const consumptionMap = {};
             clients.forEach(c => consumptionMap[c.name] = 0);
-            monthlyApps.forEach(a => {
-                if(consumptionMap[a.clientName] !== undefined) consumptionMap[a.clientName]++;
-                else consumptionMap[a.clientName] = 1;
-            });
-
-            const sortedData = Object.entries(consumptionMap)
-                .map(([name, count]) => ({ name, count }))
-                .sort((a, b) => b.count - a.count)
-                .slice(0, 5);
-
+            monthlyApps.forEach(a => { if(consumptionMap[a.clientName] !== undefined) consumptionMap[a.clientName]++; else consumptionMap[a.clientName] = 1; });
+            const sortedData = Object.entries(consumptionMap).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count).slice(0, 5);
             const maxCount = Math.max(...sortedData.map(d => d.count), 1);
-
-            if(monthlyApps.length === 0) {
-                chartContainer.innerHTML = `<p class="text-slate-400 text-xs italic text-center py-6 w-full">Sem registros de consumo para este mês.</p>`;
-                return;
-            }
-
+            if(monthlyApps.length === 0) { chartContainer.innerHTML = `<p class="text-slate-400 text-xs italic text-center py-6 w-full">Sem registros de consumo para este mês.</p>`; return; }
             sortedData.forEach((d) => {
                 const percentage = (d.count / maxCount) * 100;
-                chartContainer.innerHTML += `
-                    <div class="flex flex-col items-center group h-full justify-end w-16 sm:w-24 relative">
-                        <!-- Rótulo do Dado no topo da Coluna -->
-                        <div class="text-[11px] font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border mb-1.5">
-                            ${d.count}
-                        </div>
-                        <!-- Coluna (Barra Vertical de BI) -->
+                chartContainer.innerHTML += `<div class="flex flex-col items-center group h-full justify-end w-16 sm:w-24 relative">
+                        <div class="text-[11px] font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border mb-1.5">${d.count}</div>
                         <div class="w-8 sm:w-12 bg-slate-100 rounded-t border border-b-0 border-slate-200/60 relative overflow-hidden transition-all duration-500 flex items-end" style="height: ${percentage}%">
                             <div class="bg-indigo-600 w-full rounded-t transition-all duration-500 shadow-inner group-hover:bg-indigo-700" style="height: 100%"></div>
                         </div>
-                        <!-- Rótulo do Eixo X (Nome do Cliente na Base) -->
-                        <div class="text-[11px] font-semibold text-slate-500 mt-2 text-center truncate w-full" title="${d.name}">
-                            ${d.name}
-                        </div>
+                        <div class="text-[11px] font-semibold text-slate-500 mt-2 text-center truncate w-full" title="${d.name}">${d.name}</div>
                     </div>`;
             });
         }
 
         function toggleClientForm() { document.getElementById('client-form-container').classList.toggle('hidden'); }
-        
         function editClient(index) {
             const c = clients[index];
             document.getElementById('edit-client-index').value = index;
@@ -446,35 +435,26 @@
         }
 
         function showDayDetails(dateStr) {
-            selectedDateStr = dateStr; 
-            renderCalendar();
-            
+            selectedDateStr = dateStr; renderCalendar();
             const list = document.getElementById('day-appointments-list');
             const dateDisplay = document.getElementById('selected-date-display');
-            
             const [y, m, d] = dateStr.split('-');
-            const formatted = `${d}/${m}/${y}`;
-            dateDisplay.innerText = formatted;
-
+            dateDisplay.innerText = `${d}/${m}/${y}`;
             const dailyApps = appointments.filter(a => a.serviceDate === dateStr);
             list.innerHTML = dailyApps.length ? '' : '<p class="text-slate-400 text-sm italic text-center py-8">Nenhum agendamento para este dia.</p>';
-            
             dailyApps.sort((a,b) => a.serviceTime.localeCompare(b.serviceTime)).forEach(app => {
                 const isConcluido = app.status === 'concluido', isCancelado = app.status === 'cancelado';
                 let statusBadge = isConcluido ? '<span class="status-indicator status-done"></span>' : (isCancelado ? '<span class="status-indicator status-canceled"></span>' : "");
                 list.innerHTML += `<div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <div class="flex items-center gap-4">
-                        <span class="text-xs font-black text-indigo-600 bg-white px-2 py-1 rounded-lg border">${app.serviceTime}</span>
-                        <div><p class="text-sm font-black text-slate-800">${app.petName}<span class="text-[10px] text-slate-400 font-normal ml-1">(${app.clientName})${statusBadge}</span></p>
-                        <p class="text-[12px] font-bold text-indigo-500 uppercase">${app.serviceType}</p></div>
-                    </div>
+                    <div class="flex items-center gap-4"><span class="text-xs font-black text-indigo-600 bg-white px-2 py-1 rounded-lg border">${app.serviceTime}</span>
+                    <div><p class="text-sm font-black text-slate-800">${app.petName}<span class="text-[10px] text-slate-400 font-normal ml-1">(${app.clientName})${statusBadge}</span></p>
+                    <p class="text-[12px] font-bold text-indigo-500 uppercase">${app.serviceType}</p></div></div>
                     <div class="flex gap-2">
                         <button onclick="updateStatus(${app.id}, 'concluido')" class="btn-status btn-check ${isConcluido ? 'active' : ''}"><i data-lucide="check" class="w-4 h-4"></i></button>
                         <button onclick="updateStatus(${app.id}, 'cancelado')" class="btn-status btn-x ${isCancelado ? 'active' : ''}"><i data-lucide="x" class="w-4 h-4"></i></button>
                         <button onclick="editApp(${app.id})" class="btn-status bg-blue-50 text-blue-600 border border-blue-100"><i data-lucide="pencil" class="w-4 h-4"></i></button>
                         <button onclick="deleteApp(${app.id})" class="btn-status bg-rose-50 text-rose-600 border border-rose-100"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>
-                </div>`;
+                    </div></div>`;
             });
             lucide.createIcons();
         }
@@ -484,31 +464,13 @@
         function handleFormSubmit(e) {
             e.preventDefault(); 
             const editId = document.getElementById('edit-id').value;
-            const fields = [
-                document.getElementById('clientNameSearch'),
-                document.getElementById('petName'),
-                document.getElementById('serviceDate'),
-                document.getElementById('serviceTime'),
-                document.getElementById('serviceValue')
-            ];
-
+            const fields = [document.getElementById('clientNameSearch'), document.getElementById('petName'), document.getElementById('serviceDate'), document.getElementById('serviceTime'), document.getElementById('serviceValue')];
             let hasEmpty = false;
-            fields.forEach(f => {
-                if(!f.value || f.value.trim() === "") {
-                    f.classList.add('error-field');
-                    hasEmpty = true;
-                } else {
-                    f.classList.remove('error-field');
-                }
-            });
-
+            fields.forEach(f => { if(!f.value || f.value.trim() === "") { f.classList.add('error-field'); hasEmpty = true; } else { f.classList.remove('error-field'); } });
             if(hasEmpty) return;
-
-            const date = document.getElementById('serviceDate').value;
-            const time = document.getElementById('serviceTime').value;
+            const date = document.getElementById('serviceDate').value, time = document.getElementById('serviceTime').value;
             const isConflict = appointments.some(a => a.serviceDate === date && a.serviceTime === time && a.id != editId && a.status !== 'cancelado');
             if(isConflict) { alert("Atenção: Já existe um agendamento para este dia e horário!"); return; }
-
             const data = { id: editId ? parseInt(editId) : Date.now(), clientName: document.getElementById('clientNameSearch').value, petName: document.getElementById('petName').value, serviceType: document.getElementById('serviceType').value, serviceValue: parseFloat(document.getElementById('serviceValue').value), serviceDate: date, serviceTime: time, status: editId ? (appointments.find(a => a.id == editId).status) : 'pendente' };
             if (editId) appointments = appointments.map(a => a.id == editId ? data : a); else appointments.push(data);
             localStorage.setItem('pet_appointments', JSON.stringify(appointments)); e.target.reset(); document.getElementById('edit-id').value = ''; renderCalendar(); if(selectedDateStr) showDayDetails(selectedDateStr);
@@ -518,13 +480,30 @@
         function editApp(id) { const app = appointments.find(a => a.id === id); document.getElementById('edit-id').value = app.id; document.getElementById('clientNameSearch').value = app.clientName; document.getElementById('petName').value = app.petName; document.getElementById('serviceType').value = app.serviceType; document.getElementById('serviceValue').value = app.serviceValue; document.getElementById('serviceDate').value = app.serviceDate; document.getElementById('serviceTime').value = app.serviceTime; window.scrollTo({ top: 0, behavior: 'smooth' }); }
         
         function changeMonth(dir) { currentCalDate.setMonth(currentCalDate.getMonth() + dir); renderCalendar(); }
-        function updateDashboard() { let g = 0, p = 0; appointments.forEach(a => { if(a.status === 'concluido') g += a.serviceValue; else if(a.status === 'cancelado') p += a.serviceValue; }); document.getElementById('kpi-ganhos').innerText = `R$ ${g.toFixed(2)}`; document.getElementById('kpi-perdas').innerText = `R$ ${p.toFixed(2)}`; document.getElementById('kpi-saldo').innerText = `R$ ${(g-p).toFixed(2)}`; }
+        function updateDashboard() { 
+            const currentMonthStr = `${currentCalDate.getFullYear()}-${String(currentCalDate.getMonth() + 1).padStart(2, '0')}`;
+            let g = 0, p = 0; 
+            appointments.forEach(a => { 
+                if(a.serviceDate.startsWith(currentMonthStr)) {
+                    if(a.status === 'concluido') g += a.serviceValue; 
+                    else if(a.status === 'cancelado') p += a.serviceValue; 
+                }
+            }); 
+            document.getElementById('kpi-ganhos').innerText = `R$ ${g.toFixed(2)}`; 
+            document.getElementById('kpi-perdas').innerText = `R$ ${p.toFixed(2)}`; 
+            document.getElementById('kpi-saldo').innerText = `R$ ${(g-p).toFixed(2)}`; 
+        }
         function autoFillPet(name) { const found = clients.find(c => c.name.toLowerCase().includes(name.toLowerCase())); if (found && name.length > 2) document.getElementById('petName').value = found.pet; }
 
         window.onload = () => {
             const d = new Date();
             const formatada = d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
             document.getElementById('current-date').innerText = formatada.split(' ').map(w => w.length > 2 ? w.charAt(0).toUpperCase() + w.slice(1) : w).join(' ');
+            
+            // Sincroniza o seletor visual com o mês atual
+            const monthSelector = document.querySelector('select[onchange="updateChartMonth(this.value)"]');
+            if(monthSelector) monthSelector.value = d.getMonth();
+
             const lastTab = localStorage.getItem('pet_last_tab') || 'agenda';
             switchTab(lastTab);
         };
