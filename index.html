@@ -1,74 +1,65 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Agenda Pet - Gestão</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* Estilos Globais e Reset de Largura */
+    body { 
+        font-family: 'Inter', sans-serif; 
+        overflow-x: hidden; 
+        width: 100%; /* Corrigido de 100vw para 100% para evitar a barra branca */
+        margin: 0;
+        padding: 0;
+    }
     
-    <style>
-        /* Ajuste na largura para evitar a parte branca lateral */
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; width: 100%; position: relative; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
-        .hidden { display: none !important; }
-        .bg-pet-sidebar { background-color: #312e81; } 
-        .bg-pet-active { background-color: #4338ca; }
-        .fita-azul { width: 3px; height: 20px; background-color: #3b82f6; border-radius: 4px; margin-right: 12px; }
+    .hidden { display: none !important; }
+    .bg-pet-sidebar { background-color: #312e81; } 
+    .bg-pet-active { background-color: #4338ca; }
+    
+    /* Configuração de Scroll Interno */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+
+    /* Ajustes Exclusivos Mobile */
+    @media (max-width: 768px) { 
+        .sidebar-desktop { display: none !important; }
         
-        .header-date-badge {
-            background-color: #e0f2fe; color: #0369a1;
-            padding: 8px 16px; border-radius: 12px; font-weight: 600;
-        }
-
-        .client-card {
-            background: #fff;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid #f1f5f9;
+        /* Remove o cabeçalho superior que estava duplicando */
+        #header-main { display: none !important; }
+        
+        /* Garante que o conteúdo ocupe apenas a largura da tela */
+        .content-area { 
+            padding: 0 !important; 
+            width: 100% !important; 
+            max-width: 100% !important; 
+            overflow-x: hidden; 
         }
         
-        .calendar-grid-container {
-            display: grid; grid-template-columns: repeat(7, 1fr);
-            gap: 1px; background-color: #e2e8f0; border: 1px solid #e2e8f0;
-            transition: max-height 0.3s ease-out;
-            overflow: hidden;
+        #main-app {
+            display: block !important; /* Facilita o empilhamento no mobile */
+            height: auto !important;
+            overflow-x: hidden;
         }
 
-        .calendar-collapsed { max-height: 0; border: none; }
-
-        .calendar-cell {
-            background: white; min-height: 80px; padding: 8px;
-            transition: all 0.2s; cursor: pointer;
+        .bg-mobile-full { 
+            background-color: #312e81; 
+            min-height: 100vh; 
+            width: 100% !important; 
+            margin: 0;
+            box-sizing: border-box; 
         }
-        .calendar-cell.selected { background-color: #eef2ff; border: 1px solid #4338ca; }
-        .cell-day-number { font-size: 13px; font-weight: 800; color: #1e293b; margin-bottom: 4px; }
-        .event-dot { width: 6px; height: 6px; background: #4338ca; border-radius: 50%; display: inline-block; margin-right: 2px; }
+    }
 
-        .mobile-menu-card {
-            background: white;
-            border-radius: 24px;
-            padding: 24px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.2s;
-            width: 100%;
-            box-sizing: border-box;
-        }
+    /* Estilos dos Cards Mobile */
+    .mobile-menu-card {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        box-sizing: border-box;
+    }
+</style>
 
-        @media (max-width: 768px) { 
-            .sidebar-desktop { display: none; }
-            /* O topo original do desktop é escondido aqui para não duplicar */
-            #header-main { display: none !important; }
-            .content-area { padding: 0px !important; width: 100% !important; overflow-x: hidden; }
-            .bg-mobile-full { background-color: #312e81; min-height: 100vh; width: 100% !important; box-sizing: border-box; }
-        }
-    </style>
-</head>
 <body class="bg-slate-50 text-slate-800">
 
     <div id="main-app" class="flex flex-col md:flex-row h-screen overflow-hidden">
@@ -92,17 +83,18 @@
         </aside>
 
         <div class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
+            
             <header id="header-main" class="hidden md:flex bg-white border-b px-8 py-5 justify-between items-center sticky top-0 z-40">
                 <div class="flex items-center">
-                    <div class="fita-azul"></div>
-                    <h2 id="page-title" class="text-lg font-light text-slate-500 uppercase tracking-[0.2em]">Agendamento</h2>
+                    <div class="fita-azul" style="width: 3px; height: 20px; background: #3b82f6; margin-right: 12px;"></div>
+                    <h2 id="page-title" class="text-lg font-light text-slate-500 uppercase tracking-[0.2em]">Dashboard</h2>
                 </div>
                 <div class="text-right">
-                    <span id="current-date" class="header-date-badge text-sm"></span>
+                    <span id="current-date" class="bg-blue-50 text-blue-700 px-4 py-2 rounded-xl text-sm font-bold"></span>
                 </div>
             </header>
 
-            <main class="content-area p-4 md:p-8 max-w-full mx-auto overflow-x-hidden">
+            <main class="content-area p-4 md:p-8 w-full overflow-x-hidden">
 
                 <div id="tab-home" class="bg-mobile-full p-6 flex flex-col justify-start w-full md:hidden">
                     <div class="flex items-center gap-4 text-white pt-6 pb-10">
@@ -122,33 +114,13 @@
                                 <p class="text-[11px] text-slate-400">Ver e criar agendamentos</p>
                             </div>
                         </button>
-
-                        <button onclick="switchTab('clientes')" class="mobile-menu-card">
-                            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
-                                <i data-lucide="users" class="w-6 h-6"></i>
-                            </div>
-                            <div class="text-left">
-                                <h3 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Clientes</h3>
-                                <p class="text-[11px] text-slate-400">Base de tutores e pets</p>
-                            </div>
-                        </button>
-
-                        <button onclick="switchTab('dashboard')" class="mobile-menu-card">
-                            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center">
-                                <i data-lucide="pie-chart" class="w-6 h-6"></i>
-                            </div>
-                            <div class="text-left">
-                                <h3 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Dashboard</h3>
-                                <p class="text-[11px] text-slate-400">Relatórios e valores</p>
-                            </div>
-                        </button>
-                    </div>
+                        </div>
                 </div>
 
                 <div id="tab-agenda" class="hidden">
-                    <div class="md:hidden mb-4">
-                        <button onclick="switchTab('home')" class="text-slate-500 font-bold text-xs uppercase bg-white px-4 py-2 rounded-xl border border-slate-100 flex items-center gap-2">
-                             <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar
+                     <div class="md:hidden mb-4 p-4">
+                        <button onclick="switchTab('home')" class="flex items-center gap-2 text-slate-500 font-bold text-xs uppercase bg-white px-4 py-2 rounded-xl shadow-sm">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar
                         </button>
                     </div>
                     </div>
@@ -156,43 +128,3 @@
             </main>
         </div>
     </div>
-
-    <script>
-        let appointments = JSON.parse(localStorage.getItem('pet_appointments')) || [];
-        
-        function switchTab(tab) {
-            // Esconde todas as abas
-            ['home', 'agenda', 'clientes', 'dashboard'].forEach(t => {
-                const el = document.getElementById(`tab-${t}`);
-                if(el) el.classList.add('hidden');
-            });
-
-            // Mostra a aba clicada
-            const target = document.getElementById(`tab-${tab}`);
-            if(target) target.classList.remove('hidden');
-
-            // Logica do header no Desktop
-            const header = document.getElementById('header-main');
-            if (header) {
-                if (tab === 'home' && window.innerWidth < 768) {
-                    header.classList.add('hidden');
-                } else if (window.innerWidth >= 768) {
-                    header.classList.remove('hidden');
-                }
-            }
-
-            lucide.createIcons();
-            window.scrollTo(0,0);
-        }
-
-        window.onload = () => {
-            const isMobile = window.innerWidth < 768;
-            switchTab(isMobile ? 'home' : 'agenda');
-            
-            const d = new Date();
-            const dateEl = document.getElementById('current-date');
-            if(dateEl) dateEl.innerText = d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-        };
-    </script>
-</body>
-</html>
