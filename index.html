@@ -107,8 +107,8 @@
         @media (max-width: 768px) { 
             .sidebar-desktop { display: none; }
             #header-main { display: none; }
-            .content-area { padding: 0px !important; }
-            .bg-mobile-full { background-color: #312e81; min-height: 100vh; }
+            .content-area { padding: 0px !important; width: 100% !important; max-width: 100% !important; }
+            .bg-mobile-full { background-color: #312e81; min-height: 100vh; width: 100vw; }
         }
     </style>
 </head>
@@ -148,7 +148,7 @@
                 </div>
             </header>
 
-            <main class="content-area p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-6">
+            <main class="content-area p-4 md:p-8 max-w-[1600px] w-full mx-auto">
 
                 <!-- Tela Home Mobile / Inicial -->
                 <div id="tab-home" class="bg-mobile-full p-6 flex flex-col justify-start">
@@ -196,7 +196,7 @@
                     <!-- Mensagem Desktop -->
                     <div class="hidden md:block text-center py-20 opacity-20">
                         <i data-lucide="dog" class="w-20 h-20 mx-auto mb-4"></i>
-                        <p class="font-black uppercase tracking-[0.3em]">Selecione uma opção ao lado</p>
+                        <p class="font-black uppercase tracking-[0.3em]">Selecione uma option ao lado</p>
                     </div>
                 </div>
 
@@ -263,7 +263,7 @@
                                 <div>
                                     <h3 class="text-xl font-black text-slate-800 tracking-tight">Clientes</h3>
                                     <p class="text-slate-400 text-xs font-medium">Base de clientes registrada.</p>
-                                </div>
+                                }</div>
                             </div>
                             <button onclick="toggleClientsView()" id="btn-toggle-clients" class="w-full sm:w-auto bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2">
                                 <i data-lucide="eye" class="w-4 h-4"></i> <span id="text-toggle-clients">Ver Clientes</span>
