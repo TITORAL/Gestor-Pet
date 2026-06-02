@@ -441,23 +441,30 @@
             updateDashboard();
         }
 
-        function switchTab(tab) {
-            localStorage.setItem('pet_last_tab', tab);
-            ['agenda', 'clientes', 'dashboard'].forEach(t => {
-                document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`btn-${t}-dt`).classList.remove('bg-pet-active');
-                document.getElementById(`btn-${t}-dt`).style.opacity = "0.7";
-            });
-            document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            document.getElementById(`btn-${tab}-dt`).classList.add('bg-pet-active');
-            document.getElementById(`btn-${tab}-dt`).style.opacity = "1";
-            
-            document.getElementById('page-title').innerText = { 'agenda': 'Agendamentos', 'clientes': 'Clientes', 'dashboard': 'Dashboard & Finança' }[tab];
-            
-            if(tab === 'clientes') { renderClientList(); renderConsumptionChart(); }
-            if(tab === 'dashboard') updateDashboard();
-            if(tab === 'agenda') { renderCalendar(); showDayDetails(selectedDateStr); }
-            lucide.createIcons();
+       function switchTab(tab) {
+    // 1. Esconder todas as abas
+    document.getElementById('tab-agenda').classList.add('hidden');
+    document.getElementById('tab-clientes').classList.add('hidden');
+    document.getElementById('tab-dashboard').classList.add('hidden');
+    document.getElementById('tab-gastos').classList.add('hidden'); // Adicione esta linha
+
+    // 2. Mostrar a aba clicada
+    document.getElementById('tab-' + tab).classList.remove('hidden');
+
+    // 3. Atualizar o Título da página (Evita o "undefined")
+    const titulos = {
+        'agenda': 'Agendamentos',
+        'clientes': 'Meus Clientes',
+        'dashboard': 'Relatórios Financeiros',
+        'gastos': 'Controle de Gastos' // Adicione esta linha
+    };
+    
+    // Altera o H2 ou H1 principal do seu conteúdo
+    document.getElementById('main-title').innerText = titulos[tab] || 'Painel';
+    
+    // 4. Atualizar estilo dos botões (opcional)
+    updateButtonStyles(tab);
+}
         }
 
         function renderClientList() {
