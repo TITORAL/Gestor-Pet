@@ -45,7 +45,7 @@
         <main class="p-6 space-y-6">
             
             <!-- ABA: AGENDAMENTO -->
-            <div id="tab-agenda" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div id="tab-agenda" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div class="lg:col-span-4 space-y-6">
                     <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
                         <h3 class="text-xs font-black uppercase mb-4 text-slate-400">Novo Agendamento</h3>
@@ -90,7 +90,7 @@
                     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
                         <div class="p-4 border-b flex justify-between items-center bg-slate-50">
                             <button onclick="toggleCalendar()" class="text-xs font-bold text-indigo-600 flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4"></i> VER CALENDÁRIO</button>
-                            <span id="cal-month-name" class="text-xs font-black uppercase">Junho 2026</span>
+                            <span id="cal-month-name" class="text-xs font-black uppercase">Painel de Dias</span>
                         </div>
                         <div id="calendar-grid" class="calendar-grid-container calendar-collapsed"></div>
                     </div>
@@ -138,7 +138,7 @@
             <div id="tab-dashboard" class="hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="p-8 bg-emerald-500 text-white rounded-[2.5rem] shadow-lg relative">
-                        <p class="text-[10px] font-black uppercase opacity-80 mb-2">Receita Total: <span id="dash-mes-label">Junho</span></p>
+                        <p class="text-[10px] font-black uppercase opacity-80 mb-2">Receita Total</p>
                         <h3 class="text-4xl font-black" id="dash-faturamento">R$ 0,00</h3>
                     </div>
                     <div class="p-8 bg-indigo-600 text-white rounded-[2.5rem] shadow-lg">
@@ -153,9 +153,68 @@
                 </div>
             </div>
 
-            <!-- ABA: GASTOS -->
-            <div id="tab-gastos" class="hidden">
-                <p class="text-center py-20 text-slate-400">Gerencie suas despesas fixas e variáveis aqui.</p>
+            <!-- ABA: GASTOS (SISTEMA COMPLETO INTEGRADO) -->
+            <div id="tab-gastos" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Form de Cadastro de Gastos -->
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                        <h3 class="text-xs font-black uppercase mb-4 text-slate-400">Cadastrar Nova Despesa</h3>
+                        <form onsubmit="saveExpense(event)" class="space-y-3">
+                            <input type="text" id="exp-description" placeholder="Descrição da Despesa (Ex: Aluguel, Ração)" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none outline-none focus:ring-2 ring-rose-500" required>
+                            <input type="number" id="exp-valor" placeholder="Valor R$" step="0.01" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none outline-none focus:ring-2 ring-rose-500" required>
+                            
+                            <select id="exp-category" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none outline-none focus:ring-2 ring-rose-500">
+                                <option value="Fixo">Custo Fixo</option>
+                                <option value="Variável">Custo Variável</option>
+                            </select>
+                            
+                            <input type="date" id="exp-date" class="w-full p-3 bg-slate-50 rounded-xl text-xs border-none outline-none focus:ring-2 ring-rose-500" required>
+                            
+                            <button type="submit" class="w-full bg-rose-500 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-rose-600 transition uppercase text-xs tracking-widest">Registrar Saída</button>
+                        </form>
+                    </div>
+
+                    <!-- Indicadores de Gastos -->
+                    <div class="bg-slate-900 p-6 rounded-[2rem] text-white shadow-xl space-y-4">
+                        <div>
+                            <p class="text-[9px] font-black uppercase opacity-50 tracking-widest">Total Despendido</p>
+                            <h3 id="total-expenses-card" class="text-3xl font-black text-rose-400">R$ 0,00</h3>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800">
+                            <div>
+                                <p class="text-[8px] font-bold uppercase opacity-40">Custos Fixos</p>
+                                <p id="fixo-expenses-card" class="text-sm font-black text-slate-200">R$ 0,00</p>
+                            </div>
+                            <div>
+                                <p class="text-[8px] font-bold uppercase opacity-40">Custos Variáveis</p>
+                                <p id="variavel-expenses-card" class="text-sm font-black text-slate-200">R$ 0,00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Histórico de Despesas -->
+                <div class="lg:col-span-8 space-y-6">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                        <h4 class="text-xs font-black text-rose-500 uppercase mb-4 tracking-widest">Fluxo de Saídas / Extrato</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="border-b text-[10px] uppercase text-slate-400 font-black tracking-wider">
+                                        <th class="pb-3">Data</th>
+                                        <th class="pb-3">Descrição</th>
+                                        <th class="pb-3">Categoria</th>
+                                        <th class="pb-3 text-right">Valor</th>
+                                        <th class="pb-3 text-center">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expenses-table-body" class="divide-y divide-slate-100">
+                                    <!-- Dinâmico via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </main>
@@ -165,6 +224,7 @@
 <script>
     let appointments = JSON.parse(localStorage.getItem('pet_apps')) || [];
     let registeredClients = JSON.parse(localStorage.getItem('pet_clients_reg')) || [];
+    let expenses = JSON.parse(localStorage.getItem('pet_expenses')) || [];
     let selectedDate = new Date().toISOString().split('T')[0];
     let serviceChart;
 
@@ -180,11 +240,12 @@
         if(tab === 'agenda') title.innerText = 'Agendamento';
         if(tab === 'clientes') title.innerText = 'Cadastro';
         if(tab === 'dashboard') title.innerText = 'Finanças';
-        if(tab === 'gastos') title.innerText = 'Gastos';
+        if(tab === 'gastos') title.innerText = 'Gastos / Despesas';
         
         localStorage.setItem('active_pet_tab', tab);
 
         if(tab === 'dashboard') renderDashboard();
+        if(tab === 'gastos') renderExpenses();
     }
 
     // --- AGENDAMENTO ---
@@ -232,6 +293,7 @@
 
     function renderCalendar() {
         const grid = document.getElementById('calendar-grid');
+        if (!grid) return;
         grid.innerHTML = '';
         const date = new Date();
         const days = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -245,6 +307,7 @@
     function renderDayList(date) {
         selectedDate = date;
         const list = document.getElementById('day-list');
+        if (!list) return;
         const filtered = appointments.filter(a => a.data === date);
         list.innerHTML = filtered.length ? '' : '<p class="text-xs text-slate-400 italic py-4">Sem serviços para este dia.</p>';
         filtered.forEach(a => {
@@ -304,7 +367,9 @@
         const contagem = { 'Banho': 0, 'Tosa': 0, 'Banho e Tosa': 0 };
         appointments.forEach(a => { if(contagem[a.servico] !== undefined) contagem[a.servico]++ });
 
-        const ctx = document.getElementById('chartServicos').getContext('2d');
+        const canvas = document.getElementById('chartServicos');
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
         if(serviceChart) serviceChart.destroy();
         serviceChart = new Chart(ctx, {
             type: 'bar',
@@ -325,6 +390,69 @@
         });
     }
 
+    // --- SISTEMA DE GASTOS ---
+    function saveExpense(e) {
+        e.preventDefault();
+        const expense = {
+            id: Date.now(),
+            description: document.getElementById('exp-description').value,
+            valor: parseFloat(document.getElementById('exp-valor').value),
+            category: document.getElementById('exp-category').value,
+            date: document.getElementById('exp-date').value
+        };
+        expenses.push(expense);
+        localStorage.setItem('pet_expenses', JSON.stringify(expenses));
+        e.target.reset();
+        renderExpenses();
+    }
+
+    function deleteExpense(id) {
+        expenses = expenses.filter(exp => exp.id !== id);
+        localStorage.setItem('pet_expenses', JSON.stringify(expenses));
+        renderExpenses();
+    }
+
+    function renderExpenses() {
+        const tableBody = document.getElementById('expenses-table-body');
+        if(!tableBody) return;
+
+        // Cálculos dos Cards
+        const total = expenses.reduce((acc, cur) => acc + cur.valor, 0);
+        const fixo = expenses.filter(e => e.category === 'Fixo').reduce((acc, cur) => acc + cur.valor, 0);
+        const variavel = expenses.filter(e => e.category === 'Variável').reduce((acc, cur) => acc + cur.valor, 0);
+
+        document.getElementById('total-expenses-card').innerText = `R$ ${total.toFixed(2)}`;
+        document.getElementById('fixo-expenses-card').innerText = `R$ ${fixo.toFixed(2)}`;
+        document.getElementById('variavel-expenses-card').innerText = `R$ ${variavel.toFixed(2)}`;
+
+        if (expenses.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-400 italic">Nenhum gasto registrado até o momento.</td></tr>`;
+            return;
+        }
+
+        // Ordenar por data (mais recentes primeiro)
+        expenses.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+        tableBody.innerHTML = expenses.map(exp => {
+            const dateFormatted = exp.date.split('-').reverse().join('/');
+            const badgeColor = exp.category === 'Fixo' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600';
+            return `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="py-3 text-slate-500">${dateFormatted}</td>
+                    <td class="py-3 font-semibold text-slate-700">${exp.description}</td>
+                    <td class="py-3"><span class="px-2 py-1 rounded-md text-[10px] font-bold ${badgeColor}">${exp.category}</span></td>
+                    <td class="py-3 text-right font-bold text-rose-600">R$ ${exp.valor.toFixed(2)}</td>
+                    <td class="py-3 text-center">
+                        <button onclick="deleteExpense(${exp.id})" class="text-slate-400 hover:text-rose-600 transition">
+                            <i data-lucide="trash-2" class="w-4 h-4 mx-auto"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        lucide.createIcons();
+    }
+
     // --- CARREGAMENTO INICIAL ---
     window.onload = () => {
         const d = new Date();
@@ -333,6 +461,7 @@
         
         renderDayList(selectedDate);
         renderBiPanel();
+        renderExpenses();
 
         // Recupera o estado da última aba visitada pelo usuário
         const savedTab = localStorage.getItem('active_pet_tab') || 'agenda';
