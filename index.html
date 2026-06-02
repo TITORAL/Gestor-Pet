@@ -441,21 +441,49 @@
             updateDashboard();
         }
 
-      function switchTab(tab) {
-    localStorage.setItem('pet_last_tab', tab);
-    
-    // Lista contendo todas as 4 abas agora
-    const abas = ['agenda', 'clientes', 'dashboard', 'gastos'];
-    
-    abas.forEach(t => {
-        const tabEl = document.getElementById(`tab-${t}`);
-        const btnEl = document.getElementById(`btn-${t}-dt`);
+     function switchTab(tab) {
+    try {
+        // 1. IDs de todas as abas que você possui
+        const abas = ['agenda', 'clientes', 'dashboard', 'gastos'];
         
-        if (tabEl) tabEl.classList.add('hidden');
-        if (btnEl) {
-            btnEl.classList.remove('bg-pet-active');
-            btnEl.style.opacity = "0.7";
+        abas.forEach(id => {
+            const container = document.getElementById(`tab-${id}`);
+            const botao = document.getElementById(`btn-${id}-dt`);
+            
+            if (container) container.classList.add('hidden');
+            if (botao) {
+                botao.classList.remove('bg-indigo-600', 'text-white'); // Ajuste para sua cor ativa
+                botao.style.opacity = "0.6";
+            }
+        });
+
+        // 2. Ativar a aba selecionada
+        const abaAtiva = document.getElementById(`tab-${tab}`);
+        const botaoAtivo = document.getElementById(`btn-${tab}-dt`);
+        
+        if (abaAtiva) abaAtiva.classList.remove('hidden');
+        if (botaoAtivo) {
+            botaoAtivo.classList.add('bg-indigo-600', 'text-white');
+            botaoAtivo.style.opacity = "1";
         }
+
+        // 3. Mudar o Título (Substitua 'page-title' pelo ID real do seu H2 se for diferente)
+        const tituloElem = document.getElementById('page-title') || document.getElementById('main-title');
+        const nomes = { 
+            agenda: 'Agendamentos', 
+            clientes: 'Meus Clientes', 
+            dashboard: 'Dashboard', 
+            gastos: 'Gastos' 
+        };
+        if (tituloElem) tituloElem.innerText = nomes[tab];
+
+        // 4. Forçar ícones do Lucide
+        if (window.lucide) lucide.createIcons();
+        
+    } catch (e) {
+        console.error("Erro ao trocar de aba:", e);
+    }
+}
     });
 
     // Ativa a aba atual
