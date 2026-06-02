@@ -24,6 +24,7 @@
 <body class="bg-slate-50 text-slate-800">
 
 <div class="flex flex-col md:flex-row h-screen overflow-hidden">
+    <!-- Sidebar -->
     <aside class="w-64 bg-pet-sidebar text-white flex flex-col p-6 shrink-0">
         <div class="flex items-center gap-3 mb-10"><i data-lucide="dog" class="w-8 h-8 text-indigo-300"></i><h1 class="text-lg font-black uppercase">Agenda Pet</h1></div>
         <nav class="space-y-1">
@@ -35,6 +36,7 @@
     </aside>
 
     <div class="flex-1 flex flex-col overflow-y-auto">
+        <!-- Header -->
         <header class="bg-white border-b px-8 py-5 flex justify-between items-center sticky top-0 z-40">
             <div class="flex items-center"><div class="fita-azul"></div><h2 id="page-title" class="text-lg font-light text-slate-500 uppercase tracking-widest">Agendamento</h2></div>
             <div id="header-date" class="text-sm font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl"></div>
@@ -42,6 +44,7 @@
 
         <main class="p-6 space-y-6">
             
+            <!-- ABA: AGENDAMENTO -->
             <div id="tab-agenda" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div class="lg:col-span-4 space-y-6">
                     <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
@@ -63,21 +66,22 @@
                         </form>
                     </div>
 
+                    <!-- CARD B.I. AGENDAMENTO EM TEMPO REAL (TODOS OS REGISTROS) -->
                     <div class="bg-indigo-900 p-6 rounded-[2rem] text-white shadow-xl">
-                        <h4 class="text-[10px] font-black uppercase opacity-60 mb-4 tracking-widest">Status do Último Agendamento</h4>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center border-b border-indigo-800 pb-2">
-                                <span class="text-[10px] opacity-60">TUTOR</span>
-                                <span id="bi-tutor" class="font-bold text-sm">-</span>
-                            </div>
-                            <div class="flex justify-between items-center border-b border-indigo-800 pb-2">
-                                <span class="text-[10px] opacity-60">PET</span>
-                                <span id="bi-pet" class="font-bold text-sm">-</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] opacity-60">SERVIÇO</span>
-                                <span id="bi-tipo" class="font-bold text-sm text-indigo-300">-</span>
-                            </div>
+                        <h4 class="text-[10px] font-black uppercase opacity-60 mb-3 tracking-widest">Painel B.I. - Todos os Agendamentos</h4>
+                        <div class="max-h-60 overflow-y-auto pr-1 text-xs">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-indigo-800 text-[9px] opacity-50 tracking-wider">
+                                        <th class="pb-2 font-black">TUTOR</th>
+                                        <th class="pb-2 font-black">PET</th>
+                                        <th class="pb-2 font-black text-right">SERVIÇO</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bi-table-body" class="divide-y divide-indigo-800/40">
+                                    <!-- Conteúdo dinâmico em tempo real -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -97,20 +101,26 @@
                 </div>
             </div>
 
+            <!-- ABA: CLIENTES (CADASTRO) -->
             <div id="tab-clientes" class="hidden max-w-4xl mx-auto space-y-6">
-                <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-                    <h3 class="text-xs font-black uppercase mb-6 text-slate-400">Novo Cadastro de Cliente</h3>
+                <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm relative">
                     <form onsubmit="saveClient(event)" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                        <!-- Cabeçalho do Card com Botão no Canto Superior Direito -->
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xs font-black uppercase text-slate-400">Novo Cadastro de Cliente</h3>
+                            <button type="submit" class="bg-indigo-400 text-white font-bold px-6 py-3 rounded-xl shadow-md hover:bg-indigo-500 transition uppercase text-[10px] tracking-widest">
+                                Cadastrar Cliente
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="space-y-4">
                                 <input type="text" id="reg-tutor" placeholder="Nome do Tutor" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none outline-none focus:ring-2 ring-indigo-500" required>
-                                <button type="submit" class="w-full bg-indigo-400 text-white font-bold py-4 rounded-2xl shadow-md hover:bg-indigo-500 transition uppercase text-[10px] tracking-widest">Cadastrar Cliente</button>
                                 <input type="text" id="reg-pet" placeholder="Nome do Pet" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none outline-none focus:ring-2 ring-indigo-500" required>
                             </div>
                             <div class="space-y-4">
                                 <input type="tel" id="reg-zap" placeholder="WhatsApp" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none outline-none focus:ring-2 ring-indigo-500">
                                 <input type="text" id="reg-address" placeholder="Endereço" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none outline-none focus:ring-2 ring-indigo-500">
-                                <div class="hidden md:block h-[52px]"></div>
                             </div>
                         </div>
                     </form>
@@ -125,8 +135,20 @@
                 </div>
             </div>
 
+            <!-- ABA: DASHBOARD (FINANÇAS) -->
             <div id="tab-dashboard" class="hidden space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-8 bg-emerald-500 text-white rounded-[2.5rem] shadow-lg relative">
+                        <p class="text-[10px] font-black uppercase opacity-80 mb-2">Receita Total: <span id="dash-mes-label">Junho</span></p>
+                        <h3 class="text-4xl font-black" id="dash-faturamento">R$ 0,00</h3>
+                    </div>
+                    <div class="p-8 bg-indigo-600 text-white rounded-[2.5rem] shadow-lg">
+                        <p class="text-[10px] font-black uppercase opacity-80 mb-2">Receita do Dia</p>
+                        <h3 class="text-4xl font-black" id="dash-receita-dia">R$ 0,00</h3>
+                        <p id="dash-data-completa" class="text-[10px] mt-2 opacity-70 font-bold uppercase"></p>
+                    </div>
                 </div>
+            </div>
 
         </main>
     </div>
@@ -137,19 +159,26 @@
     let registeredClients = JSON.parse(localStorage.getItem('pet_clients_reg')) || [];
     let selectedDate = new Date().toISOString().split('T')[0];
 
+    // Mapeamento e Persistência de Abas
     function switchTab(tab) {
         document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
         document.querySelectorAll('nav button').forEach(b => b.classList.add('opacity-70'));
+        
         document.getElementById(`tab-${tab}`).classList.remove('hidden');
         document.getElementById(`btn-${tab}-dt`).classList.remove('opacity-70');
+
         const title = document.getElementById('page-title');
         if(tab === 'agenda') title.innerText = 'Agendamento';
         if(tab === 'clientes') title.innerText = 'Cadastro';
         if(tab === 'dashboard') title.innerText = 'Finanças';
+        
+        // Salva o estado da aba no LocalStorage para não perder no refresh
+        localStorage.setItem('active_pet_tab', tab);
+
         if(tab === 'dashboard') renderDashboard();
     }
 
-    // --- AGENDAMENTO (Mantida) ---
+    // --- AGENDAMENTO ---
     function saveAppointment(e) {
         e.preventDefault();
         const app = {
@@ -162,11 +191,29 @@
         };
         appointments.push(app);
         localStorage.setItem('pet_apps', JSON.stringify(appointments));
-        document.getElementById('bi-tutor').innerText = app.tutor;
-        document.getElementById('bi-pet').innerText = app.pet;
-        document.getElementById('bi-tipo').innerText = app.servico;
+        
         e.target.reset();
+        renderBiPanel();
         renderDayList(app.data);
+    }
+
+    // Renderiza a lista de B.I em tempo real com todos os cadastros
+    function renderBiPanel() {
+        const tableBody = document.getElementById('bi-table-body');
+        if (!tableBody) return;
+        
+        if (appointments.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 opacity-40 italic text-[11px]">Nenhum agendamento ativo.</td></tr>`;
+            return;
+        }
+
+        tableBody.innerHTML = appointments.map(app => `
+            <tr class="hover:bg-indigo-800/30 transition-colors">
+                <td class="py-2.5 font-bold tracking-wide">${app.tutor}</td>
+                <td class="py-2.5 opacity-80">${app.pet}</td>
+                <td class="py-2.5 text-right font-semibold text-indigo-300">${app.servico}</td>
+            </tr>
+        `).join('');
     }
 
     function toggleCalendar() {
@@ -198,7 +245,7 @@
         renderCalendar();
     }
 
-    // --- CADASTRO DE CLIENTES (ATUALIZADA) ---
+    // --- CADASTRO DE CLIENTES ---
     function saveClient(e) {
         e.preventDefault();
         const client = {
@@ -234,11 +281,19 @@
         } else { btnText.innerText = "Ver Clientes"; }
     }
 
+    // --- CARREGAMENTO INICIAL ---
     window.onload = () => {
         const d = new Date();
         document.getElementById('header-date').innerText = d.toLocaleDateString('pt-BR', {weekday: 'long', day: 'numeric', month: 'long'});
         lucide.createIcons();
+        
+        // Renderiza listas primordiais
         renderDayList(selectedDate);
+        renderBiPanel();
+
+        // Recupera a aba em que o usuário parou ou define 'agenda' por padrão
+        const savedTab = localStorage.getItem('active_pet_tab') || 'agenda';
+        switchTab(savedTab);
     };
 </script>
 </body>
