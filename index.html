@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda Pet - Gestão Completa</title>
+    <title>Agenda Pet - Sistema Integrado</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,17 +12,19 @@
         body { font-family: 'Inter', sans-serif; }
         .hidden { display: none !important; }
         .bg-pet-sidebar { background-color: #312e81; }
-        .calendar-grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background-color: #e2e8f0; border: 1px solid #e2e8f0; }
-        .calendar-cell { background: #fff; min-height: 80px; padding: 8px; cursor: pointer; transition: all 0.2s; }
+        .calendar-grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background-color: #e2e8f0; }
+        .calendar-cell { background: #fff; min-height: 80px; padding: 8px; cursor: pointer; transition: all 0.2s; border: 1px solid #f1f5f9; }
         .calendar-cell:hover { background-color: #f8fafc; }
-        .calendar-cell.selected { background-color: #eef2ff; border: 1px solid #4338ca; }
+        .calendar-cell.selected { background-color: #eef2ff; border: 2px solid #4338ca; }
         .event-dot { width: 6px; height: 6px; background: #4338ca; border-radius: 50%; display: inline-block; margin-right: 2px; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
 
 <div id="main-app" class="flex flex-col md:flex-row h-screen overflow-hidden">
-    <aside class="sidebar-desktop w-64 bg-pet-sidebar text-white flex flex-col p-6">
+    <aside class="sidebar-desktop w-64 bg-pet-sidebar text-white flex flex-col p-6 shrink-0">
         <div class="flex items-center gap-3 mb-10"><i data-lucide="dog" class="w-8 h-8 text-indigo-300"></i><h1 class="text-lg font-black tracking-tight uppercase">Agenda Pet</h1></div>
         <nav class="space-y-1">
             <button onclick="switchTab('agenda')" id="btn-agenda-dt" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition text-sm font-semibold"><i data-lucide="calendar" class="w-4 h-4"></i> Agendamentos</button>
@@ -34,53 +36,51 @@
 
     <div class="flex-1 flex flex-col overflow-y-auto">
         <header class="bg-white border-b px-8 py-5 flex justify-between items-center sticky top-0 z-40">
-            <h2 id="page-title" class="text-lg font-light text-slate-500 uppercase tracking-widest">Painel</h2>
+            <h2 id="page-title" class="text-lg font-light text-slate-500 uppercase tracking-widest">Agendamentos</h2>
             <span id="current-date" class="text-sm font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl"></span>
         </header>
 
-        <main class="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-6">
+        <main class="p-4 md:p-8 max-w-[1600px] w-full mx-auto">
             
             <div id="tab-agenda" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div class="lg:col-span-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                <div class="lg:col-span-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm h-fit">
                     <h3 class="font-black text-xs uppercase tracking-widest mb-4">Novo Agendamento</h3>
                     <form onsubmit="saveAppointment(event)" class="space-y-3">
-                        <input type="text" id="app-tutor" placeholder="Nome do Tutor" class="w-full p-3 bg-slate-50 rounded-xl outline-none text-sm border focus:border-indigo-300" required>
-                        <input type="text" id="app-pet" placeholder="Nome do Pet" class="w-full p-3 bg-slate-50 rounded-xl outline-none text-sm border focus:border-indigo-300" required>
+                        <input type="text" id="app-tutor" placeholder="Tutor" class="w-full p-3 bg-slate-50 rounded-xl outline-none text-sm border focus:border-indigo-300" required>
+                        <input type="text" id="app-pet" placeholder="Pet" class="w-full p-3 bg-slate-50 rounded-xl outline-none text-sm border focus:border-indigo-300" required>
                         <div class="flex gap-2">
                             <input type="date" id="app-data" class="w-1/2 p-3 bg-slate-50 rounded-xl text-xs border" required>
                             <input type="time" id="app-hora" class="w-1/2 p-3 bg-slate-50 rounded-xl text-xs border" required>
                         </div>
                         <input type="number" id="app-valor" placeholder="Valor R$" step="0.01" class="w-full p-3 bg-slate-50 rounded-xl text-sm border" required>
-                        <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-indigo-700">Agendar</button>
+                        <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl text-xs uppercase tracking-widest hover:bg-indigo-700 transition shadow-lg">Confirmar</button>
                     </form>
                 </div>
-                <div class="lg:col-span-8 space-y-4">
-                    <div id="calendar-grid" class="calendar-grid-container rounded-2xl overflow-hidden shadow-sm"></div>
-                    <div id="day-list" class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm min-h-[200px]">
-                        <h4 class="text-xs font-bold text-indigo-600 uppercase mb-4">Serviços do Dia</h4>
+                <div class="lg:col-span-8 space-y-6">
+                    <div id="calendar-grid" class="calendar-grid-container rounded-3xl overflow-hidden shadow-sm border border-slate-200"></div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm min-h-[200px]">
+                        <h4 class="text-xs font-bold text-indigo-600 uppercase mb-4" id="selected-day-label">Agenda do Dia</h4>
                         <div id="appointments-container" class="space-y-2"></div>
                     </div>
                 </div>
             </div>
 
-            <div id="tab-clientes" class="hidden">
+            <div id="tab-clientes" class="hidden space-y-6">
                 <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-black">Meus Clientes</h3>
-                    </div>
+                    <h3 class="text-xl font-black mb-6">Base de Clientes</h3>
                     <div id="client-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
                 </div>
             </div>
 
-            <div id="tab-dashboard" class="hidden">
+            <div id="tab-dashboard" class="hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="p-8 bg-indigo-600 text-white rounded-3xl shadow-lg">
-                        <p class="text-xs font-bold uppercase opacity-80 mb-2">Faturamento Estimado (Mês)</p>
-                        <h3 class="text-4xl font-black" id="dash-faturamento">R$ 0,00</h3>
+                    <div class="p-8 bg-emerald-500 text-white rounded-[2.5rem] shadow-lg">
+                        <p class="text-xs font-bold uppercase opacity-80 mb-2">Receita Total</p>
+                        <h3 class="text-5xl font-black" id="dash-faturamento">R$ 0,00</h3>
                     </div>
-                    <div class="p-8 bg-slate-800 text-white rounded-3xl shadow-lg">
+                    <div class="p-8 bg-slate-800 text-white rounded-[2.5rem] shadow-lg">
                         <p class="text-xs font-bold uppercase opacity-80 mb-2">Total de Serviços</p>
-                        <h3 class="text-4xl font-black" id="dash-total-servicos">0</h3>
+                        <h3 class="text-5xl font-black" id="dash-total-servicos">0</h3>
                     </div>
                 </div>
             </div>
@@ -88,25 +88,24 @@
             <div id="tab-gastos" class="hidden">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
-                        <h2 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6">Despesas Fixas</h2>
+                        <h2 class="text-sm font-black text-slate-800 uppercase mb-6">Despesas Fixas</h2>
                         <div class="flex gap-2 mb-6">
-                            <input type="text" id="fixa-nome" placeholder="Produto" class="w-full px-4 py-3 bg-slate-50 rounded-2xl text-sm border focus:border-indigo-300 outline-none">
+                            <input type="text" id="fixa-nome" placeholder="Ex: Aluguel" class="w-full px-4 py-3 bg-slate-50 rounded-2xl text-sm border focus:border-indigo-300 outline-none">
                             <input type="number" id="fixa-valor" placeholder="R$" class="w-24 px-4 py-3 bg-slate-50 rounded-2xl text-sm border outline-none">
-                            <button onclick="addDespesa('fixa')" class="bg-indigo-600 text-white px-4 rounded-2xl font-bold">Add</button>
+                            <button onclick="addDespesa('fixa')" class="bg-indigo-600 text-white px-6 rounded-2xl font-bold">Add</button>
                         </div>
-                        <div class="h-48 mb-4"><canvas id="chartFixa"></canvas></div>
-                        <div id="lista-fixa" class="space-y-2 max-h-40 overflow-y-auto"></div>
+                        <div class="h-56 mb-4"><canvas id="chartFixa"></canvas></div>
+                        <div id="lista-fixa" class="space-y-2 max-h-48 overflow-y-auto pr-2"></div>
                     </div>
-
                     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
-                        <h2 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6">Despesas Variáveis</h2>
+                        <h2 class="text-sm font-black text-slate-800 uppercase mb-6">Despesas Variáveis</h2>
                         <div class="flex gap-2 mb-6">
-                            <input type="text" id="var-nome" placeholder="Produto" class="w-full px-4 py-3 bg-slate-50 rounded-2xl text-sm border focus:border-emerald-300 outline-none">
+                            <input type="text" id="var-nome" placeholder="Ex: Shampoo" class="w-full px-4 py-3 bg-slate-50 rounded-2xl text-sm border focus:border-emerald-300 outline-none">
                             <input type="number" id="var-valor" placeholder="R$" class="w-24 px-4 py-3 bg-slate-50 rounded-2xl text-sm border outline-none">
-                            <button onclick="addDespesa('var')" class="bg-emerald-600 text-white px-4 rounded-2xl font-bold">Add</button>
+                            <button onclick="addDespesa('var')" class="bg-emerald-600 text-white px-6 rounded-2xl font-bold">Add</button>
                         </div>
-                        <div class="h-48 mb-4"><canvas id="chartVariavel"></canvas></div>
-                        <div id="lista-var" class="space-y-2 max-h-40 overflow-y-auto"></div>
+                        <div class="h-56 mb-4"><canvas id="chartVariavel"></canvas></div>
+                        <div id="lista-var" class="space-y-2 max-h-48 overflow-y-auto pr-2"></div>
                     </div>
                 </div>
             </div>
@@ -116,13 +115,13 @@
 </div>
 
 <script>
-    // Banco de Dados Local
+    // Inicialização de Dados Segura
     let appointments = JSON.parse(localStorage.getItem('pet_appointments')) || [];
     let despesas = JSON.parse(localStorage.getItem('pet_despesas')) || { fixa: [], var: [] };
-    let selectedDate = new Date().toISOString().split('T')[0];
+    let selectedDateStr = new Date().toISOString().split('T')[0];
     let charts = {};
 
-    // --- FUNÇÕES DE AGENDAMENTO ---
+    // --- AGENDAMENTOS ---
     function saveAppointment(e) {
         e.preventDefault();
         const newApp = {
@@ -149,42 +148,59 @@
 
         for (let i = 1; i <= daysInMonth; i++) {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-            const count = appointments.filter(a => a.data === dateStr).length;
-            const dots = '<span class="event-dot"></span>'.repeat(count);
+            const dayApps = appointments.filter(a => a.data === dateStr);
+            const dots = dayApps.map(() => '<span class="event-dot"></span>').join('');
             
             grid.innerHTML += `
-                <div onclick="showDay('${dateStr}')" class="calendar-cell ${selectedDate === dateStr ? 'selected' : ''}">
-                    <span class="text-xs font-bold">${i}</span>
-                    <div class="flex flex-wrap mt-1">${dots}</div>
+                <div onclick="selectDay('${dateStr}')" class="calendar-cell ${selectedDateStr === dateStr ? 'selected' : ''}">
+                    <span class="text-xs font-black text-slate-400">${i}</span>
+                    <div class="flex flex-wrap gap-0.5 mt-1">${dots}</div>
                 </div>`;
         }
-        showDay(selectedDate);
+        selectDay(selectedDateStr);
     }
 
-    function showDay(date) {
-        selectedDate = date;
+    function selectDay(date) {
+        selectedDateStr = date;
+        const cells = document.querySelectorAll('.calendar-cell');
+        // Re-renderizar para atualizar a classe 'selected' sem recarregar tudo
+        const dayApps = appointments.filter(a => a.data === date);
         const container = document.getElementById('appointments-container');
-        const filtered = appointments.filter(a => a.data === date);
+        const label = document.getElementById('selected-day-label');
         
-        container.innerHTML = filtered.length ? '' : '<p class="text-slate-400 text-xs italic">Nenhum serviço agendado.</p>';
-        filtered.forEach(a => {
+        const d = new Date(date + 'T00:00:00');
+        label.innerText = `Agenda de ${d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'})}`;
+
+        container.innerHTML = dayApps.length ? '' : '<p class="text-slate-400 text-xs italic py-4">Nenhum serviço para este dia.</p>';
+        dayApps.forEach(a => {
             container.innerHTML += `
-                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100">
-                    <div><b class="text-sm">${a.hora} - ${a.pet}</b> <span class="text-xs text-slate-500">(${a.tutor})</span></div>
-                    <div class="text-sm font-bold text-indigo-600">R$ ${a.valor.toFixed(2)}</div>
+                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div>
+                        <div class="text-sm font-black text-indigo-900">${a.hora} - ${a.pet}</div>
+                        <div class="text-[10px] text-slate-500 uppercase font-bold">Tutor: ${a.tutor}</div>
+                    </div>
+                    <div class="text-sm font-black text-indigo-600">R$ ${a.valor.toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
                 </div>`;
         });
     }
 
-    // --- FUNÇÕES DE GASTOS ---
+    // --- GASTOS E GRÁFICOS ---
     function initChart(id, label, color) {
         const canvas = document.getElementById(id);
         if(!canvas) return null;
         if(charts[id]) charts[id].destroy();
         return new Chart(canvas.getContext('2d'), {
             type: 'bar',
-            data: { labels: [], datasets: [{ label: label, data: [], backgroundColor: color, borderRadius: 8 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            data: { labels: [], datasets: [{ label: label, data: [], backgroundColor: color, borderRadius: 10, barThickness: 20 }] },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { beginAtZero: true, grid: { display: false }, ticks: { font: { size: 9 } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 9, weight: 'bold' } } }
+                }
+            }
         });
     }
 
@@ -206,11 +222,14 @@
             const labels = despesas[tipo].map(d => d.nome);
             const valores = despesas[tipo].map(d => d.valor);
 
-            despesas[tipo].forEach(item => {
+            despesas[tipo].forEach((item, idx) => {
                 lista.innerHTML += `
-                    <div class="flex justify-between p-2 bg-slate-50 rounded-lg text-xs border border-slate-100">
-                        <span>${item.nome}</span>
-                        <b>R$ ${item.valor.toFixed(2)}</b>
+                    <div class="flex justify-between p-3 bg-slate-50 rounded-xl text-xs border border-slate-100">
+                        <span class="font-bold text-slate-600">${item.nome}</span>
+                        <div class="flex gap-3">
+                            <b class="text-indigo-600">R$ ${item.valor.toLocaleString('pt-BR', {minimumFractionDigits:2})}</b>
+                            <button onclick="removeGasto('${tipo}', ${idx})" class="text-slate-300 hover:text-red-500"><i data-lucide="x-circle" class="w-3 h-3"></i></button>
+                        </div>
                     </div>`;
             });
 
@@ -222,9 +241,15 @@
             }
         });
         localStorage.setItem('pet_despesas', JSON.stringify(despesas));
+        lucide.createIcons();
     }
 
-    // --- NAVEGAÇÃO ---
+    function removeGasto(tipo, idx) {
+        despesas[tipo].splice(idx, 1);
+        renderGastos();
+    }
+
+    // --- NAVEGAÇÃO E DASHBOARD ---
     function switchTab(tab) {
         ['agenda', 'clientes', 'dashboard', 'gastos'].forEach(t => {
             document.getElementById(`tab-${t}`).classList.add('hidden');
@@ -232,28 +257,37 @@
         });
         document.getElementById(`tab-${tab}`).classList.remove('hidden');
         document.getElementById(`btn-${tab}-dt`).classList.remove('opacity-70');
-        
+        document.getElementById('page-title').innerText = tab === 'dashboard' ? 'Financeiro' : tab.toUpperCase();
+
         if(tab === 'agenda') renderAgenda();
         if(tab === 'gastos') renderGastos();
         if(tab === 'dashboard') {
             const total = appointments.reduce((sum, a) => sum + a.valor, 0);
-            document.getElementById('dash-faturamento').innerText = `R$ ${total.toFixed(2)}`;
+            document.getElementById('dash-faturamento').innerText = `R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
             document.getElementById('dash-total-servicos').innerText = appointments.length;
         }
         if(tab === 'clientes') {
             const list = document.getElementById('client-list');
-            const uniqueClients = [...new Set(appointments.map(a => a.tutor))];
-            list.innerHTML = uniqueClients.length ? '' : '<p class="col-span-full text-center py-10 opacity-50">Sem clientes ainda.</p>';
-            uniqueClients.forEach(c => {
-                list.innerHTML += `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 font-bold text-center">${c}</div>`;
+            const tutors = [...new Set(appointments.map(a => a.tutor))];
+            list.innerHTML = tutors.length ? '' : '<p class="col-span-full text-center py-10 opacity-50 italic">Nenhum cliente cadastrado ainda.</p>';
+            tutors.forEach(t => {
+                list.innerHTML += `
+                    <div class="bg-indigo-50 p-6 rounded-3xl border border-indigo-100 flex flex-col items-center">
+                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-3 shadow-sm text-indigo-600"><i data-lucide="user" class="w-6 h-6"></i></div>
+                        <span class="font-black text-indigo-900">${t}</span>
+                    </div>`;
             });
+            lucide.createIcons();
         }
     }
 
     window.onload = () => {
-        document.getElementById('current-date').innerText = new Date().toLocaleDateString('pt-BR', {weekday: 'long', day: 'numeric', month: 'long'});
-        charts.chartFixa = initChart('chartFixa', 'Fixas', '#4f46e5');
+        const d = new Date();
+        document.getElementById('current-date').innerText = d.toLocaleDateString('pt-BR', {weekday: 'long', day: 'numeric', month: 'long'});
+        
+        charts.chartFixa = initChart('chartFixa', 'Fixas', '#6366f1');
         charts.chartVariavel = initChart('chartVariavel', 'Variáveis', '#10b981');
+        
         switchTab('agenda');
         lucide.createIcons();
     };
