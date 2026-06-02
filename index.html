@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda Pet - Gestão Profissional</title>
+    <title>Agenda Pet - Gestão Completa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -43,28 +43,49 @@
         <main class="p-6 space-y-6">
             
             <div id="tab-agenda" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div class="lg:col-span-3 bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-fit">
-                    <h3 class="text-xs font-black uppercase mb-4 text-slate-400">Novo Agendamento</h3>
-                    <form onsubmit="saveAppointment(event)" class="space-y-3">
-                        <input type="text" id="app-tutor" placeholder="Tutor" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none outline-none focus:ring-2 ring-indigo-500" required>
-                        <input type="text" id="app-pet" placeholder="Pet" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none outline-none focus:ring-2 ring-indigo-500" required>
-                        <select id="app-servico" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none outline-none">
-                            <option value="Banho">Banho</option>
-                            <option value="Tosa">Tosa</option>
-                            <option value="Banho e Tosa">Banho e Tosa</option>
-                        </select>
-                        <div class="flex gap-2">
-                            <input type="date" id="app-data" class="w-1/2 p-3 bg-slate-50 rounded-xl text-xs border-none" required>
-                            <input type="time" id="app-hora" class="w-1/2 p-3 bg-slate-50 rounded-xl text-xs border-none" required>
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                        <h3 class="text-xs font-black uppercase mb-4 text-slate-400">Novo Agendamento</h3>
+                        <form onsubmit="saveAppointment(event)" class="space-y-3">
+                            <input type="text" id="app-tutor" placeholder="Tutor" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none outline-none focus:ring-2 ring-indigo-500" required>
+                            <input type="text" id="app-pet" placeholder="Pet" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none outline-none focus:ring-2 ring-indigo-500" required>
+                            <select id="app-servico" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none outline-none">
+                                <option value="Banho">Banho</option>
+                                <option value="Tosa">Tosa</option>
+                                <option value="Banho e Tosa">Banho e Tosa</option>
+                            </select>
+                            <div class="flex gap-2">
+                                <input type="date" id="app-data" class="w-1/2 p-3 bg-slate-50 rounded-xl text-xs border-none" required>
+                                <input type="time" id="app-hora" class="w-1/2 p-3 bg-slate-50 rounded-xl text-xs border-none" required>
+                            </div>
+                            <input type="number" id="app-valor" placeholder="Valor R$" step="0.01" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none" required>
+                            <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-indigo-700 transition uppercase text-xs tracking-widest">Confirmar</button>
+                        </form>
+                    </div>
+
+                    <div class="bg-indigo-900 p-6 rounded-[2rem] text-white shadow-xl">
+                        <h4 class="text-[10px] font-black uppercase opacity-60 mb-4 tracking-widest">Status do Último Agendamento</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center border-b border-indigo-800 pb-2">
+                                <span class="text-[10px] opacity-60">TUTOR</span>
+                                <span id="bi-tutor" class="font-bold text-sm">-</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-indigo-800 pb-2">
+                                <span class="text-[10px] opacity-60">PET</span>
+                                <span id="bi-pet" class="font-bold text-sm">-</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] opacity-60">SERVIÇO</span>
+                                <span id="bi-tipo" class="font-bold text-sm text-indigo-300">-</span>
+                            </div>
                         </div>
-                        <input type="number" id="app-valor" placeholder="Valor R$" step="0.01" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none" required>
-                        <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-indigo-700 transition uppercase text-xs tracking-widest">Confirmar</button>
-                    </form>
+                    </div>
                 </div>
-                <div class="lg:col-span-9 space-y-6">
+
+                <div class="lg:col-span-8 space-y-6">
                     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
                         <div class="p-4 border-b flex justify-between items-center bg-slate-50">
-                            <button onclick="toggleCalendar()" class="text-xs font-bold text-indigo-600 flex items-center gap-2"><i data-lucide="calendar"></i> VER CALENDÁRIO</button>
+                            <button onclick="toggleCalendar()" class="text-xs font-bold text-indigo-600 flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4"></i> VER CALENDÁRIO</button>
                             <span id="cal-month-name" class="text-xs font-black uppercase">Junho 2026</span>
                         </div>
                         <div id="calendar-grid" class="calendar-grid-container calendar-collapsed"></div>
@@ -73,24 +94,26 @@
                         <h4 class="text-xs font-black text-indigo-600 uppercase mb-4">Agenda do Dia</h4>
                         <div id="day-list" class="space-y-2"></div>
                     </div>
-                    <div class="bg-indigo-900 p-6 rounded-3xl text-white shadow-xl">
-                        <h4 class="text-[10px] font-black uppercase opacity-60 mb-4 tracking-widest">Visão Geral B.I (Último Registro)</h4>
-                        <div id="bi-last-app" class="grid grid-cols-3 gap-4">
-                            <div><p class="text-[10px] opacity-60">TUTOR</p><p id="bi-tutor" class="font-bold">-</p></div>
-                            <div><p class="text-[10px] opacity-60">PET</p><p id="bi-pet" class="font-bold">-</p></div>
-                            <div><p class="text-[10px] opacity-60">SERVIÇO</p><p id="bi-tipo" class="font-bold">-</p></div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <div id="tab-clientes" class="hidden space-y-6">
+            <div id="tab-clientes" class="hidden max-w-4xl mx-auto space-y-6">
                 <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-                    <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-xs font-black uppercase mb-6 text-slate-400">Novo Cadastro de Cliente</h3>
+                    <form onsubmit="saveClient(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="reg-tutor" placeholder="Nome do Tutor" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none outline-none focus:ring-2 ring-indigo-500" required>
+                        <input type="text" id="reg-pet" placeholder="Nome do Pet" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none outline-none focus:ring-2 ring-indigo-500" required>
+                        <input type="tel" id="reg-zap" placeholder="WhatsApp" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none outline-none focus:ring-2 ring-indigo-500">
+                        <button type="submit" class="bg-indigo-600 text-white font-bold rounded-2xl shadow-lg hover:bg-indigo-700 transition uppercase text-xs tracking-widest">Cadastrar Cliente</button>
+                    </form>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-black">Base de Clientes</h3>
-                        <button onclick="toggleClientList()" class="bg-indigo-600 text-white px-6 py-2 rounded-xl text-xs font-bold uppercase">Ver Clientes</button>
+                        <button onclick="toggleClientList()" class="text-xs font-bold text-indigo-600 uppercase flex items-center gap-2"><i data-lucide="eye" class="w-4 h-4"></i> <span id="btn-view-text">Ver Clientes</span></button>
                     </div>
-                    <div id="client-container" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+                    <div id="client-container" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t"></div>
                 </div>
             </div>
 
@@ -100,7 +123,7 @@
                         <p class="text-[10px] font-black uppercase opacity-80 mb-2">Receita Total: <span id="dash-mes-label">Junho</span></p>
                         <h3 class="text-4xl font-black" id="dash-faturamento">R$ 0,00</h3>
                         <select onchange="updateDashboardMonth(this.value)" class="absolute top-6 right-6 bg-emerald-600 text-white text-[10px] p-2 rounded-lg border-none outline-none">
-                            <option value="5">Junho</option><option value="4">Maio</option><option value="3">Abril</option>
+                            <option value="5">Junho 2026</option>
                         </select>
                     </div>
                     <div class="p-8 bg-indigo-600 text-white rounded-[2.5rem] shadow-lg">
@@ -109,14 +132,10 @@
                         <p id="dash-data-completa" class="text-[10px] mt-2 opacity-70 font-bold uppercase"></p>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                    <h4 class="text-xs font-black uppercase text-slate-400 mb-6">Serviços mais vendidos</h4>
-                    <div class="h-64"><canvas id="chartServicos"></canvas></div>
+                <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <h4 class="text-xs font-black uppercase text-slate-400 mb-8 tracking-widest text-center">Desempenho de Serviços</h4>
+                    <div class="h-72"><canvas id="chartServicos"></canvas></div>
                 </div>
-            </div>
-
-            <div id="tab-gastos" class="hidden">
-                <p class="text-center py-20 text-slate-400">Gerencie suas despesas fixas e variáveis aqui.</p>
             </div>
 
         </main>
@@ -125,10 +144,10 @@
 
 <script>
     let appointments = JSON.parse(localStorage.getItem('pet_apps')) || [];
+    let registeredClients = JSON.parse(localStorage.getItem('pet_clients_reg')) || [];
     let selectedDate = new Date().toISOString().split('T')[0];
     let serviceChart;
 
-    // --- NAVEGAÇÃO E CABEÇALHO ---
     function switchTab(tab) {
         document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
         document.querySelectorAll('nav button').forEach(b => b.classList.add('opacity-70'));
@@ -140,8 +159,7 @@
         if(tab === 'agenda') title.innerText = 'Agendamento';
         if(tab === 'clientes') title.innerText = 'Cadastro';
         if(tab === 'dashboard') title.innerText = 'Finanças';
-        if(tab === 'gastos') title.innerText = 'Gastos';
-
+        
         if(tab === 'dashboard') renderDashboard();
     }
 
@@ -158,13 +176,13 @@
         };
         appointments.push(app);
         localStorage.setItem('pet_apps', JSON.stringify(appointments));
-        e.target.reset();
         
-        // Atualiza o B.I de Agendamento
+        // Atualiza B.I.
         document.getElementById('bi-tutor').innerText = app.tutor;
         document.getElementById('bi-pet').innerText = app.pet;
         document.getElementById('bi-tipo').innerText = app.servico;
         
+        e.target.reset();
         renderDayList(app.data);
     }
 
@@ -179,7 +197,6 @@
         grid.innerHTML = '';
         const date = new Date();
         const days = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-        
         for (let i = 1; i <= days; i++) {
             const dStr = `2026-06-${String(i).padStart(2, '0')}`;
             const count = appointments.filter(a => a.data === dStr).length;
@@ -195,58 +212,87 @@
         selectedDate = date;
         const list = document.getElementById('day-list');
         const filtered = appointments.filter(a => a.data === date);
-        list.innerHTML = filtered.length ? '' : '<p class="text-xs text-slate-400 italic">Sem serviços hoje.</p>';
+        list.innerHTML = filtered.length ? '' : '<p class="text-xs text-slate-400 italic py-4">Sem serviços para este dia.</p>';
         filtered.forEach(a => {
             list.innerHTML += `
-                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl text-xs border border-slate-100">
-                    <span class="font-bold">${a.hora} - ${a.pet} (${a.tutor})</span>
+                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <span class="text-sm font-bold">${a.hora} - ${a.pet} <span class="text-xs opacity-50">(${a.tutor})</span></span>
                     <span class="text-indigo-600 font-black">R$ ${a.valor.toFixed(2)}</span>
                 </div>`;
         });
         renderCalendar();
     }
 
-    // --- CLIENTES ---
-    function toggleClientList() {
-        const container = document.getElementById('client-container');
-        container.classList.toggle('hidden');
-        const tutors = [...new Set(appointments.map(a => a.tutor))];
-        container.innerHTML = tutors.map(t => `
-            <div class="bg-slate-50 p-4 rounded-2xl border text-center font-bold text-sm text-indigo-900">${t}</div>
-        `).join('');
+    // --- CADASTRO DE CLIENTES ---
+    function saveClient(e) {
+        e.preventDefault();
+        const client = {
+            tutor: document.getElementById('reg-tutor').value,
+            pet: document.getElementById('reg-pet').value,
+            zap: document.getElementById('reg-zap').value
+        };
+        registeredClients.push(client);
+        localStorage.setItem('pet_clients_reg', JSON.stringify(registeredClients));
+        e.target.reset();
+        alert("Cliente cadastrado com sucesso!");
+        if(!document.getElementById('client-container').classList.contains('hidden')) toggleClientList();
     }
 
-    // --- DASHBOARD ---
+    function toggleClientList() {
+        const container = document.getElementById('client-container');
+        const btnText = document.getElementById('btn-view-text');
+        container.classList.toggle('hidden');
+        
+        if(!container.classList.contains('hidden')) {
+            btnText.innerText = "Fechar Lista";
+            container.innerHTML = registeredClients.length ? '' : '<p class="col-span-full text-center py-10 text-slate-400 italic">Nenhum cliente cadastrado.</p>';
+            registeredClients.forEach(c => {
+                container.innerHTML += `
+                    <div class="bg-indigo-50 p-6 rounded-3xl border border-indigo-100 text-center">
+                        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm text-indigo-600"><i data-lucide="user" class="w-5 h-5"></i></div>
+                        <p class="font-black text-indigo-900 text-sm">${c.tutor}</p>
+                        <p class="text-[10px] text-indigo-400 font-bold uppercase">Pet: ${c.pet}</p>
+                    </div>`;
+            });
+            lucide.createIcons();
+        } else {
+            btnText.innerText = "Ver Clientes";
+        }
+    }
+
+    // --- FINANÇAS ---
     function renderDashboard() {
         const now = new Date();
         const hojeStr = now.toISOString().split('T')[0];
         
-        // Receita do Dia
         const receitaDia = appointments.filter(a => a.data === hojeStr).reduce((s, a) => s + a.valor, 0);
         document.getElementById('dash-receita-dia').innerText = `R$ ${receitaDia.toFixed(2)}`;
         document.getElementById('dash-data-completa').innerText = now.toLocaleDateString('pt-BR', {day:'2-digit', month:'long', year:'numeric'});
 
-        // Receita do Mês
         const receitaMes = appointments.reduce((s, a) => s + a.valor, 0);
         document.getElementById('dash-faturamento').innerText = `R$ ${receitaMes.toFixed(2)}`;
 
-        // Gráfico de Serviços
         const contagem = { 'Banho': 0, 'Tosa': 0, 'Banho e Tosa': 0 };
         appointments.forEach(a => { if(contagem[a.servico] !== undefined) contagem[a.servico]++ });
 
         const ctx = document.getElementById('chartServicos').getContext('2d');
         if(serviceChart) serviceChart.destroy();
         serviceChart = new Chart(ctx, {
-            type: 'doughnut',
+            type: 'bar',
             data: {
                 labels: Object.keys(contagem),
                 datasets: [{
+                    label: 'Quantidade',
                     data: Object.values(contagem),
-                    backgroundColor: ['#6366f1', '#10b981', '#f59e0b'],
-                    borderWidth: 0
+                    backgroundColor: '#6366f1',
+                    borderRadius: 12
                 }]
             },
-            options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            options: { 
+                maintainAspectRatio: false, 
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
+            }
         });
     }
 
