@@ -110,6 +110,9 @@
                 </button>
                 <button onclick="switchTab('dashboard')" id="btn-dashboard-dt" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition text-sm font-semibold opacity-70">
                     <i data-lucide="pie-chart" class="w-4 h-4"></i> Dashboard & Finança
+                <button onclick="switchTab('gastos')" id="btn-gastos-dt" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition text-sm font-semibold opacity-70">
+                   <i data-lucide="wallet" class="w-4 h-4"></i> Gastos
+                 </button>
                 </button>
             </nav>
         </aside>
@@ -351,7 +354,49 @@
             </main>
         </div>
     </div>
+               <div id="tab-gastos" class="hidden animate-fade-in">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+        
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-slate-800">Despesas Fixas</h2>
+                <span class="text-xs font-medium text-slate-400 bg-slate-50 px-3 py-1 rounded-full" id="data-fixa"></span>
+            </div>
+            
+            <div class="space-y-4 mb-6">
+                <input type="text" id="fixa-nome" placeholder="Nome do Produto" class="w-full px-4 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                <div class="flex gap-2">
+                    <input type="number" id="fixa-valor" placeholder="Valor (R$)" class="w-1/2 px-4 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <input type="date" id="fixa-data" class="w-1/2 px-4 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <button onclick="addDespesa('fixa')" class="w-full bg-indigo-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition">Adicionar</button>
+            </div>
+            <div class="h-48">
+                <canvas id="chartFixa"></canvas>
+            </div>
+        </div>
 
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-slate-800">Despesas Variáveis</h2>
+                <span class="text-xs font-medium text-slate-400 bg-slate-50 px-3 py-1 rounded-full" id="data-variavel"></span>
+            </div>
+            
+            <div class="space-y-4 mb-6">
+                <input type="text" id="var-nome" placeholder="Nome do Produto" class="w-full px-4 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                <div class="flex gap-2">
+                    <input type="number" id="var-valor" placeholder="Valor (R$)" class="w-1/2 px-4 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <input type="date" id="var-data" class="w-1/2 px-4 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <button onclick="addDespesa('var')" class="w-full bg-slate-800 text-white py-2 rounded-lg text-sm font-semibold hover:bg-black transition">Adicionar</button>
+            </div>
+            <div class="h-48">
+                <canvas id="chartVariavel"></canvas>
+            </div>
+        </div>
+
+    </div>
+</div> 
     <script>
         let appointments = JSON.parse(localStorage.getItem('pet_appointments')) || [];
         let clients = JSON.parse(localStorage.getItem('pet_clients')) || [];
@@ -630,5 +675,67 @@
             switchTab(lastTab);
         };
     </script>
+     // Configuração de datas automáticas ao carregar
+function updateDates() {
+    const agora = new Date();
+    const opcoes = { weekday: 'long', day: '2-digit', month: '2-digit' };
+    const dataFormatada = agora.toLocaleDateString('pt-BR', opcoes);
+    document.getElementById('data-fixa').innerText = dataFormatada;
+    document.getElementById('data-variavel').innerText = dataFormatada;
+}
+
+// Inicialização dos Gráficos
+let charts = {};
+
+function initChart(id, label) {
+    const ctx = document.getElementById(id).getContext('2d');
+    return new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: label,
+                data: [],
+                backgroundColor: (context) => {
+                    const value = context.dataset.data[context.dataIndex];
+                    return value > 500 ? '#f87171' : '#818cf8'; // Vermelho se custo for > 500
+                },
+                borderRadius: 8,
+                barThickness: 20
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
+        }
+    });
+}
+
+function addDespesa(tipo) {
+    const prefixo = tipo === 'fixa' ? 'fixa' : 'var';
+    const nome = document.getElementById(`${prefixo}-nome`).value;
+    const valor = parseFloat(document.getElementById(`${prefixo}-valor`).value);
+    
+    if (nome && valor) {
+        const chartId = tipo === 'fixa' ? 'chartFixa' : 'chartVariavel';
+        charts[chartId].data.labels.push(nome);
+        charts[chartId].data.datasets[0].data.push(valor);
+        charts[chartId].update();
+        
+        // Limpar inputs
+        document.getElementById(`${prefixo}-nome`).value = '';
+        document.getElementById(`${prefixo}-valor`).value = '';
+    }
+}
+
+// Chame no carregamento da página
+window.onload = () => {
+    updateDates();
+    charts.chartFixa = initChart('chartFixa', 'Fixas');
+    charts.chartVariavel = initChart('chartVariavel', 'Variáveis');
+    if(typeof lucide !== 'undefined') lucide.createIcons();
+};
 </body>
 </html>
