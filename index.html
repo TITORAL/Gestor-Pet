@@ -66,9 +66,9 @@
                         </form>
                     </div>
 
-                    <!-- CARD B.I. AGENDAMENTO EM TEMPO REAL (TODOS OS REGISTROS) -->
+                    <!-- CARD B.I. AGENDAMENTO EM TEMPO REAL -->
                     <div class="bg-indigo-900 p-6 rounded-[2rem] text-white shadow-xl">
-                        <h4 class="text-[10px] font-black uppercase opacity-60 mb-3 tracking-widest">Painel B.I. - Todos os Agendamentos</h4>
+                        <h4 class="text-[10px] font-black uppercase opacity-60 mb-3 tracking-widest">Todos agendamentos</h4>
                         <div class="max-h-60 overflow-y-auto pr-1 text-xs">
                             <table class="w-full text-left border-collapse">
                                 <thead>
@@ -105,7 +105,6 @@
             <div id="tab-clientes" class="hidden max-w-4xl mx-auto space-y-6">
                 <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm relative">
                     <form onsubmit="saveClient(event)" class="space-y-4">
-                        <!-- Cabeçalho do Card com Botão no Canto Superior Direito -->
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="text-xs font-black uppercase text-slate-400">Novo Cadastro de Cliente</h3>
                             <button type="submit" class="bg-indigo-400 text-white font-bold px-6 py-3 rounded-xl shadow-md hover:bg-indigo-500 transition uppercase text-[10px] tracking-widest">
@@ -148,6 +147,15 @@
                         <p id="dash-data-completa" class="text-[10px] mt-2 opacity-70 font-bold uppercase"></p>
                     </div>
                 </div>
+                <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <h4 class="text-xs font-black uppercase text-slate-400 mb-8 tracking-widest text-center">Desempenho de Serviços</h4>
+                    <div class="h-72"><canvas id="chartServicos"></canvas></div>
+                </div>
+            </div>
+
+            <!-- ABA: GASTOS -->
+            <div id="tab-gastos" class="hidden">
+                <p class="text-center py-20 text-slate-400">Gerencie suas despesas fixas e variáveis aqui.</p>
             </div>
 
         </main>
@@ -158,8 +166,9 @@
     let appointments = JSON.parse(localStorage.getItem('pet_apps')) || [];
     let registeredClients = JSON.parse(localStorage.getItem('pet_clients_reg')) || [];
     let selectedDate = new Date().toISOString().split('T')[0];
+    let serviceChart;
 
-    // Mapeamento e Persistência de Abas
+    // Gerenciamento e Preservação de Abas no F5
     function switchTab(tab) {
         document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
         document.querySelectorAll('nav button').forEach(b => b.classList.add('opacity-70'));
@@ -171,8 +180,8 @@
         if(tab === 'agenda') title.innerText = 'Agendamento';
         if(tab === 'clientes') title.innerText = 'Cadastro';
         if(tab === 'dashboard') title.innerText = 'Finanças';
+        if(tab === 'gastos') title.innerText = 'Gastos';
         
-        // Salva o estado da aba no LocalStorage para não perder no refresh
         localStorage.setItem('active_pet_tab', tab);
 
         if(tab === 'dashboard') renderDashboard();
@@ -197,7 +206,6 @@
         renderDayList(app.data);
     }
 
-    // Renderiza a lista de B.I em tempo real com todos os cadastros
     function renderBiPanel() {
         const tableBody = document.getElementById('bi-table-body');
         if (!tableBody) return;
@@ -281,17 +289,52 @@
         } else { btnText.innerText = "Ver Clientes"; }
     }
 
+    // --- FINANÇAS ---
+    function renderDashboard() {
+        const now = new Date();
+        const hojeStr = now.toISOString().split('T')[0];
+        
+        const receitaDia = appointments.filter(a => a.data === hojeStr).reduce((s, a) => s + a.valor, 0);
+        document.getElementById('dash-receita-dia').innerText = `R$ ${receitaDia.toFixed(2)}`;
+        document.getElementById('dash-data-completa').innerText = now.toLocaleDateString('pt-BR', {day:'2-digit', month:'long', year:'numeric'});
+
+        const receitaMes = appointments.reduce((s, a) => s + a.valor, 0);
+        document.getElementById('dash-faturamento').innerText = `R$ ${receitaMes.toFixed(2)}`;
+
+        const contagem = { 'Banho': 0, 'Tosa': 0, 'Banho e Tosa': 0 };
+        appointments.forEach(a => { if(contagem[a.servico] !== undefined) contagem[a.servico]++ });
+
+        const ctx = document.getElementById('chartServicos').getContext('2d');
+        if(serviceChart) serviceChart.destroy();
+        serviceChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(contagem),
+                datasets: [{
+                    label: 'Quantidade',
+                    data: Object.values(contagem),
+                    backgroundColor: '#6366f1',
+                    borderRadius: 12
+                }]
+            },
+            options: { 
+                maintainAspectRatio: false, 
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
+            }
+        });
+    }
+
     // --- CARREGAMENTO INICIAL ---
     window.onload = () => {
         const d = new Date();
         document.getElementById('header-date').innerText = d.toLocaleDateString('pt-BR', {weekday: 'long', day: 'numeric', month: 'long'});
         lucide.createIcons();
         
-        // Renderiza listas primordiais
         renderDayList(selectedDate);
         renderBiPanel();
 
-        // Recupera a aba em que o usuário parou ou define 'agenda' por padrão
+        // Recupera o estado da última aba visitada pelo usuário
         const savedTab = localStorage.getItem('active_pet_tab') || 'agenda';
         switchTab(savedTab);
     };
