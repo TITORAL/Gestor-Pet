@@ -48,318 +48,135 @@ body{font-family:'Inter',sans-serif}::-webkit-scrollbar{width:4px}::-webkit-scro
 </div>
 <div id="tab-clientes" class="hidden space-y-6 max-w-4xl mx-auto"><div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-slate-100"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"><div class="flex items-center gap-4"><div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm"><i data-lucide="users" class="w-7 h-7"></i></div><div><h3 class="text-xl font-black text-slate-800 tracking-tight">Clientes</h3><p class="text-slate-400 text-xs font-medium">Base de clientes registrados.</p></div></div><button onclick="toggleClientsView()" id="btn-toggle-clients" class="w-full sm:w-auto bg-slate-100 text-slate-700 hover:bg-indigo-50 px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2"><i data-lucide="eye" class="w-4 h-4"></i> <span id="text-toggle-clients">Ver Clientes</span></button></div><div id="expanded-clients-container" class="expandable-clients"><div class="flex justify-between items-center mb-6 pt-4 border-t border-slate-100"><span class="text-[10px] font-black uppercase text-slate-400">Listagem Ativa</span><button onclick="toggleClientForm()" class="bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest shadow-md shadow-indigo-100 hover:bg-indigo-700 transition-all flex items-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Novo Cadastro</button></div><div id="client-form-container" class="hidden mb-6 bg-slate-50 p-6 rounded-2xl border border-dashed border-slate-200"><form id="reg-client-form" onsubmit="saveClient(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4"><input type="hidden" id="edit-client-index"><div class="space-y-1"><label class="text-[10px] font-black uppercase text-slate-400 ml-1">Tutor</label><input type="text" id="regClientName" required class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none text-sm"></div><div class="space-y-1"><label class="text-[10px] font-black uppercase text-slate-400 ml-1">Pet</label><input type="text" id="regPet" required class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none text-sm"></div><div class="space-y-1"><label class="text-[10px] font-black uppercase text-slate-400 ml-1">WhatsApp</label><input type="tel" id="regPhone" required class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none text-sm"></div><div class="space-y-1"><label class="text-[10px] font-black uppercase text-slate-400 ml-1">Endereço</label><input type="text" id="regAddress" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none text-sm"></div><div class="md:col-span-2 flex justify-end gap-2 pt-2"><button type="button" onclick="toggleClientForm()" class="px-4 py-2 text-xs font-bold text-slate-400 uppercase">Cancelar</button><button class="bg-indigo-900 text-white px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest">Salvar</button></div></form></div><div id="client-list-bi" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div></div></div>
 <div id="tab-dashboard" class="hidden space-y-6 max-w-[1600px] mx-auto"><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="p-8 bg-emerald-50 rounded-[2rem] border border-emerald-100 flex flex-col justify-between h-48 relative"><div><p class="text-[10px] font-black text-emerald-600 uppercase mb-2 tracking-widest">Receita Total do Mês</p><h3 class="text-4xl font-black text-emerald-700" id="kpi-ganhos">R$ 0,00</h3></div><div class="absolute top-6 right-6"><div class="relative"><select onchange="changeDashboardMonth(this.value)" id="dash-month-select" class="appearance-none bg-white text-emerald-700 pl-8 pr-7 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider border border-emerald-200/60 cursor-pointer outline-none shadow-sm"><option value="0">Jan</option><option value="1">Fev</option><option value="2">Mar</option><option value="3">Abr</option><option value="4">Mai</option><option value="5">Jun</option><option value="6">Jul</option><option value="7">Ago</option><option value="8">Set</option><option value="9">Out</option><option value="10">Nov</option><option value="11">Dez</option></select><i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-600 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"></i><i data-lucide="chevron-down" class="w-3.5 h-3.5 text-emerald-600 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none"></i></div></div></div><div class="p-8 bg-indigo-50 rounded-[2rem] border border-indigo-100 flex flex-col justify-between h-48 relative"><div><p class="text-[10px] font-black text-indigo-600 uppercase mb-2 tracking-widest">Receita do Dia</p><h3 class="text-4xl font-black text-indigo-700" id="kpi-receita-dia">R$ 0,00</h3></div><div class="absolute top-6 right-6"><div class="relative"><input type="date" onchange="changeDashboardDay(this.value)" id="dash-day-select" class="bg-white text-indigo-700 pl-8 pr-3 py-1.5 rounded-xl text-[11px] font-bold uppercase border border-indigo-200/60 outline-none shadow-sm"><i data-lucide="calendar-days" class="w-3.5 h-3.5 text-indigo-600 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"></i></div></div></div></div></div>
-<div id="tab-gastos" class="hidden"><div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6"><div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6"><div class="flex justify-between items-center mb-6"><h2 class="text-lg font-bold text-slate-800">Despesas Fixas</h2><span class="text-xs font-medium text-slate-400 bg-slate-50 px-3 py-1 rounded-full" id="data-fixa"></span></div><div class="space-y-4 mb-6"><input type="text" id="fixa-nome" placeholder="Produto" class="w-full px-4 py-2 rounded-lg border border-slate-200 text-sm outline-none"><div class="flex gap-2"><input type="number" id="fixa-valor" placeholder="Valor" class="w-1/2 px-4 py-2 rounded-lg border border-slate-200 text-sm outline-none"><input type="date" id="fixa-data" class="w-1/2 px-4 py-2 rounded-lg border border-slate-200 text-sm outline-none"></div><button onclick="addDespesa('fixa')" class="w-full bg-indigo-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition">Adicionar</button></div><div class="h-48"><canvas id="chartFixa"></canvas></div></div><div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6"><div class="flex justify-between items-center mb-6"><h2 class="text-lg font-bold text-slate-800">Despesas Variáveis</h2><span class="text-xs font-medium text-slate-400 bg-slate-50 px-3 py-1 rounded-full" id="data-variavel"></span></div><div class="space-y-4 mb-6"><input type="text" id="var-nome" placeholder="Produto" class="w-full px-4 py-2 rounded-lg border border-slate-200 text-sm outline-none"><div class="flex gap-2"><input type="number" id="var-valor" placeholder="Valor" class="w-1/2 px-4 py-2 rounded-lg border border-slate-200 text-sm outline-none"><input type="date" id="var-data" class="w-1/2 px-4 py-2 rounded-lg border border-slate-200 text-sm outline-none"></div><button onclick="addDespesa('var')" class="w-full bg-slate-800 text-white py-2 rounded-lg text-sm font-semibold hover:bg-black transition">Adicionar</button></div><div class="h-48"><canvas id="chartVariavel"></canvas></div></div></div></div>
-</main></div></div>
-</body>
-</html>
+<div id="tab-gastos" class="hidden">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-slate-800">Despesas Fixas</h2>
+                <span class="text-xs font-medium text-slate-400 bg-slate-50 px-3 py-1 rounded-full" id="data-fixa"></span>
+            </div>
+            <div class="space-y-4 mb-6">
+                <input type="text" id="fixa-nome" placeholder="Produto" class="w-full px-4 py-2 rounded-lg border border-slate-200 text-sm outline-none">
+                <div class="flex gap-2">
+                    <input type="number" id="fixa-valor" placeholder="R$ 0,00" class="w-full px-4 py-2 rounded-lg border border-slate-200 text-sm outline-none">
+                </div>
+                <button onclick="addDespesa('fixa')" class="w-full bg-indigo-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition">Adicionar</button>
+            </div>
+            <div class="h-48 mb-4"><canvas id="chartFixa"></canvas></div>
+            <div id="lista-fixa" class="space-y-2 max-h-40 overflow-y-auto pt-2 border-t"></div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-slate-800">Despesas Variáveis</h2>
+                <span class="text-xs font-medium text-slate-400 bg-slate-50 px-3 py-1 rounded-full" id="data-variavel"></span>
+            </div>
+            <div class="space-y-4 mb-6">
+                <input type="text" id="var-nome" placeholder="Produto" class="w-full px-4 py-2 rounded-lg border border-slate-200 text-sm outline-none">
+                <div class="flex gap-2">
+                    <input type="number" id="var-valor" placeholder="R$ 0,00" class="w-full px-4 py-2 rounded-lg border border-slate-200 text-sm outline-none">
+                </div>
+                <button onclick="addDespesa('var')" class="w-full bg-emerald-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-emerald-700 transition">Adicionar</button>
+            </div>
+            <div class="h-48 mb-4"><canvas id="chartVariavel"></canvas></div>
+            <div id="lista-var" class="space-y-2 max-h-40 overflow-y-auto pt-2 border-t"></div>
+        </div>
+    </div>
 </div>
-</div> 
+
 <script>
     let appointments = JSON.parse(localStorage.getItem('pet_appointments')) || [];
     let clients = JSON.parse(localStorage.getItem('pet_clients')) || [];
+    let despesas = JSON.parse(localStorage.getItem('pet_despesas')) || { fixa: [], var: [] };
     let currentCalDate = new Date();
     let selectedDateStr = new Date().toISOString().split('T')[0];
-    let currentDashDayStr = new Date().toISOString().split('T')[0];
     let charts = {};
-
-    function clearError(el) { el.classList.remove('error-field'); }
-
-    function toggleCalendar() {
-        const grid = document.getElementById('calendar-grid');
-        const btnText = document.getElementById('toggle-text');
-        const isCollapsed = grid.classList.toggle('calendar-collapsed');
-        btnText.innerText = isCollapsed ? 'Ver Calendário' : 'Recolher';
-    }
-
-    function toggleClientsView() {
-        const container = document.getElementById('expanded-clients-container');
-        const btnText = document.getElementById('text-toggle-clients');
-        const isOpen = container.classList.toggle('open');
-        btnText.innerText = isOpen ? 'Recolher' : 'Ver Clientes';
-    }
-
-    function updateChartMonth(monthIndex) {
-        currentCalDate.setMonth(parseInt(monthIndex));
-        const selectDash = document.getElementById('dash-month-select');
-        const selectChart = document.getElementById('chart-month-select');
-        if(selectDash) selectDash.value = monthIndex;
-        if(selectChart) selectChart.value = monthIndex;
-        renderConsumptionChart();
-        renderCalendar();
-        updateDashboard();
-    }
-
-    function changeDashboardMonth(monthIndex) { updateChartMonth(monthIndex); }
-
-    function changeDashboardDay(dateString) {
-        if(!dateString) return;
-        currentDashDayStr = dateString;
-        updateDashboard();
-    }
-
-    function switchTab(tab) {
-        try {
-            const abas = ['agenda', 'clientes', 'dashboard', 'gastos'];
-            abas.forEach(id => {
-                const container = document.getElementById(`tab-${id}`);
-                const botao = document.getElementById(`btn-${id}-dt`);
-                if (container) container.classList.add('hidden');
-                if (botao) {
-                    botao.classList.remove('bg-indigo-600', 'text-white', 'bg-pet-active');
-                    botao.style.opacity = "0.6";
-                }
-            });
-
-            const abaAtiva = document.getElementById(`tab-${tab}`);
-            const botaoAtivo = document.getElementById(`btn-${tab}-dt`);
-            if (abaAtiva) abaAtiva.classList.remove('hidden');
-            if (botaoAtivo) {
-                botaoAtivo.classList.add('bg-indigo-600', 'text-white');
-                botaoAtivo.style.opacity = "1";
-            }
-
-            const titulos = {
-                'agenda': 'Agendamentos',
-                'clientes': 'Clientes',
-                'dashboard': 'Dashboard & Finança',
-                'gastos': 'Controle de Gastos'
-            };
-            const pageTitle = document.getElementById('page-title') || document.getElementById('main-title');
-            if (pageTitle) pageTitle.innerText = titulos[tab] || 'Painel';
-
-            localStorage.setItem('pet_last_tab', tab);
-
-            if (tab === 'clientes' && typeof renderClientList === 'function') renderClientList();
-            if (tab === 'dashboard' && typeof updateDashboard === 'function') updateDashboard();
-            if (tab === 'agenda' && typeof renderCalendar === 'function') {
-                renderCalendar();
-                if (typeof showDayDetails === 'function') showDayDetails(selectedDateStr);
-            }
-            if (tab === 'gastos' && typeof updateDates === 'function') updateDates();
-
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        } catch (e) { console.error("Erro ao trocar de aba:", e); }
-    }
-
-    function renderClientList() {
-        const list = document.getElementById('client-list-bi');
-        if(!list) return;
-        list.innerHTML = '';
-        if(clients.length === 0) {
-            list.innerHTML = `<div class="col-span-full py-8 text-center opacity-30"><p class="text-xs font-bold uppercase tracking-widest">Nenhum cliente cadastrado</p></div>`;
-            return;
-        }
-        clients.sort((a,b) => a.name.localeCompare(b.name)).forEach((c) => {
-            const realIndex = clients.indexOf(c);
-            list.innerHTML += `
-                <div class="client-card p-5 rounded-2xl flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-black text-sm">${c.name.charAt(0)}</div>
-                        <div><h4 class="font-bold text-slate-800 text-sm leading-tight">${c.name}</h4>
-                        <div class="flex flex-col gap-0.5 mt-0.5"><span class="text-[10px] font-black text-indigo-500 uppercase">${c.pet}</span>
-                        <span class="text-[11px] font-semibold text-slate-500 flex items-center gap-1"><i data-lucide="phone" class="w-2.5 h-2.5"></i> ${c.phone}</span></div></div>
-                    </div>
-                    <div class="flex gap-0.5">
-                        <button onclick="editClient(${realIndex})" class="p-1.5 text-slate-300 hover:text-indigo-600 transition-colors"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
-                        <button onclick="deleteClient(${realIndex})" class="p-1.5 text-slate-300 hover:text-rose-500 transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                    </div>
-                </div>`;
-        });
-        lucide.createIcons();
-    }
-
-    function renderConsumptionChart() {
-        const chartContainer = document.getElementById('client-consumption-chart');
-        if(!chartContainer) return;
-        chartContainer.innerHTML = '';
-        const currentMonthStr = `${currentCalDate.getFullYear()}-${String(currentCalDate.getMonth() + 1).padStart(2, '0')}`;
-        const monthlyApps = appointments.filter(a => a.serviceDate.startsWith(currentMonthStr) && a.status !== 'cancelado');
-        const consumptionMap = {};
-        clients.forEach(c => consumptionMap[c.name] = 0);
-        monthlyApps.forEach(a => { if(consumptionMap[a.clientName] !== undefined) consumptionMap[a.clientName]++; else consumptionMap[a.clientName] = 1; });
-        const sortedData = Object.entries(consumptionMap).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count).slice(0, 5);
-        const maxCount = Math.max(...sortedData.map(d => d.count), 1);
-        if(monthlyApps.length === 0) { chartContainer.innerHTML = `<p class="text-slate-400 text-xs italic text-center py-6 w-full">Sem registros de consumo para este mês.</p>`; return; }
-        sortedData.forEach((d) => {
-            const percentage = (d.count / maxCount) * 100;
-            chartContainer.innerHTML += `<div class="flex flex-col items-center group h-full justify-end w-16 sm:w-24 relative">
-                    <div class="text-[11px] font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border mb-1.5">${d.count}</div>
-                    <div class="w-8 sm:w-12 bg-slate-100 rounded-t border border-b-0 border-slate-200/60 relative overflow-hidden transition-all duration-500 flex items-end" style="height: ${percentage}%">
-                        <div class="bg-indigo-600 w-full rounded-t transition-all duration-500 shadow-inner group-hover:bg-indigo-700" style="height: 100%"></div>
-                    </div>
-                    <div class="text-[11px] font-semibold text-slate-500 mt-2 text-center truncate w-full" title="${d.name}">${d.name}</div>
-                </div>`;
-        });
-    }
-
-    function toggleClientForm() { document.getElementById('client-form-container').classList.toggle('hidden'); }
-    function editClient(index) {
-        const c = clients[index];
-        document.getElementById('edit-client-index').value = index;
-        document.getElementById('regClientName').value = c.name;
-        document.getElementById('regPet').value = c.pet;
-        document.getElementById('regPhone').value = c.phone;
-        document.getElementById('regAddress').value = c.address || "";
-        if(document.getElementById('client-form-container').classList.contains('hidden')) toggleClientForm();
-    }
-
-    function deleteClient(index) { if(confirm("Excluir cliente?")) { clients.splice(index, 1); localStorage.setItem('pet_clients', JSON.stringify(clients)); renderClientList(); renderConsumptionChart(); } }
-
-    function saveClient(e) {
-        e.preventDefault();
-        const index = document.getElementById('edit-client-index').value;
-        const data = { name: document.getElementById('regClientName').value, pet: document.getElementById('regPet').value, phone: document.getElementById('regPhone').value, address: document.getElementById('regAddress').value };
-        if(index !== "") clients[index] = data; else clients.push(data);
-        localStorage.setItem('pet_clients', JSON.stringify(clients));
-        e.target.reset(); document.getElementById('edit-client-index').value = "";
-        toggleClientForm(); renderClientList(); renderConsumptionChart();
-    }
-
-    function renderCalendar() {
-        const grid = document.getElementById('calendar-grid');
-        if(!grid) return;
-        grid.innerHTML = '';
-        const year = currentCalDate.getFullYear(), month = currentCalDate.getMonth();
-        const monthEl = document.getElementById('cal-month');
-        if(monthEl) monthEl.innerText = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(currentCalDate).toUpperCase();
-        const firstDay = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
-        for (let i = 0; i < firstDay; i++) grid.innerHTML += '<div class="calendar-cell bg-slate-50/50"></div>';
-        for (let day = 1; day <= daysInMonth; day++) {
-            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const dailyApps = appointments.filter(a => a.serviceDate === dateStr);
-            let dots = dailyApps.map(() => '<span class="event-dot"></span>').join('');
-            grid.innerHTML += `<div onclick="showDayDetails('${dateStr}')" class="calendar-cell ${selectedDateStr === dateStr ? 'selected' : ''}"><div class="cell-day-number">${day}</div><div class="flex flex-wrap gap-0.5">${dots}</div></div>`;
-        }
-    }
-
-    function showDayDetails(dateStr) {
-        selectedDateStr = dateStr; renderCalendar();
-        const list = document.getElementById('day-appointments-list');
-        const dateDisplay = document.getElementById('selected-date-display');
-        if(!list || !dateDisplay) return;
-        const [y, m, d] = dateStr.split('-');
-        dateDisplay.innerText = `${d}/${m}/${y}`;
-        const dailyApps = appointments.filter(a => a.serviceDate === dateStr);
-        list.innerHTML = dailyApps.length ? '' : '<p class="text-slate-400 text-sm italic text-center py-8">Nenhum agendamento para este dia.</p>';
-        dailyApps.sort((a,b) => a.serviceTime.localeCompare(b.serviceTime)).forEach(app => {
-            const isConcluido = app.status === 'concluido', isCancelado = app.status === 'cancelado';
-            let statusBadge = isConcluido ? '<span class="status-indicator status-done"></span>' : (isCancelado ? '<span class="status-indicator status-canceled"></span>' : "");
-            list.innerHTML += `<div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <div class="flex items-center gap-4"><span class="text-xs font-black text-indigo-600 bg-white px-2 py-1 rounded-lg border">${app.serviceTime}</span>
-                    <div><p class="text-sm font-black text-slate-800">${app.petName}<span class="text-[10px] text-slate-400 font-normal ml-1">(${app.clientName})${statusBadge}</span></p>
-                    <p class="text-[12px] font-bold text-indigo-500 uppercase">${app.serviceType}</p></div></div>
-                    <div class="flex gap-2">
-                        <button onclick="updateStatus(${app.id}, 'concluido')" class="btn-status btn-check ${isConcluido ? 'active' : ''}"><i data-lucide="check" class="w-4 h-4"></i></button>
-                        <button onclick="updateStatus(${app.id}, 'cancelado')" class="btn-status btn-x ${isCancelado ? 'active' : ''}"><i data-lucide="x" class="w-4 h-4"></i></button>
-                        <button onclick="editApp(${app.id})" class="btn-status bg-blue-50 text-blue-600 border border-blue-100"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                        <button onclick="deleteApp(${app.id})" class="btn-status bg-rose-50 text-rose-600 border border-rose-100"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div></div>`;
-        });
-        lucide.createIcons();
-    }
-
-    function deleteApp(id) { if(confirm("Remover este agendamento?")) { appointments = appointments.filter(a => a.id !== id); localStorage.setItem('pet_appointments', JSON.stringify(appointments)); showDayDetails(selectedDateStr); } }
-
-    function handleFormSubmit(e) {
-        e.preventDefault(); 
-        const editId = document.getElementById('edit-id').value;
-        const fields = [document.getElementById('clientNameSearch'), document.getElementById('petName'), document.getElementById('serviceDate'), document.getElementById('serviceTime'), document.getElementById('serviceValue')];
-        let hasEmpty = false;
-        fields.forEach(f => { if(!f.value || f.value.trim() === "") { f.classList.add('error-field'); hasEmpty = true; } else { f.classList.remove('error-field'); } });
-        if(hasEmpty) return;
-        const date = document.getElementById('serviceDate').value, time = document.getElementById('serviceTime').value;
-        const isConflict = appointments.some(a => a.serviceDate === date && a.serviceTime === time && a.id != editId && a.status !== 'cancelado');
-        if(isConflict) { alert("Atenção: Já existe um agendamento para este dia e horário!"); return; }
-        const data = { id: editId ? parseInt(editId) : Date.now(), clientName: document.getElementById('clientNameSearch').value, petName: document.getElementById('petName').value, serviceType: document.getElementById('serviceType').value, serviceValue: parseFloat(document.getElementById('serviceValue').value), serviceDate: date, serviceTime: time, status: editId ? (appointments.find(a => a.id == editId).status) : 'pendente' };
-        if (editId) appointments = appointments.map(a => a.id == editId ? data : a); else appointments.push(data);
-        localStorage.setItem('pet_appointments', JSON.stringify(appointments)); e.target.reset(); document.getElementById('edit-id').value = ''; renderCalendar(); if(selectedDateStr) showDayDetails(selectedDateStr);
-    }
-
-    function updateStatus(id, status) { appointments = appointments.map(a => a.id === id ? {...a, status: a.status === status ? 'pendente' : status} : a); localStorage.setItem('pet_appointments', JSON.stringify(appointments)); showDayDetails(selectedDateStr); }
-    function editApp(id) { const app = appointments.find(a => a.id === id); document.getElementById('edit-id').value = app.id; document.getElementById('clientNameSearch').value = app.clientName; document.getElementById('petName').value = app.petName; document.getElementById('serviceType').value = app.serviceType; document.getElementById('serviceValue').value = app.serviceValue; document.getElementById('serviceDate').value = app.serviceDate; document.getElementById('serviceTime').value = app.serviceTime; window.scrollTo({ top: 0, behavior: 'smooth' }); }
-    function changeMonth(dir) { currentCalDate.setMonth(currentCalDate.getMonth() + dir); renderCalendar(); }
-
-    function updateDashboard() { 
-        const currentMonthStr = `${currentCalDate.getFullYear()}-${String(currentCalDate.getMonth() + 1).padStart(2, '0')}`;
-        let receitaMes = 0, receitaDia = 0;
-        appointments.forEach(a => { 
-            if(a.serviceDate.startsWith(currentMonthStr) && a.status === 'concluido') receitaMes += a.serviceValue; 
-            if(a.serviceDate === currentDashDayStr && a.status === 'concluido') receitaDia += a.serviceValue;
-        }); 
-        const ganhoEl = document.getElementById('kpi-ganhos'), diaEl = document.getElementById('kpi-receita-dia');
-        if(ganhoEl) ganhoEl.innerText = `R$ ${receitaMes.toFixed(2)}`; 
-        if(diaEl) diaEl.innerText = `R$ ${receitaDia.toFixed(2)}`;
-
-        const tableBody = document.getElementById('dash-consumption-table-body');
-        if(!tableBody) return;
-        tableBody.innerHTML = '';
-        const currentMonthApps = appointments.filter(a => a.serviceDate.startsWith(currentMonthStr));
-        if(currentMonthApps.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-400 italic">Nenhum consumo registrado para este mês.</td></tr>`;
-            return;
-        }
-        currentMonthApps.sort((a,b) => b.serviceDate.localeCompare(a.serviceDate)).forEach(app => {
-            const [y, m, d] = app.serviceDate.split('-');
-            const statuses = { 'concluido': '<span class="text-emerald-600 font-bold ml-1">(Pago)</span>', 'cancelado': '<span class="text-rose-500 font-bold line-through ml-1">(Cancelado)</span>', 'pendente': '<span class="text-amber-500 font-bold ml-1">(Pendente)</span>' };
-            tableBody.innerHTML += `
-                <tr class="hover:bg-slate-50/50 transition-colors">
-                    <td class="py-4 font-bold text-slate-800">${app.clientName}<span class="block text-[11px] font-black text-indigo-500 uppercase mt-0.5">${app.petName}</span></td>
-                    <td class="py-4 text-slate-500 font-medium">${d}/${m}/${y} <span class="text-xs bg-slate-100 px-1.5 py-0.5 rounded ml-1 font-semibold">${app.serviceTime}</span></td>
-                    <td class="py-4 font-semibold text-slate-700">${app.serviceType} ${statuses[app.status] || ''}</td>
-                    <td class="py-4 font-black text-slate-900 text-right">R$ ${app.serviceValue.toFixed(2)}</td>
-                </tr>`;
-        });
-    }
-
-    function autoFillPet(name) { const found = clients.find(c => c.name.toLowerCase().includes(name.toLowerCase())); if (found && name.length > 2) document.getElementById('petName').value = found.pet; }
 
     function updateDates() {
         const agora = new Date();
         const dataFormatada = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' });
-        const fixo = document.getElementById('data-fixa'), variavel = document.getElementById('data-variavel');
-        if(fixo) fixo.innerText = dataFormatada;
-        if(variavel) variavel.innerText = dataFormatada;
+        if(document.getElementById('data-fixa')) document.getElementById('data-fixa').innerText = dataFormatada;
+        if(document.getElementById('data-variavel')) document.getElementById('data-variavel').innerText = dataFormatada;
     }
 
-    function initChart(id, label) {
+    function initChart(id, label, color) {
         const canvas = document.getElementById(id);
         if(!canvas) return null;
-        const ctx = canvas.getContext('2d');
-        return new Chart(ctx, {
+        return new Chart(canvas.getContext('2d'), {
             type: 'bar',
-            data: { labels: [], datasets: [{ label: label, data: [], backgroundColor: (c) => c.dataset.data[c.dataIndex] > 500 ? '#f87171' : '#818cf8', borderRadius: 8, barThickness: 20 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } } }
+            data: { labels: [], datasets: [{ label: label, data: [], backgroundColor: color, borderRadius: 8, barThickness: 25 }] },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }
+                } 
+            }
         });
     }
 
+    function renderGastos() {
+        ['fixa', 'var'].forEach(tipo => {
+            const lista = document.getElementById(`lista-${tipo}`);
+            if(!lista) return;
+            lista.innerHTML = '';
+            
+            const labels = despesas[tipo].map(d => d.nome);
+            const valores = despesas[tipo].map(d => d.valor);
+
+            despesas[tipo].forEach((item, index) => {
+                lista.innerHTML += `
+                    <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span class="text-xs font-bold text-slate-700">${item.nome}</span>
+                        <span class="text-xs font-black text-indigo-600">R$ ${item.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                    </div>`;
+            });
+
+            const chart = tipo === 'fixa' ? charts.chartFixa : charts.chartVariavel;
+            if(chart) {
+                chart.data.labels = labels;
+                chart.data.datasets[0].data = valores;
+                chart.update();
+            }
+        });
+        localStorage.setItem('pet_despesas', JSON.stringify(despesas));
+    }
+
     function addDespesa(tipo) {
-        const prefixo = tipo === 'fixa' ? 'fixa' : 'var';
-        const nome = document.getElementById(`${prefixo}-nome`).value, valor = parseFloat(document.getElementById(`${prefixo}-valor`).value);
-        if (nome && valor) {
-            const chartId = tipo === 'fixa' ? 'chartFixa' : 'chartVariavel';
-            charts[chartId].data.labels.push(nome);
-            charts[chartId].data.datasets[0].data.push(valor);
-            charts[chartId].update();
-            document.getElementById(`${prefixo}-nome`).value = '';
-            document.getElementById(`${prefixo}-valor`).value = '';
+        const nome = document.getElementById(`${tipo}-nome`).value;
+        const valor = parseFloat(document.getElementById(`${tipo}-valor`).value);
+
+        if (nome && !isNaN(valor)) {
+            despesas[tipo].push({ nome, valor });
+            document.getElementById(`${tipo}-nome`).value = '';
+            document.getElementById(`${tipo}-valor`).value = '';
+            renderGastos();
+        } else {
+            alert("Por favor, insira um nome e um valor válido.");
         }
     }
 
-    window.onload = () => {
-        const d = new Date();
-        const formatada = d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-        const curDateEl = document.getElementById('current-date');
-        if(curDateEl) curDateEl.innerText = formatada.split(' ').map(w => w.length > 2 ? w.charAt(0).toUpperCase() + w.slice(1) : w).join(' ');
-        
-        ['chart-month-select', 'dash-month-select'].forEach(id => { const el = document.getElementById(id); if(el) el.value = d.getMonth(); });
-        const dashDay = document.getElementById('dash-day-select');
-        if(dashDay) dashDay.value = d.toISOString().split('T')[0];
+    // Mantendo integração com o sistema de abas original
+    const originalSwitchTab = switchTab;
+    switchTab = function(tab) {
+        originalSwitchTab(tab);
+        if (tab === 'gastos') {
+            updateDates();
+            renderGastos();
+        }
+    };
 
-        updateDates();
-        charts.chartFixa = initChart('chartFixa', 'Fixas');
-        charts.chartVariavel = initChart('chartVariavel', 'Variáveis');
+    window.onload = () => {
+        charts.chartFixa = initChart('chartFixa', 'Fixas', '#6366f1');
+        charts.chartVariavel = initChart('chartVariavel', 'Variáveis', '#10b981');
         
-        switchTab(localStorage.getItem('pet_last_tab') || 'agenda');
+        updateDates();
+        renderGastos();
+        
+        const lastTab = localStorage.getItem('pet_last_tab') || 'agenda';
+        switchTab(lastTab);
     };
 </script>
 </body>
