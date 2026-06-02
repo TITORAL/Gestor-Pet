@@ -441,23 +441,56 @@
             updateDashboard();
         }
 
-       function switchTab(tab) {
-    // 1. Esconder todas as abas
-    document.getElementById('tab-agenda').classList.add('hidden');
-    document.getElementById('tab-clientes').classList.add('hidden');
-    document.getElementById('tab-dashboard').classList.add('hidden');
-    document.getElementById('tab-gastos').classList.add('hidden'); // Adicione esta linha
+      function switchTab(tab) {
+    localStorage.setItem('pet_last_tab', tab);
+    
+    // Lista contendo todas as 4 abas agora
+    const abas = ['agenda', 'clientes', 'dashboard', 'gastos'];
+    
+    abas.forEach(t => {
+        const tabEl = document.getElementById(`tab-${t}`);
+        const btnEl = document.getElementById(`btn-${t}-dt`);
+        
+        if (tabEl) tabEl.classList.add('hidden');
+        if (btnEl) {
+            btnEl.classList.remove('bg-pet-active');
+            btnEl.style.opacity = "0.7";
+        }
+    });
 
-    // 2. Mostrar a aba clicada
-    document.getElementById('tab-' + tab).classList.remove('hidden');
+    // Ativa a aba atual
+    const currentTab = document.getElementById(`tab-${tab}`);
+    const currentBtn = document.getElementById(`btn-${tab}-dt`);
+    
+    if (currentTab) currentTab.classList.remove('hidden');
+    if (currentBtn) {
+        currentBtn.classList.add('bg-pet-active');
+        currentBtn.style.opacity = "1";
+    }
 
-    // 3. Atualizar o Título da página (Evita o "undefined")
+    // Tradução dos títulos (corrige o undefined)
     const titulos = {
         'agenda': 'Agendamentos',
-        'clientes': 'Meus Clientes',
-        'dashboard': 'Relatórios Financeiros',
-        'gastos': 'Controle de Gastos' // Adicione esta linha
+        'clientes': 'Clientes',
+        'dashboard': 'Dashboard & Finança',
+        'gastos': 'Controle de Gastos'
     };
+    
+    const pageTitle = document.getElementById('page-title');
+    if (pageTitle) pageTitle.innerText = titulos[tab] || 'Painel';
+
+    // Executa lógicas específicas de cada aba se existirem
+    if (tab === 'clientes' && typeof renderClientList === 'function') renderClientList();
+    if (tab === 'dashboard' && typeof updateDashboard === 'function') updateDashboard();
+    if (tab === 'agenda' && typeof renderCalendar === 'function') {
+        renderCalendar();
+        if (typeof showDayDetails === 'function') showDayDetails(selectedDateStr);
+    }
+    if (tab === 'gastos' && typeof updateDates === 'function') updateDates();
+
+    // Força o Lucide a redesenhar os ícones da barra lateral e da tela
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
     
     // Altera o H2 ou H1 principal do seu conteúdo
     document.getElementById('main-title').innerText = titulos[tab] || 'Painel';
