@@ -18,6 +18,10 @@
         .calendar-cell { background: #fff; min-height: 50px; padding: 6px; cursor: pointer; border: 1px solid #f8fafc; text-align: center; }
         .calendar-cell.selected { background-color: #eef2ff; border: 1px solid #4338ca; }
         .event-dot { width: 4px; height: 4px; background: #4338ca; border-radius: 50%; display: inline-block; margin-right: 1px; }
+
+        /* Estilização para o menu retrátil de serviços */
+        details summary::-webkit-details-marker { display: none; }
+        details[open] .arrow-icon { transform: rotate(180deg); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased selection:bg-indigo-500 selection:text-white">
@@ -93,18 +97,19 @@
                         <input type="text" id="app-tutor" placeholder="Tutor" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none outline-none focus:ring-2 ring-indigo-500" required>
                         <input type="text" id="app-pet" placeholder="Pet" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none outline-none focus:ring-2 ring-indigo-500" required>
                         
-                        <!-- SELEÇÃO DE SERVIÇOS COM CHECKBOXES -->
-                        <div class="p-3 bg-slate-50 rounded-xl space-y-2">
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Serviços a realizar:</label>
-                            <div class="grid grid-cols-1 gap-2 text-xs text-slate-700">
+                        <!-- SELEÇÃO DE SERVIÇOS RETRÁTIL (ACCORDION) -->
+                        <details class="bg-slate-50 rounded-xl overflow-hidden group">
+                            <summary class="flex justify-between items-center p-3 cursor-pointer select-none font-bold text-xs text-slate-500 uppercase">
+                                <span>Serviços a realizar</span>
+                                <i data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-300 arrow-icon"></i>
+                            </summary>
+                            
+                            <div class="p-3 pt-1 border-t border-slate-100 grid grid-cols-1 gap-2 text-xs text-slate-700">
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <input type="checkbox" name="app-servico-check" value="Banho" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"> Banho
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <input type="checkbox" name="app-servico-check" value="Tosa" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"> Tosa
-                                </label>
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" name="app-servico-check" value="Banho e Tosa" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"> Banho e Tosa
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <input type="checkbox" name="app-servico-check" value="Remoção de sub pelo" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"> Remoção de sub pelo
@@ -119,7 +124,7 @@
                                     <input type="checkbox" name="app-servico-check" value="Trimming padrão da raça" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"> Trimming padrão da raça
                                 </label>
                             </div>
-                        </div>
+                        </details>
 
                         <div class="flex gap-2">
                             <input type="date" id="app-data" class="w-1/2 p-3 bg-slate-50 rounded-xl text-xs border-none" required>
@@ -418,7 +423,6 @@
         const contagem = { 
             'Banho': 0, 
             'Tosa': 0, 
-            'Banho e Tosa': 0,
             'Remoção de sub pelo': 0,
             'Handstripping': 0,
             'Hidratação': 0,
