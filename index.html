@@ -92,11 +92,35 @@
                     <form onsubmit="saveAppointment(event)" class="space-y-3">
                         <input type="text" id="app-tutor" placeholder="Tutor" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none outline-none focus:ring-2 ring-indigo-500" required>
                         <input type="text" id="app-pet" placeholder="Pet" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none outline-none focus:ring-2 ring-indigo-500" required>
-                        <select id="app-servico" class="w-full p-3 bg-slate-50 rounded-xl text-sm border-none outline-none">
-                            <option value="Banho">Banho</option>
-                            <option value="Tosa">Tosa</option>
-                            <option value="Banho e Tosa">Banho e Tosa</option>
-                        </select>
+                        
+                        <!-- SELEÇÃO DE SERVIÇOS COM CHECKBOXES -->
+                        <div class="p-3 bg-slate-50 rounded-xl space-y-2">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Serviços a realizar:</label>
+                            <div class="grid grid-cols-1 gap-2 text-xs text-slate-700">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="app-servico-check" value="Banho" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"> Banho
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="app-servico-check" value="Tosa" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"> Tosa
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="app-servico-check" value="Banho e Tosa" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"> Banho e Tosa
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="app-servico-check" value="Remoção de sub pelo" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"> Remoção de sub pelo
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="app-servico-check" value="Handstripping" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"> Handstripping
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="app-servico-check" value="Hidratação" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"> Hidratação
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="app-servico-check" value="Trimming padrão da raça" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"> Trimming padrão da raça
+                                </label>
+                            </div>
+                        </div>
+
                         <div class="flex gap-2">
                             <input type="date" id="app-data" class="w-1/2 p-3 bg-slate-50 rounded-xl text-xs border-none" required>
                             <input type="time" id="app-hora" class="w-1/2 p-3 bg-slate-50 rounded-xl text-xs border-none" required>
@@ -273,10 +297,20 @@
     // --- AGENDAMENTO ---
     function saveAppointment(e) {
         e.preventDefault();
+        
+        // Coleta todos os serviços marcados no checkbox
+        const selectedServices = Array.from(document.querySelectorAll('input[name="app-servico-check"]:checked'))
+                                      .map(cb => cb.value);
+
+        if (selectedServices.length === 0) {
+            alert('Por favor, selecione pelo menos um serviço.');
+            return;
+        }
+
         const app = {
             tutor: document.getElementById('app-tutor').value,
             pet: document.getElementById('app-pet').value,
-            servico: document.getElementById('app-servico').value,
+            servico: selectedServices.join(', '), // Junta os serviços selecionados por vírgula
             data: document.getElementById('app-data').value,
             hora: document.getElementById('app-hora').value,
             valor: parseFloat(document.getElementById('app-valor').value)
@@ -381,8 +415,24 @@
         const receitaMes = appointments.reduce((s, a) => s + a.valor, 0);
         document.getElementById('dash-faturamento').innerText = `R$ ${receitaMes.toFixed(2)}`;
 
-        const contagem = { 'Banho': 0, 'Tosa': 0, 'Banho e Tosa': 0 };
-        appointments.forEach(a => { if(contagem[a.servico] !== undefined) contagem[a.servico]++ });
+        const contagem = { 
+            'Banho': 0, 
+            'Tosa': 0, 
+            'Banho e Tosa': 0,
+            'Remoção de sub pelo': 0,
+            'Handstripping': 0,
+            'Hidratação': 0,
+            'Trimming padrão da raça': 0
+        };
+
+        appointments.forEach(a => { 
+            if (a.servico) {
+                const servicosArray = a.servico.split(', ');
+                servicosArray.forEach(s => {
+                    if(contagem[s] !== undefined) contagem[s]++;
+                });
+            }
+        });
 
         const canvas = document.getElementById('chartServicos'); if(!canvas) return;
         const ctx = canvas.getContext('2d');
